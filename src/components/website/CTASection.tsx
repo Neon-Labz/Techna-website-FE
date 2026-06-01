@@ -1,8 +1,9 @@
-import { useNavigate } from 'react-router-dom';
+'use client';
+import { useRouter } from 'next/navigation';
 import { ArrowRight, Phone } from 'lucide-react';
 
 export default function CTASection() {
-  const navigate = useNavigate();
+  const navigate = useRouter();
   return (
     <section className="py-16 bg-yellow-400">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -18,7 +19,7 @@ export default function CTASection() {
           </div>
           <div className="flex flex-wrap gap-4 shrink-0">
             <button
-              onClick={() => navigate('/register')}
+              onClick={() => navigate.push('/register')}
               className="flex items-center gap-2 px-7 py-3.5 bg-blue-950 hover:bg-blue-900 text-white font-semibold rounded-xl transition-all duration-200 hover:scale-105 shadow-lg"
             >
               Apply Now <ArrowRight className="w-4 h-4" />

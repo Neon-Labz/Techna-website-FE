@@ -1,3 +1,4 @@
+'use client';
 import { useState } from 'react';
 import { CreditCard, Download, CheckCircle, Clock, AlertCircle, Filter, Receipt, DollarSign } from 'lucide-react';
 import { mockPayments } from '../../data/mockData';

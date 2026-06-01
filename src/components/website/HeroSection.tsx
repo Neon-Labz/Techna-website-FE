@@ -1,8 +1,9 @@
-import { useNavigate } from 'react-router-dom';
+'use client';
+import { useRouter } from 'next/navigation';
 import { ArrowRight, Award, Users, BookOpen, Star } from 'lucide-react';
 
 export default function HeroSection() {
-  const navigate = useNavigate();
+  const navigate = useRouter();
 
   const stats = [
     { icon: Users, value: '2,400+', label: 'Students Enrolled' },
@@ -47,13 +48,13 @@ export default function HeroSection() {
           {/* CTA Buttons */}
           <div className="flex flex-wrap gap-4 mb-14">
             <button
-              onClick={() => navigate('/register')}
+              onClick={() => navigate.push('/register')}
               className="flex items-center gap-2 px-8 py-4 bg-yellow-400 hover:bg-yellow-300 text-blue-950 font-bold rounded-xl shadow-xl transition-all duration-300 hover:scale-105 text-base"
             >
               Apply Now <ArrowRight className="w-5 h-5" />
             </button>
             <button
-              onClick={() => navigate('/modules')}
+              onClick={() => navigate.push('/modules')}
               className="flex items-center gap-2 px-8 py-4 bg-white/10 hover:bg-white/20 text-white font-semibold rounded-xl border border-white/30 backdrop-blur-sm transition-all duration-300 text-base"
             >
               Explore Modules <BookOpen className="w-5 h-5" />

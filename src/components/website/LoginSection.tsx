@@ -1,12 +1,13 @@
-"use client";
+'use client';
 import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { Eye, EyeOff, Mail, Lock, GraduationCap, ArrowRight } from 'lucide-react';
 import { useAuthStore } from '../../store/authStore';
 import { mockStudent } from '../../data/mockData';
 
 export default function LoginSection() {
-  const navigate = useNavigate();
+  const router = useRouter();
   const { login } = useAuthStore();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -20,32 +21,20 @@ export default function LoginSection() {
     setError('');
     setLoading(true);
 
-    // Simulate API call
     setTimeout(() => {
       setLoading(false);
-      if (email === 'ganesh@student.techna.lk' && password === 'password123') {
-        login(mockStudent, 'mock-jwt-token-123456789');
-        navigate('/dashboard');
-      } else if (email && password) {
-        // For demo: accept any credentials
-        login(mockStudent, 'mock-jwt-token-123456789');
-        navigate('/dashboard');
-      } else {
-        setError('Invalid credentials. Please try again.');
-      }
+      login(mockStudent, 'mock-jwt-token-123456789');
+      router.push('/dashboard');
     }, 1500);
   };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-950 via-blue-900 to-blue-800 flex items-center justify-center px-4 py-12">
-      {/* Decorative circles */}
       <div className="absolute top-20 left-20 w-64 h-64 bg-yellow-400/10 rounded-full blur-3xl pointer-events-none" />
       <div className="absolute bottom-20 right-20 w-80 h-80 bg-blue-400/10 rounded-full blur-3xl pointer-events-none" />
 
       <div className="w-full max-w-md relative">
-        {/* Card */}
         <div className="bg-white rounded-3xl shadow-2xl p-8">
-          {/* Logo */}
           <div className="text-center mb-8">
             <div className="w-16 h-16 bg-gradient-to-br from-blue-900 to-blue-700 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg">
               <GraduationCap className="w-9 h-9 text-yellow-400" />
@@ -61,7 +50,6 @@ export default function LoginSection() {
           )}
 
           <form onSubmit={handleSubmit} className="space-y-5">
-            {/* Email */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1.5">Email Address</label>
               <div className="relative">
@@ -76,7 +64,6 @@ export default function LoginSection() {
               </div>
             </div>
 
-            {/* Password */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1.5">Password</label>
               <div className="relative">
@@ -121,21 +108,20 @@ export default function LoginSection() {
 
           <div className="text-center mt-6 pt-6 border-t border-gray-100">
             <p className="text-gray-500 text-sm">
-              Don't have an account?{' '}
-              <Link to="/register" className="text-blue-700 font-semibold hover:underline">
+              Don&apos;t have an account?{' '}
+              <Link href="/register" className="text-blue-700 font-semibold hover:underline">
                 Register Now
               </Link>
             </p>
           </div>
 
-          {/* Demo hint */}
           <div className="mt-4 p-3 bg-blue-50 rounded-xl text-xs text-blue-700 text-center">
             <strong>Demo:</strong> Use any email & password to login
           </div>
         </div>
 
         <div className="text-center mt-6">
-          <Link to="/" className="text-blue-200 text-sm hover:text-white transition-colors">
+          <Link href="/" className="text-blue-200 text-sm hover:text-white transition-colors">
             ← Back to Home
           </Link>
         </div>

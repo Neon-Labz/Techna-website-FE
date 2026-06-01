@@ -1,6 +1,7 @@
-"use client";
+'use client';
 import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { Check, ChevronRight, ChevronLeft, GraduationCap, User, MapPin, BookOpen, FileText, Plus, Trash2 } from 'lucide-react';
 import { SUBJECTS, DISTRICTS, RACES, RELIGIONS, GRADES } from '../../data/mockData';
 
@@ -16,7 +17,7 @@ interface OLRow { year: string; indexNumber: string; english: string; mathematic
 const emptyOL: OLRow = { year: '', indexNumber: '', english: '', mathematics: '', science: '', sinhala: '', tamil: '' };
 
 export default function RegisterSection() {
-  const navigate = useNavigate();
+  const router = useRouter();
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
   const [submitted, setSubmitted] = useState(false);
@@ -108,7 +109,7 @@ export default function RegisterSection() {
             <p><strong>Application Reference:</strong></p>
             <p className="font-mono text-lg mt-1">APP-2024-{Math.floor(Math.random() * 9000 + 1000)}</p>
           </div>
-          <button onClick={() => navigate('/login')} className="w-full py-3 bg-blue-900 text-white font-semibold rounded-xl hover:bg-blue-800 transition-all">
+          <button onClick={() => router.push('/login')} className="w-full py-3 bg-blue-900 text-white font-semibold rounded-xl hover:bg-blue-800 transition-all">
             Go to Login
           </button>
         </div>
@@ -531,7 +532,7 @@ export default function RegisterSection() {
         </div>
 
         <div className="text-center mt-6">
-          <Link to="/login" className="text-blue-200 text-sm hover:text-white transition-colors">
+          <Link href="/login" className="text-blue-200 text-sm hover:text-white transition-colors">
             Already registered? Sign In →
           </Link>
         </div>

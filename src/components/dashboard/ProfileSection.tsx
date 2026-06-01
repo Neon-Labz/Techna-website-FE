@@ -1,3 +1,4 @@
+'use client';
 import { useState } from 'react';
 import { User, Edit2, Save, X, Eye, EyeOff, Camera, CheckCircle, BookOpen, Phone, MapPin, Lock } from 'lucide-react';
 import { useAuthStore } from '../../store/authStore';

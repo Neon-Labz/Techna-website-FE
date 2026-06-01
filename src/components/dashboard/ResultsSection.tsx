@@ -1,3 +1,4 @@
+'use client';
 import { useState, useMemo } from 'react';
 import { Award, Download, Filter, BarChart3, Calendar, BookOpen } from 'lucide-react';
 import { mockResults, mockModules } from '../../data/mockData';

@@ -1,4 +1,5 @@
-import { useNavigate } from 'react-router-dom';
+'use client';
+import { useRouter } from 'next/navigation';
 import { ArrowRight, Clock, User, Layers } from 'lucide-react';
 import { mockModules } from '../../data/mockData';
 
@@ -13,7 +14,7 @@ const moduleColors = [
 ];
 
 export default function FeaturedModulesSection() {
-  const navigate = useNavigate();
+  const router = useRouter();
   const featured = mockModules.slice(0, 6);
 
   return (
@@ -26,7 +27,7 @@ export default function FeaturedModulesSection() {
             <p className="text-gray-500 mt-2 max-w-lg">Comprehensive subjects designed for A/L Technology Stream students to excel academically and professionally.</p>
           </div>
           <button
-            onClick={() => navigate('/modules')}
+            onClick={() => router.push('/modules')}
             className="flex items-center gap-2 text-blue-900 font-semibold hover:gap-3 transition-all"
           >
             View All Modules <ArrowRight className="w-4 h-4" />
@@ -38,7 +39,7 @@ export default function FeaturedModulesSection() {
             <div
               key={module.id}
               className="group rounded-2xl overflow-hidden border border-gray-100 shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-1 cursor-pointer"
-              onClick={() => navigate('/modules')}
+              onClick={() => router.push('/modules')}
             >
               {/* Card Header */}
               <div className={`bg-gradient-to-br ${moduleColors[i % moduleColors.length]} p-6 relative overflow-hidden`}>

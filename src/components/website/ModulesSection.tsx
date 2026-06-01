@@ -1,3 +1,4 @@
+'use client';
 import { useState } from 'react';
 import { Clock, User, Play, ChevronDown, ChevronUp, BookOpen, Layers, Calendar } from 'lucide-react';
 import { mockModules } from '../../data/mockData';

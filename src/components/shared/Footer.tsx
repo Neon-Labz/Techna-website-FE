@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom';
+import Link from 'next/link';
 import { GraduationCap, Phone, Mail, MapPin } from 'lucide-react';
 
 export default function Footer() {
@@ -39,7 +39,7 @@ export default function Footer() {
                 { label: 'Register', path: '/register' },
               ].map(link => (
                 <li key={link.path}>
-                  <Link to={link.path} className="text-blue-300 hover:text-white text-sm transition-colors flex items-center gap-1">
+                  <Link href={link.path} className="text-blue-300 hover:text-white text-sm transition-colors flex items-center gap-1">
                     <span className="text-yellow-400">›</span> {link.label}
                   </Link>
                 </li>

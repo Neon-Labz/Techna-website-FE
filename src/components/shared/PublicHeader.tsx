@@ -1,11 +1,13 @@
+'use client';
 import { useState } from 'react';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
+import Link from 'next/link';
+import { usePathname, useRouter } from 'next/navigation';
 import { Menu, X, GraduationCap } from 'lucide-react';
 
 export default function PublicHeader() {
   const [menuOpen, setMenuOpen] = useState(false);
-  const location = useLocation();
-  const navigate = useNavigate();
+  const pathname = usePathname();
+  const router = useRouter();
 
   const navLinks = [
     { label: 'Home', path: '/' },
@@ -13,14 +15,14 @@ export default function PublicHeader() {
     { label: 'Contact Us', path: '/contact' },
   ];
 
-  const isActive = (path: string) => location.pathname === path;
+  const isActive = (path: string) => pathname === path;
 
   return (
     <header className="bg-white shadow-md sticky top-0 z-40">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-18 py-3">
           {/* Logo */}
-          <Link to="/" className="flex items-center gap-3">
+          <Link href="/" className="flex items-center gap-3">
             <div className="w-12 h-12 bg-gradient-to-br from-blue-900 to-blue-700 rounded-full flex items-center justify-center">
               <GraduationCap className="w-7 h-7 text-yellow-400" />
             </div>
@@ -35,7 +37,7 @@ export default function PublicHeader() {
             {navLinks.map(link => (
               <Link
                 key={link.path}
-                to={link.path}
+                href={link.path}
                 className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
                   isActive(link.path)
                     ? 'bg-blue-900 text-white'
@@ -50,13 +52,13 @@ export default function PublicHeader() {
           {/* Auth Buttons */}
           <div className="hidden md:flex items-center gap-3">
             <button
-              onClick={() => navigate('/login')}
+              onClick={() => router.push('/login')}
               className="px-5 py-2 text-sm font-semibold text-blue-900 border-2 border-blue-900 rounded-lg hover:bg-blue-50 transition-all duration-200"
             >
               Login
             </button>
             <button
-              onClick={() => navigate('/register')}
+              onClick={() => router.push('/register')}
               className="px-5 py-2 text-sm font-semibold text-white bg-gradient-to-r from-blue-900 to-blue-700 rounded-lg hover:from-blue-800 hover:to-blue-600 transition-all duration-200 shadow-md"
             >
               Register
@@ -79,7 +81,7 @@ export default function PublicHeader() {
               {navLinks.map(link => (
                 <Link
                   key={link.path}
-                  to={link.path}
+                  href={link.path}
                   onClick={() => setMenuOpen(false)}
                   className={`px-4 py-2.5 rounded-lg text-sm font-medium transition-all ${
                     isActive(link.path)
@@ -92,13 +94,13 @@ export default function PublicHeader() {
               ))}
               <div className="flex gap-2 mt-3 pt-3 border-t border-gray-100">
                 <button
-                  onClick={() => { navigate('/login'); setMenuOpen(false); }}
+                  onClick={() => { router.push('/login'); setMenuOpen(false); }}
                   className="flex-1 py-2 text-sm font-semibold text-blue-900 border-2 border-blue-900 rounded-lg hover:bg-blue-50"
                 >
                   Login
                 </button>
                 <button
-                  onClick={() => { navigate('/register'); setMenuOpen(false); }}
+                  onClick={() => { router.push('/register'); setMenuOpen(false); }}
                   className="flex-1 py-2 text-sm font-semibold text-white bg-blue-900 rounded-lg hover:bg-blue-800"
                 >
                   Register

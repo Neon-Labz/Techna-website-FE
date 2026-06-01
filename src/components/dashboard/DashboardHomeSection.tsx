@@ -1,3 +1,5 @@
+'use client';
+'use client';
 import { useState } from 'react';
 import { Bell, BookOpen, Play, ChevronRight, Calendar, Award, TrendingUp, Clock, Filter } from 'lucide-react';
 import { mockNotices, mockModules, mockResults } from '../../data/mockData';

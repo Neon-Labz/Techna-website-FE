@@ -1,13 +1,15 @@
+'use client';
 import { useState } from 'react';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
+import Link from 'next/link';
+import { usePathname, useRouter } from 'next/navigation';
 import { Menu, X, GraduationCap, LogOut, Bell, User } from 'lucide-react';
 import { useAuthStore } from '../../store/authStore';
 
 export default function PrivateHeader() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
-  const location = useLocation();
-  const navigate = useNavigate();
+  const pathname = usePathname();
+  const router = useRouter();
   const { student, logout } = useAuthStore();
 
   const navLinks = [
@@ -17,11 +19,11 @@ export default function PrivateHeader() {
     { label: 'Payments', path: '/dashboard/payments' },
   ];
 
-  const isActive = (path: string) => location.pathname === path;
+  const isActive = (path: string) => pathname === path;
 
   const handleLogout = () => {
     logout();
-    navigate('/');
+    router.push('/');
     setDropdownOpen(false);
   };
 
@@ -30,7 +32,7 @@ export default function PrivateHeader() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-18 py-3">
           {/* Logo */}
-          <Link to="/dashboard" className="flex items-center gap-3">
+          <Link href="/dashboard" className="flex items-center gap-3">
             <div className="w-12 h-12 bg-yellow-400 rounded-full flex items-center justify-center shadow-md">
               <GraduationCap className="w-7 h-7 text-blue-900" />
             </div>
@@ -45,7 +47,7 @@ export default function PrivateHeader() {
             {navLinks.map(link => (
               <Link
                 key={link.path}
-                to={link.path}
+                href={link.path}
                 className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
                   isActive(link.path)
                     ? 'bg-white/20 text-white'
@@ -63,7 +65,7 @@ export default function PrivateHeader() {
               <Bell className="w-5 h-5" />
               <span className="absolute top-1 right-1 w-2 h-2 bg-yellow-400 rounded-full"></span>
             </button>
-            
+
             <div className="relative">
               <button
                 onClick={() => setDropdownOpen(!dropdownOpen)}
@@ -82,7 +84,7 @@ export default function PrivateHeader() {
                     <p className="text-xs text-gray-500">{student?.admissionNumber}</p>
                   </div>
                   <Link
-                    to="/dashboard/profile"
+                    href="/dashboard/profile"
                     onClick={() => setDropdownOpen(false)}
                     className="flex items-center gap-2 px-4 py-2.5 text-sm text-gray-700 hover:bg-blue-50 transition-all"
                   >
@@ -119,7 +121,7 @@ export default function PrivateHeader() {
               {navLinks.map(link => (
                 <Link
                   key={link.path}
-                  to={link.path}
+                  href={link.path}
                   onClick={() => setMenuOpen(false)}
                   className={`px-4 py-2.5 rounded-lg text-sm font-medium transition-all ${
                     isActive(link.path)
