@@ -3,6 +3,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { Menu, X, GraduationCap } from 'lucide-react';
+import Image from 'next/image';
 
 export default function PublicHeader() {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -22,10 +23,8 @@ export default function PublicHeader() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-18 py-3">
           {/* Logo */}
-          <Link href="/" className="flex items-center gap-3">
-            <div className="w-12 h-12 bg-gradient-to-br from-blue-900 to-blue-700 rounded-full flex items-center justify-center">
-              <GraduationCap className="w-7 h-7 text-yellow-400" />
-            </div>
+          <Link href="/" className="flex items-center gap-0">
+            <Image src="/logo.png" alt="Techna Logo" width={105} height={40} className="rounded-full" />
             <div>
               <p className="text-lg font-bold text-blue-900 leading-tight font-poppins">Techna</p>
               <p className="text-xs text-gray-500 leading-tight">Technical Institute</p>

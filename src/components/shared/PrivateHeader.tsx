@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { Menu, X, GraduationCap, LogOut, Bell, User } from 'lucide-react';
 import { useAuthStore } from '../../store/authStore';
+import Image from 'next/image';
 
 export default function PrivateHeader() {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -32,10 +33,8 @@ export default function PrivateHeader() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-18 py-3">
           {/* Logo */}
-          <Link href="/dashboard" className="flex items-center gap-3">
-            <div className="w-12 h-12 bg-yellow-400 rounded-full flex items-center justify-center shadow-md">
-              <GraduationCap className="w-7 h-7 text-blue-900" />
-            </div>
+          <Link href="/dashboard" className="flex items-center gap-0">
+            <Image src="/logo.png" alt="Techna Logo" width={105} height={40} className="rounded-full" />
             <div>
               <p className="text-lg font-bold text-white leading-tight">Techna</p>
               <p className="text-xs text-blue-300 leading-tight">Student Portal</p>

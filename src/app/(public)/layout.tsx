@@ -1,7 +1,7 @@
 'use client';
-import PublicHeader from '../../src/components/shared/PublicHeader';
-import Footer from '../../src/components/shared/Footer';
-import WhatsAppButton from '../../src/components/shared/WhatsAppButton';
+import PublicHeader from '../../components/shared/PublicHeader';
+import Footer from '../../components/shared/Footer';
+import WhatsAppButton from '../../components/shared/WhatsAppButton';
 
 export default function PublicLayout({ children }: { children: React.ReactNode }) {
   return (

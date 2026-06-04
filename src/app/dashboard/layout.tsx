@@ -1,9 +1,9 @@
 'use client';
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import PrivateHeader from '../../src/components/shared/PrivateHeader';
-import WhatsAppButton from '../../src/components/shared/WhatsAppButton';
-import { useAuthStore } from '../../src/store/authStore';
+import PrivateHeader from '../../components/shared/PrivateHeader';
+import WhatsAppButton from '../../components/shared/WhatsAppButton';
+import { useAuthStore } from '../../store/authStore';
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const { isAuthenticated } = useAuthStore();

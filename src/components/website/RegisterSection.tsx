@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Check, ChevronRight, ChevronLeft, GraduationCap, User, MapPin, BookOpen, FileText, Plus, Trash2 } from 'lucide-react';
 import { SUBJECTS, DISTRICTS, RACES, RELIGIONS, GRADES } from '../../data/mockData';
+import Image from 'next/image';
 
 const STEPS = [
   { id: 1, label: 'Basic Info', icon: User, desc: 'Personal details' },
@@ -124,9 +125,7 @@ export default function RegisterSection() {
       <div className="max-w-3xl mx-auto">
         {/* Header */}
         <div className="text-center mb-8">
-          <div className="w-14 h-14 bg-yellow-400 rounded-2xl flex items-center justify-center mx-auto mb-3 shadow-lg">
-            <GraduationCap className="w-8 h-8 text-blue-900" />
-          </div>
+          <Image src="/logo.png" alt="Techna Logo" width={120} height={50} className="mx-auto mb-4 rounded-full" />
           <h1 className="text-2xl font-bold text-white">Techna Technical Institute</h1>
           <p className="text-blue-300 text-sm">A/L Technology Stream – Admission Form 2024</p>
         </div>
