@@ -1,4 +1,4 @@
-import ProtectedRoute from '../../src/components/auth/ProtectedRoute';
+import ProtectedRoute from '@/components/auth/ProtectedRoute';
 
 export default function PortalLayout({ children }: { children: React.ReactNode }) {
   return (
