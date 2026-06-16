@@ -9,7 +9,7 @@ export default function HomePage() {
   return (
     <>
       <HeroSection />
-      <NoticesSection />
+      {/* <NoticesSection /> */}
       <FeaturedModulesSection />
       <WhyUsSection />
       <TestimonialsSection />

@@ -2,9 +2,10 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { Eye, EyeOff, Mail, Lock, GraduationCap, ArrowRight } from 'lucide-react';
+import { Eye, EyeOff, Mail, Lock, ArrowRight } from 'lucide-react';
 import { useAuthStore } from '../../store/authStore';
 import type { Student } from '../../types';
+import Image from 'next/image';
 
 const API = 'http://localhost:4000/api';
 
@@ -88,9 +89,7 @@ export default function LoginSection() {
       <div className="w-full max-w-md relative">
         <div className="bg-white rounded-3xl shadow-2xl p-8">
           <div className="text-center mb-8">
-            <div className="w-16 h-16 bg-gradient-to-br from-blue-900 to-blue-700 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg">
-              <GraduationCap className="w-9 h-9 text-yellow-400" />
-            </div>
+            <Image src="/logo.png" alt="Techna Logo" width={150} height={80} className="mx-auto mb-4 rounded-full" />
             <h1 className="text-2xl font-bold text-gray-900">Welcome Back</h1>
             <p className="text-gray-500 text-sm mt-1">Sign in to your Techna Student Portal</p>
           </div>

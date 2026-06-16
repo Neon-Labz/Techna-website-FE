@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { GraduationCap, Phone, Mail, MapPin } from 'lucide-react';
+import Image from 'next/image';
 
 export default function Footer() {
   return (
@@ -9,13 +10,11 @@ export default function Footer() {
           {/* Brand */}
           <div>
             <div className="flex items-center gap-3 mb-4">
-              <div className="w-11 h-11 bg-yellow-400 rounded-full flex items-center justify-center">
-                <GraduationCap className="w-6 h-6 text-blue-900" />
-              </div>
-              <div>
+              <Image src="/logo.png" alt="Techna Logo" width={150} height={40} className="rounded-full" />
+              {/* <div>
                 <p className="text-lg font-bold leading-tight">Techna</p>
                 <p className="text-xs text-blue-300 leading-tight">Technical Institute</p>
-              </div>
+              </div> */}
             </div>
             <p className="text-blue-300 text-sm leading-relaxed mb-4">
               Smart Thinking Leads To Innovate. Empowering students through quality technical education in A/L Technology Stream.

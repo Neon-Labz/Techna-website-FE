@@ -1,7 +1,7 @@
 'use client';
-import PrivateHeader from '../../src/components/shared/PrivateHeader';
-import WhatsAppButton from '../../src/components/shared/WhatsAppButton';
-import ProtectedRoute from '../../src/components/auth/ProtectedRoute';
+import PrivateHeader from '../../components/shared/PrivateHeader';
+import WhatsAppButton from '../../components/shared/WhatsAppButton';
+import ProtectedRoute from '../../components/auth/ProtectedRoute';
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   return (

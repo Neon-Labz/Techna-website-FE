@@ -5,44 +5,46 @@ import { mockNotices, mockModules, mockResults } from '../../data/mockData';
 import { useAuthStore } from '../../store/authStore';
 
 const typeColors = {
-  exam: 'bg-red-50 border-red-200 text-red-700',
-  general: 'bg-blue-50 border-blue-200 text-blue-700',
-  assignment: 'bg-yellow-50 border-yellow-200 text-yellow-700',
-  holiday: 'bg-green-50 border-green-200 text-green-700',
+  exam: "bg-red-50 border-red-200 text-red-700",
+  general: "bg-blue-50 border-blue-200 text-blue-700",
+  assignment: "bg-yellow-50 border-yellow-200 text-yellow-700",
+  holiday: "bg-green-50 border-green-200 text-green-700",
 };
 
 const typeDots = {
-  exam: 'bg-red-500',
-  general: 'bg-blue-500',
-  assignment: 'bg-yellow-500',
-  holiday: 'bg-green-500',
+  exam: "bg-red-500",
+  general: "bg-blue-500",
+  assignment: "bg-yellow-500",
+  holiday: "bg-green-500",
 };
 
 export default function DashboardHomeSection() {
   const { student } = useAuthStore();
-  const [activeModule, setActiveModule] = useState<string>('all');
+  const [activeModule, setActiveModule] = useState<string>("all");
+
+  const greeting = () => {
+    const h = new Date().getHours();
+    if (h < 12) return 'Good Morning';
+    if (h < 18) return 'Good Afternoon';
+    return 'Good Evening';
+  };
+
+  const avgScore = mockResults.length > 0
+    ? Math.round(mockResults.reduce((a, r) => a + (r.marks / r.maxMarks) * 100, 0) / mockResults.length)
+    : 0;
 
   const allVideos = mockModules.flatMap(m => m.videos);
   const studentModules = mockModules.filter(m =>
     m.videos.length > 0 || (student?.subjects ?? []).some(s => m.name.includes(s.split(' ')[0]))
   );
 
-  const filteredVideos = activeModule === 'all'
-    ? allVideos
-    : allVideos.filter(v => v.moduleId === activeModule);
+  const filteredVideos =
+    activeModule === "all"
+      ? allVideos
+      : allVideos.filter((v) => v.moduleId === activeModule);
 
   const recentResults = mockResults.slice(0, 3);
-  const avgScore = mockResults.length > 0
-    ? Math.round(mockResults.reduce((acc, r) => acc + (r.marks / r.maxMarks) * 100, 0) / mockResults.length)
-    : 0;
-
-  const greeting = () => {
-    const h = new Date().getHours();
-    if (h < 12) return 'Good Morning';
-    if (h < 17) return 'Good Afternoon';
-    return 'Good Evening';
-  };
-
+ 
   return (
     <div className="space-y-8">
       {/* Welcome Banner */}
@@ -104,19 +106,34 @@ export default function DashboardHomeSection() {
               <h2 className="font-bold text-gray-900 flex items-center gap-2">
                 <Bell className="w-5 h-5 text-blue-700" /> Exam Notices
               </h2>
-              <span className="text-xs text-gray-400">{mockNotices.filter(n => n.type === 'exam').length} active</span>
+              <span className="text-xs text-gray-400">
+                {mockNotices.filter((n) => n.type === "exam").length} active
+              </span>
             </div>
             <div className="space-y-3">
-              {mockNotices.map(notice => (
-                <div key={notice.id} className={`p-3.5 rounded-xl border text-sm ${typeColors[notice.type]}`}>
+              {mockNotices.map((notice) => (
+                <div
+                  key={notice.id}
+                  className={`p-3.5 rounded-xl border text-sm ${typeColors[notice.type]}`}
+                >
                   <div className="flex items-start gap-2">
-                    <span className={`w-2 h-2 rounded-full mt-1.5 shrink-0 ${typeDots[notice.type]}`} />
+                    <span
+                      className={`w-2 h-2 rounded-full mt-1.5 shrink-0 ${typeDots[notice.type]}`}
+                    />
                     <div>
-                      <p className="font-semibold text-xs leading-snug mb-1">{notice.title}</p>
-                      <p className="text-xs opacity-80 line-clamp-2 leading-relaxed">{notice.content}</p>
+                      <p className="font-semibold text-xs leading-snug mb-1">
+                        {notice.title}
+                      </p>
+                      <p className="text-xs opacity-80 line-clamp-2 leading-relaxed">
+                        {notice.content}
+                      </p>
                       <div className="flex items-center gap-1 mt-1.5 text-xs opacity-60">
                         <Calendar className="w-3 h-3" />
-                        {new Date(notice.date).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}
+                        {new Date(notice.date).toLocaleDateString("en-GB", {
+                          day: "2-digit",
+                          month: "short",
+                          year: "numeric",
+                        })}
                       </div>
                     </div>
                   </div>
@@ -137,12 +154,14 @@ export default function DashboardHomeSection() {
                 <Filter className="w-3.5 h-3.5 text-gray-400" />
                 <select
                   value={activeModule}
-                  onChange={e => setActiveModule(e.target.value)}
+                  onChange={(e) => setActiveModule(e.target.value)}
                   className="text-xs border border-gray-200 rounded-lg px-2 py-1.5 text-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 >
                   <option value="all">All Modules</option>
-                  {studentModules.map(m => (
-                    <option key={m.id} value={m.id}>{m.name}</option>
+                  {studentModules.map((m) => (
+                    <option key={m.id} value={m.id}>
+                      {m.name}
+                    </option>
                   ))}
                 </select>
               </div>
@@ -152,24 +171,40 @@ export default function DashboardHomeSection() {
               {filteredVideos.length === 0 ? (
                 <div className="text-center py-8 text-gray-400">
                   <Play className="w-8 h-8 mx-auto mb-2 opacity-30" />
-                  <p className="text-sm">No videos available for this module yet.</p>
+                  <p className="text-sm">
+                    No videos available for this module yet.
+                  </p>
                 </div>
               ) : (
-                filteredVideos.map(video => (
-                  <div key={video.id} className="flex items-center gap-4 p-4 rounded-xl hover:bg-gray-50 transition-all cursor-pointer group border border-gray-100">
+                filteredVideos.map((video) => (
+                  <div
+                    key={video.id}
+                    className="flex items-center gap-4 p-4 rounded-xl hover:bg-gray-50 transition-all cursor-pointer group border border-gray-100"
+                  >
                     <div className="w-14 h-14 bg-gradient-to-br from-blue-700 to-blue-900 rounded-xl flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform shadow-md">
                       <Play className="w-6 h-6 text-white fill-white" />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="font-semibold text-gray-900 text-sm truncate group-hover:text-blue-700">{video.title}</p>
-                      <p className="text-xs text-gray-500 mt-0.5">{video.moduleName}</p>
-                      <p className="text-xs text-gray-400 mt-0.5">{video.description}</p>
+                      <p className="font-semibold text-gray-900 text-sm truncate group-hover:text-blue-700">
+                        {video.title}
+                      </p>
+                      <p className="text-xs text-gray-500 mt-0.5">
+                        {video.moduleName}
+                      </p>
+                      <p className="text-xs text-gray-400 mt-0.5">
+                        {video.description}
+                      </p>
                     </div>
                     <div className="text-right shrink-0">
                       <div className="flex items-center gap-1 text-xs text-gray-400 mb-1">
                         <Clock className="w-3 h-3" /> {video.duration}
                       </div>
-                      <p className="text-xs text-gray-400">{new Date(video.uploadedAt).toLocaleDateString('en-GB', { day: '2-digit', month: 'short' })}</p>
+                      <p className="text-xs text-gray-400">
+                        {new Date(video.uploadedAt).toLocaleDateString(
+                          "en-GB",
+                          { day: "2-digit", month: "short" },
+                        )}
+                      </p>
                     </div>
                     <ChevronRight className="w-4 h-4 text-gray-300 group-hover:text-blue-500 group-hover:translate-x-1 transition-all" />
                   </div>
@@ -186,30 +221,56 @@ export default function DashboardHomeSection() {
           <h2 className="font-bold text-gray-900 flex items-center gap-2">
             <Award className="w-5 h-5 text-blue-700" /> Recent Results
           </h2>
-          <a href="/dashboard/results" className="text-xs text-blue-700 font-medium hover:underline flex items-center gap-1">
+          <a
+            href="/dashboard/results"
+            className="text-xs text-blue-700 font-medium hover:underline flex items-center gap-1"
+          >
             View All <ChevronRight className="w-3 h-3" />
           </a>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          {recentResults.map(result => {
+          {recentResults.map((result) => {
             const pct = Math.round((result.marks / result.maxMarks) * 100);
-            const color = pct >= 90 ? 'text-green-600 bg-green-50' : pct >= 75 ? 'text-blue-600 bg-blue-50' : pct >= 60 ? 'text-yellow-600 bg-yellow-50' : 'text-red-600 bg-red-50';
+            const color =
+              pct >= 90
+                ? "text-green-600 bg-green-50"
+                : pct >= 75
+                  ? "text-blue-600 bg-blue-50"
+                  : pct >= 60
+                    ? "text-yellow-600 bg-yellow-50"
+                    : "text-red-600 bg-red-50";
             return (
-              <div key={result.id} className="border border-gray-100 rounded-xl p-4 hover:shadow-sm transition-all">
+              <div
+                key={result.id}
+                className="border border-gray-100 rounded-xl p-4 hover:shadow-sm transition-all"
+              >
                 <div className="flex items-start justify-between mb-2">
                   <div>
-                    <p className="font-semibold text-gray-900 text-sm">{result.moduleName}</p>
-                    <p className="text-xs text-gray-400">{result.examType} · {result.semester}</p>
+                    <p className="font-semibold text-gray-900 text-sm">
+                      {result.moduleName}
+                    </p>
+                    <p className="text-xs text-gray-400">
+                      {result.examType} · {result.semester}
+                    </p>
                   </div>
-                  <span className={`text-lg font-bold px-2 py-0.5 rounded-lg ${color}`}>{result.grade}</span>
+                  <span
+                    className={`text-lg font-bold px-2 py-0.5 rounded-lg ${color}`}
+                  >
+                    {result.grade}
+                  </span>
                 </div>
                 <div className="mt-3">
                   <div className="flex justify-between text-xs text-gray-500 mb-1">
-                    <span>{result.marks}/{result.maxMarks}</span>
+                    <span>
+                      {result.marks}/{result.maxMarks}
+                    </span>
                     <span>{pct}%</span>
                   </div>
                   <div className="w-full bg-gray-100 rounded-full h-1.5">
-                    <div className="h-1.5 rounded-full bg-gradient-to-r from-blue-600 to-blue-400" style={{ width: `${pct}%` }} />
+                    <div
+                      className="h-1.5 rounded-full bg-gradient-to-r from-blue-600 to-blue-400"
+                      style={{ width: `${pct}%` }}
+                    />
                   </div>
                 </div>
               </div>
