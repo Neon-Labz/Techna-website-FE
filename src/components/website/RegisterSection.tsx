@@ -4,6 +4,8 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Check, ChevronRight, ChevronLeft, GraduationCap, User, MapPin, BookOpen, FileText, Plus, Trash2 } from 'lucide-react';
 import { SUBJECTS, DISTRICTS, RACES, RELIGIONS, GRADES } from '../../data/mockData';
+import { useAuthStore } from '../../store/authStore';
+import type { Student } from '../../types';
 import Image from 'next/image';
 
 const STEPS = [
@@ -19,9 +21,10 @@ const emptyOL: OLRow = { year: '', indexNumber: '', english: '', mathematics: ''
 
 export default function RegisterSection() {
   const router = useRouter();
+  const { login } = useAuthStore();
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
-  const [submitted, setSubmitted] = useState(false);
+  const [submitError, setSubmitError] = useState('');
 
   // Form state
   const [form, setForm] = useState({
@@ -87,36 +90,109 @@ export default function RegisterSection() {
   const next = () => { if (validateStep()) setStep(s => Math.min(s + 1, 5)); };
   const prev = () => setStep(s => Math.max(s - 1, 1));
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (!validateStep()) return;
     setLoading(true);
-    setTimeout(() => {
-      setLoading(false);
-      setSubmitted(true);
-    }, 2000);
-  };
+    setSubmitError('');
 
-  if (submitted) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-950 to-blue-900 flex items-center justify-center px-4">
-        <div className="bg-white rounded-3xl shadow-2xl p-10 max-w-md w-full text-center">
-          <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
-            <Check className="w-10 h-10 text-green-600" />
-          </div>
-          <h2 className="text-2xl font-bold text-gray-900 mb-2">Application Submitted!</h2>
-          <p className="text-gray-500 mb-2">Your admission form has been successfully submitted.</p>
-          <p className="text-gray-500 text-sm mb-6">A confirmation email will be sent to <strong>{form.email}</strong>. Our team will review your application and assign your admission number.</p>
-          <div className="bg-blue-50 rounded-xl p-4 mb-6 text-sm text-blue-700">
-            <p><strong>Application Reference:</strong></p>
-            <p className="font-mono text-lg mt-1">APP-2024-{Math.floor(Math.random() * 9000 + 1000)}</p>
-          </div>
-          <button onClick={() => router.push('/login')} className="w-full py-3 bg-blue-900 text-white font-semibold rounded-xl hover:bg-blue-800 transition-all">
-            Go to Login
-          </button>
-        </div>
-      </div>
-    );
-  }
+    const olResultRows = olRows.filter(r => r.year && r.indexNumber);
+    const payload = {
+      account: {
+        email: form.email.trim().toLowerCase(),
+        password: form.password,
+      },
+      personal: {
+        fullNameEnglish: form.fullNameEnglish.trim(),
+        nicNo: form.nicNo.trim(),
+        whatsappNo: form.whatsappNo.trim(),
+        permanentAddress: form.permanentAddress.trim() || form.address.trim(),
+        administrativeDistrict: form.administrativeDistrict,
+        ...(form.fullNameTamil.trim() && { fullNameTamil: form.fullNameTamil.trim() }),
+        ...(form.dobDay && { dobDay: Number(form.dobDay) }),
+        ...(form.dobMonth && { dobMonth: Number(form.dobMonth) }),
+        ...(form.dobYear && { dobYear: Number(form.dobYear) }),
+        ...(form.parentsNo.trim() && { parentsNo: form.parentsNo.trim() }),
+        ...(form.school.trim() && { school: form.school.trim() }),
+        ...(form.fixedTelephone.trim() && { fixedTelephone: form.fixedTelephone.trim() }),
+        ...(form.residingSince && { residingSince: form.residingSince }),
+        ...(form.race && { race: form.race }),
+        ...(form.religion && { religion: form.religion }),
+        ...(form.citizenByDescent && { citizenByDescent: form.citizenByDescent }),
+        ...(form.contactAddress.trim() && { contactAddress: form.contactAddress.trim() }),
+        ...(form.postalCode.trim() && { postalCode: form.postalCode.trim() }),
+      },
+      parent: {
+        ...(form.fatherName.trim() && { fatherName: form.fatherName.trim() }),
+        ...(form.motherName.trim() && { motherName: form.motherName.trim() }),
+        ...(form.guardianName.trim() && { guardianName: form.guardianName.trim() }),
+        ...(form.contactPerson && { contactPerson: form.contactPerson }),
+        ...(form.guardianAddress.trim() && { guardianAddress: form.guardianAddress.trim() }),
+        ...(form.guardianFixedTel.trim() && { guardianFixedTel: form.guardianFixedTel.trim() }),
+        ...(form.guardianMobile.trim() && { guardianMobile: form.guardianMobile.trim() }),
+      },
+      olRecords: {
+        ...(form.olCategory && { olCategory: form.olCategory }),
+        ...(form.olYear && { olYear: form.olYear }),
+        ...(form.olIndexNumber.trim() && { olIndexNumber: form.olIndexNumber.trim() }),
+        ...(form.olNameUsed.trim() && { olNameUsed: form.olNameUsed.trim() }),
+        ...(form.olAccept && { olAccept: form.olAccept }),
+        ...(olResultRows.length > 0 && { olResults: olResultRows }),
+      },
+      subjectSelection: {
+        subjects: form.subjects,
+        agreed: form.agreed,
+      },
+    };
+
+    try {
+      const res = await fetch('http://localhost:4000/api/students/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        // Extract real error: custom filter puts detail in error.details, plain NestJS in message
+        const details: { message: string }[] | undefined = data?.error?.details;
+        const raw = details?.length
+          ? details.map((d: { message: string }) => d.message.replace(/^[^.]+\./, '')).join('. ')
+          : data?.message;
+        setSubmitError(
+          Array.isArray(raw) ? raw.join('. ') : (raw ?? 'Registration failed. Please try again.')
+        );
+        return;
+      }
+
+      // Auto-login after successful registration
+      try {
+        const loginRes = await fetch('http://localhost:4000/api/auth/student/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: form.email.trim().toLowerCase(), password: form.password }),
+        });
+        if (loginRes.ok) {
+          const { access_token } = await loginRes.json() as { access_token: string };
+          const profileRes = await fetch('http://localhost:4000/api/auth/session', {
+            headers: { Authorization: `Bearer ${access_token}` },
+          });
+          if (profileRes.ok) {
+            const profile = await profileRes.json();
+            login({ ...profile, id: profile._id ?? profile.id } as Student, access_token);
+          }
+        }
+      } catch {
+        // Auto-login failed — redirect to /pending anyway
+      }
+
+      router.push('/pending');
+    } catch {
+      setSubmitError('Unable to connect to the server. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const inputCls = (err?: string) => `w-full px-3 py-2.5 border ${err ? 'border-red-400 bg-red-50' : 'border-gray-200 bg-gray-50'} rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 placeholder-gray-400`;
 
@@ -498,6 +574,12 @@ export default function RegisterSection() {
                 <span className="text-sm text-gray-700">I agree to the terms and conditions and hereby declare that all provided information is accurate.</span>
               </label>
               {errors.agreed && <p className="text-red-500 text-xs">{errors.agreed}</p>}
+            </div>
+          )}
+
+          {submitError && (
+            <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl text-sm mt-4">
+              {submitError}
             </div>
           )}
 

@@ -2,10 +2,12 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { Eye, EyeOff, Mail, Lock, GraduationCap, ArrowRight } from 'lucide-react';
+import { Eye, EyeOff, Mail, Lock, ArrowRight } from 'lucide-react';
 import { useAuthStore } from '../../store/authStore';
-import { mockStudent } from '../../data/mockData';
+import type { Student } from '../../types';
 import Image from 'next/image';
+
+const API = 'http://localhost:4000/api';
 
 export default function LoginSection() {
   const router = useRouter();
@@ -22,11 +24,61 @@ export default function LoginSection() {
     setError('');
     setLoading(true);
 
-    setTimeout(() => {
-      setLoading(false);
-      login(mockStudent, 'mock-jwt-token-123456789');
+    try {
+      const res = await fetch(`${API}/auth/student/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: email.trim(), password }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        const msg = data?.message ?? 'Invalid credentials';
+        setError(Array.isArray(msg) ? msg.join(' ') : msg);
+        return;
+      }
+
+      const loginData = data as {
+        access_token: string;
+        student?: Partial<Student>;
+        user?: Partial<Student>;
+        data?: { student?: Partial<Student> };
+      };
+      const access_token = loginData.access_token;
+
+      // Use student data from login response if provided
+      let studentData: Student | null =
+        (loginData.student as Student) ??
+        (loginData.user as Student) ??
+        (loginData.data?.student as Student) ??
+        null;
+
+      // Fall back to /auth/session only if login didn't return student
+      if (!studentData?.email && !studentData?.id) {
+        try {
+          const profileRes = await fetch(`${API}/auth/session`, {
+            headers: { Authorization: `Bearer ${access_token}` },
+          });
+          if (profileRes.ok) {
+            const profile = await profileRes.json();
+            // Only accept if it's real student data, not an error body
+            if (profile?.email || profile?._id) {
+              studentData = { ...profile, id: profile._id ?? profile.id } as Student;
+            }
+          }
+        } catch { /* session optional — login data takes priority */ }
+      }
+
+      // Always navigate after a successful login — the session call is best-effort.
+      // The PDF handler fetches fresh profile data from the API when needed.
+      login(studentData, access_token);
       router.push('/dashboard');
-    }, 1500);
+    } catch {
+      setError('Unable to connect to the server. Please try again.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -89,7 +141,7 @@ export default function LoginSection() {
                 <input type="checkbox" className="rounded border-gray-300 text-blue-600" />
                 Remember me
               </label>
-              <a href="#" className="text-blue-700 font-medium hover:underline">Forgot password?</a>
+              <Link href="/forgot-password" className="text-blue-700 font-medium hover:underline">Forgot password?</Link>
             </div>
 
             <button
@@ -114,9 +166,6 @@ export default function LoginSection() {
             </p>
           </div>
 
-          <div className="mt-4 p-3 bg-blue-50 rounded-xl text-xs text-blue-700 text-center">
-            <strong>Demo:</strong> Use any email & password to login
-          </div>
         </div>
 
         <div className="text-center mt-6">
