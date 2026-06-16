@@ -38,15 +38,40 @@ export default function LoginSection() {
         return;
       }
 
-      const { access_token } = data as { access_token: string };
+      const loginData = data as {
+        access_token: string;
+        student?: Partial<Student>;
+        user?: Partial<Student>;
+        data?: { student?: Partial<Student> };
+      };
+      const access_token = loginData.access_token;
 
-      const profileRes = await fetch(`${API}/auth/session`, {
-        headers: { Authorization: `Bearer ${access_token}` },
-      });
-      const profile = await profileRes.json();
-      const student = { ...profile, id: profile._id ?? profile.id } as Student;
+      // Use student data from login response if provided
+      let studentData: Student | null =
+        (loginData.student as Student) ??
+        (loginData.user as Student) ??
+        (loginData.data?.student as Student) ??
+        null;
 
-      login(student, access_token);
+      // Fall back to /auth/session only if login didn't return student
+      if (!studentData?.email && !studentData?.id) {
+        try {
+          const profileRes = await fetch(`${API}/auth/session`, {
+            headers: { Authorization: `Bearer ${access_token}` },
+          });
+          if (profileRes.ok) {
+            const profile = await profileRes.json();
+            // Only accept if it's real student data, not an error body
+            if (profile?.email || profile?._id) {
+              studentData = { ...profile, id: profile._id ?? profile.id } as Student;
+            }
+          }
+        } catch { /* session optional — login data takes priority */ }
+      }
+
+      // Always navigate after a successful login — the session call is best-effort.
+      // The PDF handler fetches fresh profile data from the API when needed.
+      login(studentData, access_token);
       router.push('/dashboard');
     } catch {
       setError('Unable to connect to the server. Please try again.');

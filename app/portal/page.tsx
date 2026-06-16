@@ -1,13 +1,14 @@
 'use client';
 import Link from 'next/link';
 import { useAuthStore } from '../../src/store/authStore';
-import { LayoutDashboard, CreditCard, Trophy, User } from 'lucide-react';
+import { LayoutDashboard, CreditCard, Trophy, User, ClipboardList } from 'lucide-react';
 
 export default function PortalPage() {
   const { student } = useAuthStore();
 
   const cards = [
     { label: 'Dashboard', href: '/dashboard', icon: LayoutDashboard, color: 'bg-blue-50 text-blue-700' },
+    { label: 'Exam Schedule', href: '/portal/results', icon: ClipboardList, color: 'bg-orange-50 text-orange-700' },
     { label: 'Payments', href: '/dashboard/payments', icon: CreditCard, color: 'bg-green-50 text-green-700' },
     { label: 'Results', href: '/dashboard/results', icon: Trophy, color: 'bg-yellow-50 text-yellow-700' },
     { label: 'Profile', href: '/dashboard/profile', icon: User, color: 'bg-purple-50 text-purple-700' },
