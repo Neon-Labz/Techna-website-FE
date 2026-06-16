@@ -1,5 +1,4 @@
 'use client';
-'use client';
 import { useState } from 'react';
 import { Bell, BookOpen, Play, ChevronRight, Calendar, Award, TrendingUp, Clock, Filter } from 'lucide-react';
 import { mockNotices, mockModules, mockResults } from '../../data/mockData';
@@ -25,7 +24,7 @@ export default function DashboardHomeSection() {
 
   const allVideos = mockModules.flatMap(m => m.videos);
   const studentModules = mockModules.filter(m =>
-    m.videos.length > 0 || student?.subjects.some(s => m.name.includes(s.split(' ')[0]))
+    m.videos.length > 0 || (student?.subjects ?? []).some(s => m.name.includes(s.split(' ')[0]))
   );
 
   const filteredVideos = activeModule === 'all'
@@ -60,7 +59,7 @@ export default function DashboardHomeSection() {
               <p className="text-blue-200 text-xs">Avg. Score</p>
             </div>
             <div className="bg-white/10 rounded-xl px-4 py-2.5 text-center">
-              <p className="text-yellow-400 font-bold text-xl">{student?.subjects.length || 3}</p>
+              <p className="text-yellow-400 font-bold text-xl">{student?.subjects?.length || 3}</p>
               <p className="text-blue-200 text-xs">Subjects</p>
             </div>
             <div className="bg-white/10 rounded-xl px-4 py-2.5 text-center">

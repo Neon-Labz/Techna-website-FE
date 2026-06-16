@@ -1,5 +1,6 @@
 export interface Student {
   id: string;
+  status?: 'pending' | 'approved' | 'rejected';
   admissionNumber: string;
   serialNumber: string;
   fullNameTamil: string;
