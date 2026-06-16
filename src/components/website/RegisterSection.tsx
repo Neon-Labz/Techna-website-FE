@@ -1,10 +1,13 @@
 'use client';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Check, ChevronRight, ChevronLeft, GraduationCap, User, MapPin, BookOpen, FileText, Plus, Trash2 } from 'lucide-react';
 import { SUBJECTS, DISTRICTS, RACES, RELIGIONS, GRADES } from '../../data/mockData';
 import Image from 'next/image';
+import { authApi } from '@/api/auth.api';
+import { dashboardApi } from '@/api/dashboard.api';
+import type { RegisterStudentPayload } from '@/api/auth.api';
 
 const STEPS = [
   { id: 1, label: 'Basic Info', icon: User, desc: 'Personal details' },
@@ -17,37 +20,161 @@ const STEPS = [
 interface OLRow { year: string; indexNumber: string; english: string; mathematics: string; science: string; sinhala: string; tamil: string; }
 const emptyOL: OLRow = { year: '', indexNumber: '', english: '', mathematics: '', science: '', sinhala: '', tamil: '' };
 
+type RegistrationModule = {
+  _id?: string;
+  id?: string;
+  name?: string;
+  status?: string;
+};
+
+const clean = (value: string) => value.trim();
+
+const optional = (value: string) => {
+  const trimmed = clean(value);
+  return trimmed || undefined;
+};
+
+const cleanPhone = (value: string) => clean(value).replace(/[\s-]/g, '');
+
+const toNumber = (value: string) => {
+  const parsed = Number(value);
+  return Number.isFinite(parsed) ? parsed : undefined;
+};
+
+const buildRegisterPayload = (
+  form: ReturnType<typeof createInitialForm>,
+  olRows: OLRow[]
+): RegisterStudentPayload => {
+  const olResults = olRows
+    .filter((row) => clean(row.year) && clean(row.indexNumber))
+    .map((row) => ({
+      year: clean(row.year),
+      indexNumber: clean(row.indexNumber),
+      ...(optional(row.english) ? { english: clean(row.english) } : {}),
+      ...(optional(row.mathematics) ? { mathematics: clean(row.mathematics) } : {}),
+      ...(optional(row.science) ? { science: clean(row.science) } : {}),
+      ...(optional(row.sinhala) ? { sinhala: clean(row.sinhala) } : {}),
+      ...(optional(row.tamil) ? { tamil: clean(row.tamil) } : {}),
+    }));
+
+  return {
+    account: {
+      email: clean(form.email).toLowerCase(),
+      password: form.password,
+    },
+    personal: {
+      fullNameTamil: optional(form.fullNameTamil),
+      fullNameEnglish: clean(form.fullNameEnglish),
+      dobDay: toNumber(form.dobDay),
+      dobMonth: toNumber(form.dobMonth),
+      dobYear: toNumber(form.dobYear),
+      nicNo: clean(form.nicNo),
+      school: optional(form.school),
+      whatsappNo: cleanPhone(form.whatsappNo),
+      parentsNo: optional(cleanPhone(form.parentsNo)),
+      permanentAddress: clean(form.permanentAddress),
+      administrativeDistrict: form.administrativeDistrict,
+      fixedTelephone: optional(cleanPhone(form.fixedTelephone)),
+      residingSince: optional(form.residingSince),
+      race: optional(form.race),
+      religion: optional(form.religion),
+      citizenByDescent: form.citizenByDescent,
+      contactAddress: optional(form.contactAddress),
+      postalCode: optional(form.postalCode),
+    },
+    parent: {
+      fatherName: optional(form.fatherName),
+      motherName: optional(form.motherName),
+      guardianName: optional(form.guardianName),
+      contactPerson: form.contactPerson,
+      guardianAddress: optional(form.guardianAddress),
+      guardianFixedTel: optional(cleanPhone(form.guardianFixedTel)),
+      guardianMobile: optional(cleanPhone(form.guardianMobile)),
+    },
+    olRecords: {
+      olCategory: form.olCategory,
+      olYear: optional(form.olYear),
+      olIndexNumber: optional(form.olIndexNumber),
+      olNameUsed: optional(form.olNameUsed),
+      olAccept: form.olAccept,
+      olResults,
+    },
+    subjectSelection: {
+      subjects: form.subjects,
+      agreed: form.agreed,
+    },
+    batch: '2026 A/L',
+  };
+};
+
+const createInitialForm = () => ({
+  fullNameTamil: '', fullNameEnglish: '', dobDay: '', dobMonth: '', dobYear: '',
+  nicNo: '', address: '', school: '', whatsappNo: '', parentsNo: '', email: '', password: '', confirmPassword: '',
+  permanentAddress: '', administrativeDistrict: '', fixedTelephone: '', residingSince: '',
+  race: '', religion: '', citizenByDescent: 'YES',
+  contactAddress: '', postalCode: '',
+  fatherName: '', motherName: '', guardianName: '',
+  contactPerson: 'Mother' as 'Father' | 'Mother' | 'Guardian',
+  guardianAddress: '', guardianFixedTel: '', guardianMobile: '',
+  olCategory: 'Local O/L', olYear: '', olIndexNumber: '', olNameUsed: '',
+  olAccept: 'Accept' as 'Accept' | 'Change',
+  subjects: [] as string[],
+  agreed: false,
+});
+
 export default function RegisterSection() {
   const router = useRouter();
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
+  const [modulesLoading, setModulesLoading] = useState(true);
+  const [moduleNames, setModuleNames] = useState<string[]>(SUBJECTS);
   const [submitted, setSubmitted] = useState(false);
+  const [submitMessage, setSubmitMessage] = useState('');
+  const [applicationReference, setApplicationReference] = useState('');
 
   // Form state
-  const [form, setForm] = useState({
-    fullNameTamil: '', fullNameEnglish: '', dobDay: '', dobMonth: '', dobYear: '',
-    nicNo: '', address: '', school: '', whatsappNo: '', parentsNo: '', email: '', password: '', confirmPassword: '',
-    // Address
-    permanentAddress: '', administrativeDistrict: '', fixedTelephone: '', residingSince: '',
-    race: '', religion: '', citizenByDescent: 'YES',
-    contactAddress: '', postalCode: '',
-    // Parents
-    fatherName: '', motherName: '', guardianName: '',
-    contactPerson: 'Mother' as 'Father' | 'Mother' | 'Guardian',
-    guardianAddress: '', guardianFixedTel: '', guardianMobile: '',
-    // OL
-    olCategory: 'Local O/L', olYear: '', olIndexNumber: '', olNameUsed: '',
-    olAccept: 'Accept' as 'Accept' | 'Change',
-    // Subjects
-    subjects: [] as string[],
-    // Agreement
-    agreed: false,
-  });
+  const [form, setForm] = useState(createInitialForm);
 
   const [olRows, setOlRows] = useState<OLRow[]>([{ ...emptyOL }]);
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   const set = (key: string, value: string | boolean | string[]) => setForm(f => ({ ...f, [key]: value }));
+
+  useEffect(() => {
+    let mounted = true;
+
+    const loadModules = async () => {
+      setModulesLoading(true);
+
+      try {
+        const modules = (await dashboardApi.getModules()) as RegistrationModule[];
+        const names = Array.from(
+          new Set(
+            modules
+              .filter((module) => !module.status || module.status === 'active')
+              .map((module) => module.name?.trim())
+              .filter((name): name is string => Boolean(name))
+          )
+        );
+
+        if (mounted && names.length > 0) {
+          setModuleNames(names);
+        }
+      } catch (error) {
+        console.error('Failed to load modules:', error);
+      } finally {
+        if (mounted) {
+          setModulesLoading(false);
+        }
+      }
+    };
+
+    void loadModules();
+
+    return () => {
+      mounted = false;
+    };
+  }, []);
 
   const toggleSubject = (sub: string) => {
     const current = form.subjects;
@@ -70,6 +197,7 @@ export default function RegisterSection() {
       if (!form.whatsappNo) e.whatsappNo = 'WhatsApp number is required';
       if (!form.email) e.email = 'Email is required';
       if (!form.password) e.password = 'Password is required';
+      if (form.password && form.password.length < 6) e.password = 'Password must be at least 6 characters';
       if (form.password !== form.confirmPassword) e.confirmPassword = 'Passwords do not match';
     }
     if (step === 2) {
@@ -87,13 +215,33 @@ export default function RegisterSection() {
   const next = () => { if (validateStep()) setStep(s => Math.min(s + 1, 5)); };
   const prev = () => setStep(s => Math.max(s - 1, 1));
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (!validateStep()) return;
     setLoading(true);
-    setTimeout(() => {
-      setLoading(false);
+    setSubmitMessage('');
+
+    try {
+      const response = await authApi.registerStudent(
+        buildRegisterPayload(form, olRows)
+      );
+
+      setSubmitMessage(
+        response?.message ||
+          'Registration submitted successfully. Awaiting admin approval.'
+      );
+      setApplicationReference(response?.data?.applicationReference || '');
       setSubmitted(true);
-    }, 2000);
+    } catch (err: any) {
+      const message = Array.isArray(err?.response?.data?.message)
+        ? err.response.data.message.join(', ')
+        : err?.response?.data?.message ||
+          err?.message ||
+          'Unable to submit registration. Please try again.';
+
+      setErrors((current) => ({ ...current, submit: message }));
+    } finally {
+      setLoading(false);
+    }
   };
 
   if (submitted) {
@@ -104,11 +252,11 @@ export default function RegisterSection() {
             <Check className="w-10 h-10 text-green-600" />
           </div>
           <h2 className="text-2xl font-bold text-gray-900 mb-2">Application Submitted!</h2>
-          <p className="text-gray-500 mb-2">Your admission form has been successfully submitted.</p>
+          <p className="text-gray-500 mb-2">{submitMessage || 'Your admission form has been successfully submitted.'}</p>
           <p className="text-gray-500 text-sm mb-6">A confirmation email will be sent to <strong>{form.email}</strong>. Our team will review your application and assign your admission number.</p>
           <div className="bg-blue-50 rounded-xl p-4 mb-6 text-sm text-blue-700">
             <p><strong>Application Reference:</strong></p>
-            <p className="font-mono text-lg mt-1">APP-2024-{Math.floor(Math.random() * 9000 + 1000)}</p>
+            <p className="font-mono text-lg mt-1">{applicationReference || '-'}</p>
           </div>
           <button onClick={() => router.push('/login')} className="w-full py-3 bg-blue-900 text-white font-semibold rounded-xl hover:bg-blue-800 transition-all">
             Go to Login
@@ -158,6 +306,12 @@ export default function RegisterSection() {
             <h2 className="text-xl font-bold text-gray-900">{STEPS[step - 1].label}</h2>
             <p className="text-gray-500 text-sm">{STEPS[step - 1].desc}</p>
           </div>
+
+          {errors.submit && (
+            <div className="mb-5 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+              {errors.submit}
+            </div>
+          )}
 
           {/* Step 1: Basic Info */}
           {step === 1 && (
@@ -449,24 +603,30 @@ export default function RegisterSection() {
               <div>
                 <label className="block text-sm font-semibold text-gray-800 mb-3">Select Subjects <span className="text-red-500">*</span></label>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  {SUBJECTS.map(sub => {
-                    const selected = form.subjects.includes(sub);
-                    return (
-                      <label
-                        key={sub}
-                        className={`flex items-center gap-3 p-3.5 rounded-xl border-2 cursor-pointer transition-all ${selected ? 'border-blue-500 bg-blue-50' : 'border-gray-200 bg-gray-50 hover:border-blue-300'}`}
-                      >
-                        <input
-                          type="checkbox"
-                          checked={selected}
-                          onChange={() => toggleSubject(sub)}
-                          className="text-blue-600 rounded w-4 h-4"
-                        />
-                        <span className={`text-sm font-medium ${selected ? 'text-blue-800' : 'text-gray-700'}`}>{sub}</span>
-                        {selected && <Check className="w-4 h-4 text-blue-600 ml-auto" />}
-                      </label>
-                    );
-                  })}
+                  {modulesLoading ? (
+                    <div className="sm:col-span-2 rounded-xl border border-gray-200 bg-gray-50 p-4 text-sm text-gray-500">
+                      Loading modules...
+                    </div>
+                  ) : (
+                    moduleNames.map(sub => {
+                      const selected = form.subjects.includes(sub);
+                      return (
+                        <label
+                          key={sub}
+                          className={`flex items-center gap-3 p-3.5 rounded-xl border-2 cursor-pointer transition-all ${selected ? 'border-blue-500 bg-blue-50' : 'border-gray-200 bg-gray-50 hover:border-blue-300'}`}
+                        >
+                          <input
+                            type="checkbox"
+                            checked={selected}
+                            onChange={() => toggleSubject(sub)}
+                            className="text-blue-600 rounded w-4 h-4"
+                          />
+                          <span className={`text-sm font-medium ${selected ? 'text-blue-800' : 'text-gray-700'}`}>{sub}</span>
+                          {selected && <Check className="w-4 h-4 text-blue-600 ml-auto" />}
+                        </label>
+                      );
+                    })
+                  )}
                 </div>
                 {errors.subjects && <p className="text-red-500 text-xs mt-2">{errors.subjects}</p>}
               </div>

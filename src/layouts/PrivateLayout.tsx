@@ -1,10 +1,36 @@
 import { Navigate, Outlet } from 'react-router-dom';
+import { useEffect } from 'react';
 import PrivateHeader from '../components/shared/PrivateHeader';
 import WhatsAppButton from '../components/shared/WhatsAppButton';
 import { useAuthStore } from '../store/authStore';
+import { authApi } from '../api/auth.api';
 
 export default function PrivateLayout() {
-  const { isAuthenticated } = useAuthStore();
+  const { isAuthenticated, updateStudent } = useAuthStore();
+
+  useEffect(() => {
+    if (!isAuthenticated) return;
+
+    let mounted = true;
+
+    const refreshStudent = async () => {
+      try {
+        const student = await authApi.getSession();
+
+        if (mounted && student?.email) {
+          updateStudent(student);
+        }
+      } catch (error) {
+        console.error('Failed to refresh student session:', error);
+      }
+    };
+
+    void refreshStudent();
+
+    return () => {
+      mounted = false;
+    };
+  }, [isAuthenticated, updateStudent]);
 
   if (!isAuthenticated) {
     return <Navigate to="/login" replace />;

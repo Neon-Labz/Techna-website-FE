@@ -4,10 +4,10 @@ import DashboardHeroSection from '@/components/dashboard/DashboardHeroSection';
 
 export default function DashboardPage() {
   return (
-    <>
+    <div className="space-y-6">
       <DashboardHeroSection />
-      <NoticesSection />
+      <NoticesSection embedded />
       <DashboardHomeSection />
-    </>
+    </div>
   );
 }

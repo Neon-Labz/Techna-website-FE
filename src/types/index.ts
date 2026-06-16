@@ -1,5 +1,17 @@
 export interface Student {
   id: string;
+  _id?: string;
+  studentId?: string;
+  name?: string;
+  role?: string;
+  modules?: string[];
+  enrolledModules?: string[];
+  subjectSelection?: {
+    subjects?: string[];
+    enrolledModules?: string[];
+  };
+  batch?: string;
+  status?: 'pending' | 'approved' | 'rejected';
   admissionNumber: string;
   serialNumber: string;
   fullNameTamil: string;

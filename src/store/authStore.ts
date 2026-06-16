@@ -9,9 +9,14 @@ export const useAuthStore = create<AuthState>()(
       student: null,
       token: null,
       login: (student: Student, token: string) =>
-        set({ isAuthenticated: true, student, token }),
-      logout: () =>
-        set({ isAuthenticated: false, student: null, token: null }),
+        set(() => ({ isAuthenticated: true, student, token })),
+      logout: () => {
+        set(() => ({ isAuthenticated: false, student: null, token: null }));
+
+        if (typeof window !== 'undefined') {
+          localStorage.removeItem('techna-auth');
+        }
+      },
       updateStudent: (student: Student) =>
         set({ student }),
     }),

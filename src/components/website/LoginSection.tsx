@@ -2,10 +2,30 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { Eye, EyeOff, Mail, Lock, GraduationCap, ArrowRight } from 'lucide-react';
+import { Eye, EyeOff, Mail, Lock, ArrowRight } from 'lucide-react';
 import { useAuthStore } from '../../store/authStore';
-import { mockStudent } from '../../data/mockData';
 import Image from 'next/image';
+import { authApi } from '@/api/auth.api';
+
+const getLoginErrorMessage = (err: any) => {
+  const responseData = err?.response?.data;
+  const details = responseData?.error?.details;
+  const detailMessage = Array.isArray(details)
+    ? details
+        .map((detail) => detail?.message)
+        .find((message) => typeof message === 'string' && message.trim())
+    : undefined;
+  const responseMessage = Array.isArray(responseData?.message)
+    ? responseData.message.join(', ')
+    : responseData?.message;
+  const message = detailMessage || responseMessage || err?.message;
+
+  if (!message || message === 'Unauthorized') {
+    return 'Invalid email/password, or your student account is not approved yet.';
+  }
+
+  return message;
+};
 
 export default function LoginSection() {
   const router = useRouter();
@@ -22,11 +42,15 @@ export default function LoginSection() {
     setError('');
     setLoading(true);
 
-    setTimeout(() => {
-      setLoading(false);
-      login(mockStudent, 'mock-jwt-token-123456789');
+    try {
+      const { student, token } = await authApi.loginStudent(email, password);
+      login(student, token);
       router.push('/dashboard');
-    }, 1500);
+    } catch (err: any) {
+      setError(getLoginErrorMessage(err));
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -115,7 +139,7 @@ export default function LoginSection() {
           </div>
 
           <div className="mt-4 p-3 bg-blue-50 rounded-xl text-xs text-blue-700 text-center">
-            <strong>Demo:</strong> Use any email & password to login
+            Use your approved student email and password to login
           </div>
         </div>
 
