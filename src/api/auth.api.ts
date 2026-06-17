@@ -20,6 +20,7 @@ export type RegisterStudentPayload = {
   personal: {
     fullNameTamil?: string;
     fullNameEnglish: string;
+    dateOfBirth?: string;
     dobDay?: number;
     dobMonth?: number;
     dobYear?: number;
@@ -71,8 +72,11 @@ export type RegisterStudentPayload = {
 
 export type RegisterStudentResponse = {
   message?: string;
+  applicationReference?: string;
+  reference?: string;
   data?: Student & {
     applicationReference?: string;
+    reference?: string;
   };
 };
 
@@ -89,13 +93,8 @@ export const authApi = {
   async loginStudent(email: string, password: string) {
     const loginRes = await api.post<LoginResponse>(
       '/auth/student/login',
-      {
-        email,
-        password,
-      },
-      {
-        headers: { 'X-Skip-Auth': 'true' },
-      }
+      { email, password },
+      { headers: { 'X-Skip-Auth': 'true' } }
     );
 
     const token = getLoginToken(loginRes.data);
@@ -105,9 +104,7 @@ export const authApi = {
     }
 
     const sessionRes = await api.get<SessionResponse>('/auth/session', {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
+      headers: { Authorization: `Bearer ${token}` },
     });
 
     const student = getSessionStudent(sessionRes.data);
@@ -119,20 +116,21 @@ export const authApi = {
     return { student, token };
   },
 
-  async registerStudent(payload: RegisterStudentPayload) {
+  async registerStudent(payload: RegisterStudentPayload | FormData) {
     const res = await api.post<RegisterStudentResponse>(
       '/students/register',
       payload,
-      {
-        headers: { 'X-Skip-Auth': 'true' },
-      }
+      { headers: { 'X-Skip-Auth': 'true' } }
     );
 
     return res.data;
   },
 
-  async getSession() {
-    const res = await api.get<SessionResponse>('/auth/session');
+  async getSession(token?: string) {
+    const res = await api.get<SessionResponse>('/auth/session', {
+      headers: token ? { Authorization: `Bearer ${token}` } : undefined,
+    });
+
     return getSessionStudent(res.data);
   },
 
@@ -140,3 +138,7 @@ export const authApi = {
     return api.post('/auth/logout');
   },
 };
+
+export const registerStudent = authApi.registerStudent;
+export const studentLogin = authApi.loginStudent;
+export const getSession = authApi.getSession;

@@ -106,10 +106,13 @@ const typeDots: Record<NoticeType, string> = {
 
 const normalizeText = (value?: string) => (value || '').trim().toLowerCase();
 
-const moduleKey = (module: Module) => module._id || module.id || module.name || '';
+const moduleKey = (module: Module) =>
+  module._id || module.id || module.name || '';
 
 const selectionKeys = (selection: ModuleSelection) => {
-  if (typeof selection === 'string') return [normalizeText(selection)].filter(Boolean);
+  if (typeof selection === 'string') {
+    return [normalizeText(selection)].filter(Boolean);
+  }
 
   return [
     selection._id,
@@ -125,6 +128,7 @@ const selectionKeys = (selection: ModuleSelection) => {
 
 const formatNoticeDate = (value?: string) => {
   if (!value) return '-';
+
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) return value;
 
@@ -143,7 +147,10 @@ const isPublished = (item: {
   if (typeof item.isPublished === 'boolean') return item.isPublished;
   if (typeof item.published === 'boolean') return item.published;
 
-  const publishText = normalizeText(String(item.isPublished ?? item.published ?? ''));
+  const publishText = normalizeText(
+    String(item.isPublished ?? item.published ?? '')
+  );
+
   if (publishText === 'true' || publishText === 'published') return true;
   if (publishText === 'false' || publishText === 'unpublished') return false;
 
@@ -151,7 +158,7 @@ const isPublished = (item: {
   if (status === 'published') return true;
   if (status === 'draft' || status === 'unpublished') return false;
 
-  return false;
+  return true;
 };
 
 const isVideoResource = (resource: Video) => {
@@ -168,7 +175,9 @@ const isVideoResource = (resource: Video) => {
 
 export default function DashboardHomeSection() {
   const { student } = useAuthStore();
-  const studentKey = student?._id || student?.id || student?.studentId || student?.email || '';
+
+  const studentKey =
+    student?._id || student?.id || student?.studentId || student?.email || '';
 
   const [activeModule, setActiveModule] = useState<string>('all');
   const [notices, setNotices] = useState<Notice[]>([]);
@@ -211,7 +220,7 @@ export default function DashboardHomeSection() {
       }
     };
 
-    fetchDashboardData();
+    void fetchDashboardData();
   }, [studentKey]);
 
   const studentModuleSelections = useMemo(() => {
@@ -251,7 +260,10 @@ export default function DashboardHomeSection() {
       const id = normalizeText(module._id || module.id);
       const name = normalizeText(module.name);
 
-      return studentModuleSelectionSet.has(id) || studentModuleSelectionSet.has(name);
+      return (
+        studentModuleSelectionSet.has(id) ||
+        studentModuleSelectionSet.has(name)
+      );
     });
   }, [modules, studentModuleSelectionSet, studentModuleSelections.length]);
 
@@ -276,7 +288,7 @@ export default function DashboardHomeSection() {
   );
 
   const isSelectedModuleContent = (...moduleRefs: Array<string | undefined>) => {
-    if (studentModuleSelections.length === 0) return false;
+    if (studentModuleSelections.length === 0) return true;
 
     const refs = moduleRefs.map(normalizeText).filter(Boolean);
 
@@ -317,11 +329,13 @@ export default function DashboardHomeSection() {
     );
   }, [modules]);
 
-  const studentModules = selectedModules;
+  const studentModules = selectedModules.length > 0 ? selectedModules : modules;
 
   const filteredVideos =
     activeModule === 'all'
-      ? allVideos.filter((v) => isSelectedModuleContent(v.moduleId, v.moduleName))
+      ? allVideos.filter((v) =>
+          isSelectedModuleContent(v.moduleId, v.moduleName)
+        )
       : allVideos.filter(
           (v) =>
             normalizeText(v.moduleId) === normalizeText(activeModule) ||
@@ -331,9 +345,9 @@ export default function DashboardHomeSection() {
   const recentResults = results.slice(0, 3);
 
   return (
-<section className="mx-auto w-full max-w-[1480px] px-4 py-6">      <div className="space-y-8">
+    <section className="mx-auto w-full max-w-[1480px] px-4 py-6">
+      <div className="space-y-8">
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-3 lg:gap-8">
-          {/* Exam Notices */}
           <div className="lg:col-span-1">
             <div className="rounded-2xl border border-gray-100 bg-white p-4 shadow-sm sm:p-5">
               <div className="mb-4 flex items-center justify-between gap-3">
@@ -395,7 +409,6 @@ export default function DashboardHomeSection() {
             </div>
           </div>
 
-          {/* Lecture Videos */}
           <div className="lg:col-span-2">
             <div className="rounded-2xl border border-gray-100 bg-white p-4 shadow-sm sm:p-5">
               <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
@@ -441,6 +454,7 @@ export default function DashboardHomeSection() {
                       video.uploadedAt ||
                       video.createdAt ||
                       new Date().toISOString();
+
                     const videoUrl = video.fileUrl || video.url || '#';
 
                     return (
@@ -493,7 +507,6 @@ export default function DashboardHomeSection() {
           </div>
         </div>
 
-        {/* Recent Results */}
         <div className="rounded-2xl border border-gray-100 bg-white p-4 shadow-sm sm:p-5">
           <div className="mb-4 flex items-center justify-between gap-3">
             <h2 className="flex items-center gap-2 font-bold text-gray-900">
@@ -612,7 +625,10 @@ export default function DashboardHomeSection() {
               <div className="rounded-xl border border-gray-100 p-3">
                 <p className="text-xs text-gray-400">Module</p>
                 <p className="mt-1 font-semibold text-gray-800">
-                  {selectedNotice.moduleName || selectedNotice.module || selectedNotice.subject || '-'}
+                  {selectedNotice.moduleName ||
+                    selectedNotice.module ||
+                    selectedNotice.subject ||
+                    '-'}
                 </p>
               </div>
 
@@ -642,7 +658,9 @@ export default function DashboardHomeSection() {
                 </p>
                 <p className="mt-1 font-semibold text-gray-800">
                   {selectedNotice.startTime || selectedNotice.endTime
-                    ? `${selectedNotice.startTime || '-'} - ${selectedNotice.endTime || '-'}`
+                    ? `${selectedNotice.startTime || '-'} - ${
+                        selectedNotice.endTime || '-'
+                      }`
                     : '-'}
                 </p>
               </div>
@@ -655,7 +673,6 @@ export default function DashboardHomeSection() {
                   {selectedNotice.venue || '-'}
                 </p>
               </div>
-
             </div>
 
             <div className="mt-4 rounded-xl border border-red-100 bg-red-50 p-4 text-sm text-red-700">

@@ -4,8 +4,8 @@ import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { Menu, X, LogOut, Bell, User } from 'lucide-react';
-import { useAuthStore } from '../../store/authStore';
 import Image from 'next/image';
+import { useAuthStore } from '../../store/authStore';
 import { authApi } from '@/api/auth.api';
 
 export default function PrivateHeader() {
@@ -15,21 +15,24 @@ export default function PrivateHeader() {
 
   const pathname = usePathname();
   const router = useRouter();
+
   const { student, token, logout } = useAuthStore();
+  const studentData = student as any;
 
   const fullName =
-    student?.fullNameEnglish?.trim() ||
-    student?.name?.trim() ||
+    studentData?.fullNameEnglish?.trim() ||
+    studentData?.name?.trim() ||
     'Student';
 
   const firstName = fullName?.split(' ')?.[0] || 'Student';
+  const studentId = studentData?.studentId?.trim() || '-';
+  const email = studentData?.email?.trim() || '-';
 
-  const admissionNo =
-    student?.admissionNumber?.trim() ||
-    student?.studentId?.trim() ||
-    '-';
-
-  const email = student?.email?.trim() || '-';
+  const profileImage =
+    studentData?.profilePhoto ||
+    studentData?.avatar ||
+    studentData?.profileImage ||
+    '';
 
   const navLinks = [
     { label: 'Home', path: '/dashboard' },
@@ -77,8 +80,11 @@ export default function PrivateHeader() {
   return (
     <header className="sticky top-0 z-40 w-full border-b border-gray-200 bg-white shadow-sm">
       <div className="mx-auto w-full max-w-[1215px] px-3">
-          <div className="flex h-14 items-center justify-between gap-3">
-          <Link href="/dashboard" className="flex shrink-0 items-center gap-2 -ml-5">
+        <div className="flex h-14 items-center justify-between gap-3">
+          <Link
+            href="/dashboard"
+            className="flex shrink-0 items-center gap-2 -ml-5"
+          >
             <Image
               src="/logo.png"
               alt="Techna Logo"
@@ -88,7 +94,7 @@ export default function PrivateHeader() {
               priority
             />
 
-           <div className="leading-tight">
+            <div className="leading-tight">
               <h1 className="text-xl font-semibold text-[#0183CB]">
                 Techna
               </h1>
@@ -130,7 +136,18 @@ export default function PrivateHeader() {
                 onClick={() => setDropdownOpen((prev) => !prev)}
                 className="flex items-center gap-2 rounded-md border border-gray-200 bg-gray-50 px-3 py-1.5 text-[#0183CB] hover:bg-gray-100"
               >
-                <User className="h-4 w-4 shrink-0 text-sky-600" />
+                <div className="flex h-7 w-7 items-center justify-center overflow-hidden rounded-full bg-yellow-400">
+                  {profileImage ? (
+                    <img
+                      src={profileImage}
+                      alt={fullName}
+                      className="h-full w-full object-cover"
+                    />
+                  ) : (
+                    <User className="h-4 w-4 text-blue-900" />
+                  )}
+                </div>
+
                 <span className="max-w-[120px] truncate text-xs font-semibold uppercase">
                   {firstName}
                 </span>
@@ -143,7 +160,7 @@ export default function PrivateHeader() {
                       {fullName}
                     </p>
                     <p className="truncate text-xs text-gray-500">
-                      {admissionNo}
+                      {studentId}
                     </p>
                     <p className="truncate text-xs text-gray-500">
                       {email}
@@ -187,16 +204,26 @@ export default function PrivateHeader() {
 
         {menuOpen && (
           <div className="border-t border-gray-100 py-3 md:hidden">
-            <div className="mb-2 rounded-lg bg-sky-50 px-4 py-3">
-              <p className="truncate text-sm font-semibold text-gray-900">
-                {fullName}
-              </p>
-              <p className="truncate text-xs text-gray-500">
-                {admissionNo}
-              </p>
-              <p className="truncate text-xs text-gray-500">
-                {email}
-              </p>
+            <div className="mb-2 flex items-center gap-3 rounded-lg bg-sky-50 px-4 py-3">
+              <div className="flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-full bg-yellow-400">
+                {profileImage ? (
+                  <img
+                    src={profileImage}
+                    alt={fullName}
+                    className="h-full w-full object-cover"
+                  />
+                ) : (
+                  <User className="h-5 w-5 text-blue-900" />
+                )}
+              </div>
+
+              <div className="min-w-0">
+                <p className="truncate text-sm font-semibold text-gray-900">
+                  {fullName}
+                </p>
+                <p className="truncate text-xs text-gray-500">{studentId}</p>
+                <p className="truncate text-xs text-gray-500">{email}</p>
+              </div>
             </div>
 
             <div className="flex flex-col gap-1">

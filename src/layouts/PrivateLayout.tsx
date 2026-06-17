@@ -6,19 +6,27 @@ import { useAuthStore } from '../store/authStore';
 import { authApi } from '../api/auth.api';
 
 export default function PrivateLayout() {
-  const { isAuthenticated, updateStudent } = useAuthStore();
+  const {
+    hasHydrated,
+    isAuthenticated,
+    student,
+    token,
+    updateStudent,
+  } = useAuthStore();
+
+  const hasValidSession = Boolean(isAuthenticated && student && token);
 
   useEffect(() => {
-    if (!isAuthenticated) return;
+    if (!hasValidSession) return;
 
     let mounted = true;
 
     const refreshStudent = async () => {
       try {
-        const student = await authApi.getSession();
+        const refreshedStudent = await authApi.getSession();
 
-        if (mounted && student?.email) {
-          updateStudent(student);
+        if (mounted && refreshedStudent?.email) {
+          updateStudent(refreshedStudent);
         }
       } catch (error) {
         console.error('Failed to refresh student session:', error);
@@ -30,9 +38,11 @@ export default function PrivateLayout() {
     return () => {
       mounted = false;
     };
-  }, [isAuthenticated, updateStudent]);
+  }, [hasValidSession, updateStudent]);
 
-  if (!isAuthenticated) {
+  if (!hasHydrated) return null;
+
+  if (!hasValidSession) {
     return <Navigate to="/login" replace />;
   }
 

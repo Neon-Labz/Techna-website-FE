@@ -18,6 +18,13 @@
       "@/*": ["./src/*"]
     }
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "app/**/*.ts", "app/**/*.tsx"],
-  "exclude": ["node_modules", "vite.config.ts"]
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
+  "exclude": [
+    "node_modules",
+    "vite.config.ts",
+    "src/App.tsx",
+    "src/main.tsx",
+    "src/layouts/PrivateLayout.tsx",
+    "src/layouts/PublicLayout.tsx"
+  ]
 }
