@@ -19,3 +19,11 @@ export const getSession = async (token?: string) => {
   });
   return response.data;
 };
+
+export const changePassword = async (currentPassword: string, newPassword: string) => {
+  const response = await apiClient.post('/auth/change-password', {
+    currentPassword,
+    newPassword,
+  });
+  return response.data;
+};
