@@ -1,7 +1,7 @@
 'use client';
 import { useRouter } from 'next/navigation';
 import { GraduationCap, Clock, LogOut } from 'lucide-react';
-import { useAuthStore } from '../../src/store/authStore';
+import { useAuthStore } from '@/store/authStore';
 
 export default function PendingApprovalPage() {
   const { student, logout } = useAuthStore();

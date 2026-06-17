@@ -1,6 +1,6 @@
 'use client';
 import Link from 'next/link';
-import { useAuthStore } from '../../src/store/authStore';
+import { useAuthStore } from '@/store/authStore';
 import { LayoutDashboard, CreditCard, Trophy, User, ClipboardList } from 'lucide-react';
 
 export default function PortalPage() {
