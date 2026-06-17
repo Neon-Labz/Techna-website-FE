@@ -1,8 +1,10 @@
 'use client';
 import { useState, useEffect } from 'react';
 import { CreditCard, Download, CheckCircle, Clock, AlertCircle, Filter, Receipt, DollarSign } from 'lucide-react';
-import { getStudentPayments, type PaymentRecord } from '@/api/payment.api';
+import { paymentApi, type PaymentFromApi } from '@/api/payment.api';
 import jsPDF from 'jspdf';
+
+type PaymentRecord = PaymentFromApi;
 
 const statusConfig = {
   paid: { label: 'Paid', color: 'bg-green-100 text-green-700 border-green-200', icon: CheckCircle, dot: 'bg-green-500' },
@@ -56,10 +58,10 @@ export default function PaymentsSection() {
       setLoading(false);
       return;
     }
-    const fetch = async () => {
+    const fetchPayments = async () => {
       try {
         setLoading(true);
-        const data = await getStudentPayments(student.studentId);
+        const data = await paymentApi.getByStudent(student.studentId);
         setPayments(data);
       } catch (err) {
         console.error('Failed to fetch payments:', err);
@@ -67,7 +69,7 @@ export default function PaymentsSection() {
         setLoading(false);
       }
     };
-    fetch();
+    fetchPayments();
   }, [student.studentId]);
 
   const modules = [...new Set(payments.map(p => p.moduleName))];
