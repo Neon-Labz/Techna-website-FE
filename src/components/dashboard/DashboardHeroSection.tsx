@@ -32,8 +32,7 @@ export default function DashboardHeroSection() {
   const studentFullName =
     student?.fullNameEnglish?.trim() || student?.name?.trim() || 'Student';
   const studentFirstName = studentFullName?.split(' ')?.[0] || 'Student';
-  const admissionNo =
-    student?.admissionNumber?.trim() || student?.studentId?.trim() || '-';
+  const admissionNo = student?.studentId?.trim() || '-';
 
   const [notices, setNotices] = useState<Notice[]>([]);
   const [modules, setModules] = useState<Module[]>([]);
@@ -143,9 +142,9 @@ export default function DashboardHeroSection() {
   ];
 
   return (
-    <section className="mx-auto w-full max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
+<section className="mx-auto w-full max-w-[1250px] px-4 py-6">
       <div className="space-y-6">
-        <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-sky-600 via-cyan-500 to-sky-400 px-5 py-6 text-white shadow-sm md:px-7 md:py-7">
+      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-[#0183CB] to-[#34BFF3] px-5 py-6 text-white shadow-sm md:px-7 md:py-7">    
           <div className="absolute -right-10 -top-16 h-52 w-52 rounded-full bg-white/10" />
           <div className="absolute right-16 -bottom-16 h-28 w-28 rounded-full bg-white/10" />
 
@@ -162,26 +161,26 @@ export default function DashboardHeroSection() {
             </p>
 
             <div className="mt-5 flex flex-wrap gap-3">
-              <div className="min-w-[78px] rounded-lg bg-slate-900/20 px-4 py-2">
+              <div className="min-w-[78px] rounded-lg bg-white/20 px-4 py-2">
                 <p className="text-lg font-bold">
                   {avgScore ? `${avgScore}%` : '-'}
                 </p>
                 <p className="text-[10px] text-white/75">Avg. Score</p>
               </div>
 
-              <div className="min-w-[78px] rounded-lg bg-slate-900/20 px-4 py-2">
+              <div className="min-w-[78px] rounded-lg bg-white/20 px-4 py-2">
                 <p className="text-lg font-bold">
                   {enrolledModuleCount}
                 </p>
                 <p className="text-[10px] text-white/75">Subjects</p>
               </div>
 
-              <div className="min-w-[78px] rounded-lg bg-slate-900/20 px-4 py-2">
+              <div className="min-w-[78px] rounded-lg bg-white/20 px-4 py-2">
                 <p className="text-lg font-bold">{results.length}</p>
                 <p className="text-[10px] text-white/75">Results</p>
               </div>
 
-              <div className="min-w-[90px] rounded-lg bg-slate-900/20 px-4 py-2">
+              <div className="min-w-[90px] rounded-lg bg-white/20 px-4 py-2">
                 <p className="text-lg font-bold">
                   {admissionNo}
                 </p>

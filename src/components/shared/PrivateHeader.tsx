@@ -76,9 +76,9 @@ export default function PrivateHeader() {
 
   return (
     <header className="sticky top-0 z-40 w-full border-b border-gray-200 bg-white shadow-sm">
-      <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="flex h-14 items-center justify-between gap-3">
-          <Link href="/dashboard" className="flex shrink-0 items-center gap-2">
+      <div className="mx-auto w-full max-w-[1215px] px-3">
+          <div className="flex h-14 items-center justify-between gap-3">
+          <Link href="/dashboard" className="flex shrink-0 items-center gap-2 -ml-5">
             <Image
               src="/logo.png"
               alt="Techna Logo"
@@ -87,6 +87,15 @@ export default function PrivateHeader() {
               className="h-auto w-[88px] object-contain sm:w-[95px]"
               priority
             />
+
+           <div className="leading-tight">
+              <h1 className="text-xl font-semibold text-[#0183CB]">
+                Techna
+              </h1>
+              <p className="text-sm font-medium text-[#0183CB]">
+                Student Portal
+              </p>
+            </div>
           </Link>
 
           <nav className="hidden items-center gap-1 md:flex">
@@ -97,7 +106,7 @@ export default function PrivateHeader() {
                 className={`rounded-md px-4 py-1.5 text-xs font-semibold transition-all ${
                   isActive(link.path)
                     ? 'bg-sky-500 text-white shadow-sm'
-                    : 'text-gray-600 hover:bg-sky-50 hover:text-sky-600'
+                    : 'text-[#0183CB] hover:bg-sky-50 hover:text-sky-600'
                 }`}
               >
                 {link.label}
@@ -109,7 +118,7 @@ export default function PrivateHeader() {
             <button
               type="button"
               aria-label="Notifications"
-              className="relative rounded-full p-2 text-gray-500 hover:bg-gray-100 hover:text-sky-600"
+              className="relative rounded-full p-2 text-[#0183CB] hover:bg-gray-100 hover:text-sky-600"
             >
               <Bell className="h-4 w-4" />
               <span className="absolute right-1.5 top-1.5 h-1.5 w-1.5 rounded-full bg-red-500" />
@@ -119,7 +128,7 @@ export default function PrivateHeader() {
               <button
                 type="button"
                 onClick={() => setDropdownOpen((prev) => !prev)}
-                className="flex items-center gap-2 rounded-md border border-gray-200 bg-gray-50 px-3 py-1.5 text-gray-700 hover:bg-gray-100"
+                className="flex items-center gap-2 rounded-md border border-gray-200 bg-gray-50 px-3 py-1.5 text-[#0183CB] hover:bg-gray-100"
               >
                 <User className="h-4 w-4 shrink-0 text-sky-600" />
                 <span className="max-w-[120px] truncate text-xs font-semibold uppercase">

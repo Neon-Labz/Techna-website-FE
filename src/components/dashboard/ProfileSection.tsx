@@ -64,7 +64,7 @@ export default function ProfileSection() {
             <h1 className="text-2xl font-bold">{student?.fullNameEnglish}</h1>
             <p className="text-blue-300 text-sm mt-1">{student?.fullNameTamil}</p>
             <div className="flex flex-wrap justify-center md:justify-start gap-3 mt-3">
-              <span className="px-3 py-1 bg-white/10 rounded-full text-xs font-medium">{student?.admissionNumber}</span>
+              <span className="px-3 py-1 bg-white/10 rounded-full text-xs font-medium">{student?.studentId || '-'}</span>
               <span className="px-3 py-1 bg-yellow-400/20 border border-yellow-400/30 text-yellow-300 rounded-full text-xs font-medium">Active Student</span>
               <span className="px-3 py-1 bg-white/10 rounded-full text-xs font-medium">{student?.email}</span>
             </div>
@@ -214,13 +214,11 @@ export default function ProfileSection() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-6">
             <div>
-              <label className="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1.5">Admission Number</label>
-              <input value={student?.admissionNumber || ''} disabled className={inputCls(true)} />
+              <label className="block text-xs font-semibold text-gray-800 uppercase tracking-wider mb-1.5">
+              Admission Number              </label>
+              <input value={student?.studentId || ''} disabled className={inputCls(true)} />
             </div>
-            <div>
-              <label className="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1.5">Serial Number</label>
-              <input value={student?.serialNumber || ''} disabled className={inputCls(true)} />
-            </div>
+           
           </div>
 
           <div className="mb-6">

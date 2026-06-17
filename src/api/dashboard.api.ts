@@ -26,7 +26,6 @@ export const dashboardApi = {
   },
 
   getResults: async () => {
-    const res = await api.get('/results');
-    return getArrayData(res.data);
+    return [];
   },
 };

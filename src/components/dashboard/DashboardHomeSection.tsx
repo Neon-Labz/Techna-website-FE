@@ -331,15 +331,14 @@ export default function DashboardHomeSection() {
   const recentResults = results.slice(0, 3);
 
   return (
-    <section className="mx-auto w-full max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
-      <div className="space-y-8">
+<section className="mx-auto w-full max-w-[1480px] px-4 py-6">      <div className="space-y-8">
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-3 lg:gap-8">
           {/* Exam Notices */}
           <div className="lg:col-span-1">
             <div className="rounded-2xl border border-gray-100 bg-white p-4 shadow-sm sm:p-5">
               <div className="mb-4 flex items-center justify-between gap-3">
                 <h2 className="flex items-center gap-2 font-bold text-gray-900">
-                  <Bell className="h-5 w-5 text-blue-700" /> Exam Notices
+                  <Bell className="h-5 w-5 text-[#0183CB]" /> Exam Notices
                 </h2>
                 <span className="shrink-0 text-xs text-gray-400">
                   {examNotices.length} active
@@ -401,7 +400,7 @@ export default function DashboardHomeSection() {
             <div className="rounded-2xl border border-gray-100 bg-white p-4 shadow-sm sm:p-5">
               <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                 <h2 className="flex items-center gap-2 font-bold text-gray-900">
-                  <Play className="h-5 w-5 text-blue-700" /> Lecture Recordings
+                  <Play className="h-5 w-5 text-[#0183CB]" /> Lecture Recordings
                 </h2>
 
                 <div className="flex items-center gap-1.5 sm:justify-end">
@@ -498,12 +497,12 @@ export default function DashboardHomeSection() {
         <div className="rounded-2xl border border-gray-100 bg-white p-4 shadow-sm sm:p-5">
           <div className="mb-4 flex items-center justify-between gap-3">
             <h2 className="flex items-center gap-2 font-bold text-gray-900">
-              <Award className="h-5 w-5 text-blue-700" /> Recent Results
+              <Award className="h-5 w-5 text-[#0183CB]" /> Recent Results
             </h2>
 
             <Link
               href="/dashboard/results"
-              className="flex shrink-0 items-center gap-1 text-xs font-medium text-blue-700 hover:underline"
+              className="flex shrink-0 items-center gap-1 text-xs font-medium text-[#0183CB] hover:underline"
             >
               View All <ChevronRight className="h-3 w-3" />
             </Link>
