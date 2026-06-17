@@ -13,6 +13,7 @@ export interface Student {
   parentsNo: string;
   email: string;
   subjects: string[];
+
   // Personal Details
   permanentAddress: string;
   administrativeDistrict: string;
@@ -30,12 +31,14 @@ export interface Student {
   guardianAddress: string;
   guardianFixedTel: string;
   guardianMobile: string;
+
   // OL Results
   olCategory: string;
   olYear: string;
   olIndexNumber: string;
   olNameUsed: string;
   olResults: OLResult[];
+
   profilePhoto?: string;
   createdAt: string;
 }
@@ -115,7 +118,17 @@ export interface AuthState {
   isAuthenticated: boolean;
   student: Student | null;
   token: string | null;
-  login: (student: Student | null, token: string) => void;
+  hasHydrated: boolean;
+
+  login: (
+    student: Student | null,
+    token: string,
+    rememberMe?: boolean
+  ) => void;
+
   logout: () => void;
+
+  setHasHydrated: (hasHydrated: boolean) => void;
+
   updateStudent: (student: Student) => void;
 }

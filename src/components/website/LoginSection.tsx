@@ -1,81 +1,89 @@
 'use client';
-import { useState } from 'react';
+
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 import { Eye, EyeOff, Mail, Lock, ArrowRight } from 'lucide-react';
 import { useAuthStore } from '../../store/authStore';
-import type { Student } from '../../types';
-import Image from 'next/image';
+import { getSession, studentLogin } from '../../api/auth.api';
 
-const API = 'http://localhost:4000/api';
+const getApiErrorMessage = (error: unknown, fallback: string) => {
+  const responseData = (error as { response?: { data?: { message?: string | string[] } } })?.response?.data;
+  const message = responseData?.message;
+
+  if (Array.isArray(message)) return message.join(', ');
+  if (message) return message;
+  if (error instanceof Error) return error.message;
+  return fallback;
+};
 
 export default function LoginSection() {
   const router = useRouter();
-  const { login } = useAuthStore();
+  const { hasHydrated, isAuthenticated, login, student, token } = useAuthStore();
+
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [rememberMe, setRememberMe] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
+  useEffect(() => {
+    if (hasHydrated && isAuthenticated && student && token) {
+      router.replace('/dashboard');
+    }
+  }, [hasHydrated, isAuthenticated, router, student, token]);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!email || !password) { setError('Please fill in all fields.'); return; }
+
+    if (!email || !password) {
+      setError('Please fill in all fields.');
+      return;
+    }
+
     setError('');
     setLoading(true);
 
     try {
-      const res = await fetch(`${API}/auth/student/login`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: email.trim(), password }),
-      });
+      const result = await studentLogin(email.trim(), password);
 
-      const data = await res.json();
+      const accessToken =
+        result.access_token ||
+        result.token ||
+        result.accessToken ||
+        result.data?.access_token ||
+        result.data?.token ||
+        result.data?.accessToken;
 
-      if (!res.ok) {
-        const msg = data?.message ?? 'Invalid credentials';
-        setError(Array.isArray(msg) ? msg.join(' ') : msg);
-        return;
+      if (!accessToken) {
+        throw new Error('Login response was missing access token.');
       }
 
-      const loginData = data as {
-        access_token: string;
-        student?: Partial<Student>;
-        user?: Partial<Student>;
-        data?: { student?: Partial<Student> };
-      };
-      const access_token = loginData.access_token;
+      const sessionResult = await getSession(accessToken);
+      const studentData =
+        sessionResult.student ||
+        sessionResult.user ||
+        sessionResult.data?.student ||
+        sessionResult.data?.user ||
+        sessionResult.data;
 
-      // Use student data from login response if provided
-      let studentData: Student | null =
-        (loginData.student as Student) ??
-        (loginData.user as Student) ??
-        (loginData.data?.student as Student) ??
-        null;
-
-      // Fall back to /auth/session only if login didn't return student
-      if (!studentData?.email && !studentData?.id) {
-        try {
-          const profileRes = await fetch(`${API}/auth/session`, {
-            headers: { Authorization: `Bearer ${access_token}` },
-          });
-          if (profileRes.ok) {
-            const profile = await profileRes.json();
-            // Only accept if it's real student data, not an error body
-            if (profile?.email || profile?._id) {
-              studentData = { ...profile, id: profile._id ?? profile.id } as Student;
-            }
-          }
-        } catch { /* session optional — login data takes priority */ }
+      if (!studentData) {
+        throw new Error('Failed to load student session.');
       }
 
-      // Always navigate after a successful login — the session call is best-effort.
-      // The PDF handler fetches fresh profile data from the API when needed.
-      login(studentData, access_token);
+      login(studentData, accessToken, rememberMe);
       router.push('/dashboard');
-    } catch {
-      setError('Unable to connect to the server. Please try again.');
+    } catch (error) {
+      localStorage.removeItem('token');
+      localStorage.removeItem('access_token');
+      localStorage.removeItem('accessToken');
+      sessionStorage.removeItem('token');
+      sessionStorage.removeItem('access_token');
+      sessionStorage.removeItem('accessToken');
+
+      setError(getApiErrorMessage(error, 'Login failed. Please check your credentials.'));
     } finally {
       setLoading(false);
     }
@@ -110,6 +118,7 @@ export default function LoginSection() {
                   value={email}
                   onChange={e => setEmail(e.target.value)}
                   placeholder="student@techna.lk"
+                  autoComplete="new-email"
                   className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-gray-50 text-gray-900 placeholder-gray-400"
                 />
               </div>
@@ -124,6 +133,7 @@ export default function LoginSection() {
                   value={password}
                   onChange={e => setPassword(e.target.value)}
                   placeholder="Enter your password"
+                  autoComplete="new-password"
                   className="w-full pl-10 pr-11 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-gray-50 text-gray-900 placeholder-gray-400"
                 />
                 <button
@@ -138,10 +148,17 @@ export default function LoginSection() {
 
             <div className="flex items-center justify-between text-sm">
               <label className="flex items-center gap-2 text-gray-600 cursor-pointer">
-                <input type="checkbox" className="rounded border-gray-300 text-blue-600" />
+                <input
+                  type="checkbox"
+                  checked={rememberMe}
+                  onChange={e => setRememberMe(e.target.checked)}
+                  className="rounded border-gray-300 text-blue-600"
+                />
                 Remember me
               </label>
-              <Link href="/forgot-password" className="text-blue-700 font-medium hover:underline">Forgot password?</Link>
+              <Link href="/forgot-password" className="text-blue-700 font-medium hover:underline">
+                Forgot password?
+              </Link>
             </div>
 
             <button
@@ -165,7 +182,6 @@ export default function LoginSection() {
               </Link>
             </p>
           </div>
-
         </div>
 
         <div className="text-center mt-6">

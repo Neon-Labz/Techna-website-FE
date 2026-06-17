@@ -1,5 +1,9 @@
 import api from '@/lib/axios';
 
+// --------------------
+// Types
+// --------------------
+
 export interface LoginResponse {
   access_token: string;
   role: string;
@@ -16,21 +20,31 @@ export interface SessionResponse {
   createdAt?: string;
 }
 
+// --------------------
+// Auth API
+// --------------------
+
 export const authApi = {
   /**
-   * Login student with email and password
+   * Student register
+   */
+  registerStudent: (formData: FormData): Promise<any> =>
+    api.post('/students/register', formData),
+
+  /**
+   * Student login
    */
   studentLogin: (email: string, password: string): Promise<LoginResponse> =>
     api.post('/auth/student/login', { email, password }),
 
   /**
-   * Get the current session/user info using stored token
+   * Get current session
    */
-  getSession: (): Promise<any> =>
+  getSession: (): Promise<SessionResponse> =>
     api.get('/auth/session'),
 
   /**
-   * Logout the current user
+   * Logout user
    */
   logout: (): Promise<{ message: string }> =>
     api.post('/auth/logout'),
