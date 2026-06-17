@@ -51,7 +51,7 @@ export default function FeaturedModulesSection() {
             <span className="text-[#34BFF3] font-semibold text-[12px] uppercase tracking-[0.1em]">
               OUR PROGRAMS
             </span>
-            <h2 className="text-[32px] font-bold text-[#0a0a0f] mt-1">
+            <h2 className="text-[30px] font-bold text-[#0a0a0f] mt-1">
               Explore Our Programs
             </h2>
             <p className="text-[#6b7280] text-[14px] mt-2 max-w-md leading-relaxed">
@@ -61,7 +61,7 @@ export default function FeaturedModulesSection() {
           </div>
           <button
             onClick={() => router.push('/modules')}
-            className="flex items-center gap-2 bg-[#34BFF3] hover:bg-[#2aadd8] text-white text-[13px] font-semibold px-4 py-2.5 rounded-full transition-all duration-200"
+            className="flex items-center gap-2 bg-[#34BFF3] hover:bg-[#2aadd8] text-white text-[13px] font-semibold px-4 py-2.5 rounded-full transition-all duration-200 whitespace-nowrap"
           >
             View All Programs <ArrowRight className="w-4 h-4" />
           </button>
@@ -90,7 +90,7 @@ export default function FeaturedModulesSection() {
                   className="group rounded-2xl overflow-hidden border border-[#e5e7eb] shadow-sm hover:shadow-lg transition-all duration-300 hover:-translate-y-1 cursor-pointer bg-white"
                   onClick={() => router.push('/modules')}
                 >
-                  {/* Card Top - Gradient */}
+                  {/* Card Top */}
                   <div
                     className="p-6 relative overflow-hidden"
                     style={{
@@ -99,16 +99,13 @@ export default function FeaturedModulesSection() {
                   >
                     <div className="absolute -right-4 -top-4 w-20 h-20 bg-white/10 rounded-full" />
                     <div className="absolute right-4 -bottom-6 w-14 h-14 bg-white/10 rounded-full" />
-
-                    <div className="w-11 h-11 bg-white/20 rounded-xl flex items-center justify-center mb-4">
+                    <div className="w-11 h-11 bg-white/20 rounded-xl flex items-center justify-center mb-4 relative z-10">
                       <Icon className="w-5 h-5 text-white" />
                     </div>
-
-                    <h3 className="text-white font-bold text-[16px] leading-snug">
+                    <h3 className="text-white font-bold text-[16px] leading-snug relative z-10">
                       {module.name}
                     </h3>
-
-                    <p className="text-white/80 text-[13px] mt-2 leading-relaxed line-clamp-2">
+                    <p className="text-white/80 text-[13px] mt-2 leading-relaxed line-clamp-2 relative z-10">
                       {module.description}
                     </p>
                   </div>
@@ -117,10 +114,7 @@ export default function FeaturedModulesSection() {
                   <div className="px-6 py-4 bg-white">
                     <button
                       className="flex items-center gap-1.5 text-[#34BFF3] text-[13px] font-semibold hover:gap-3 transition-all duration-200"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        router.push('/modules');
-                      }}
+                      onClick={(e) => { e.stopPropagation(); router.push('/modules'); }}
                     >
                       Learn More <ArrowRight className="w-3.5 h-3.5" />
                     </button>

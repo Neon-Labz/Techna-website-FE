@@ -7,11 +7,10 @@ export default function CTASection() {
   return (
     <section className="w-full py-8 bg-white">
       <div
-        className="mx-auto flex flex-row items-center gap-6 px-12"
+        className="mx-auto flex flex-row items-center gap-6 px-12 max-w-7xl"
         style={{
           background: 'linear-gradient(90deg, #0183CB 0%, #34BFF3 100%)',
           height: '176px',
-          maxWidth: '1342px',
           borderRadius: '16px',
         }}
       >
