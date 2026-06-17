@@ -28,6 +28,19 @@ const typeConfig = {
   },
 };
 
+const formatDate = (date?: string) => {
+  if (!date) return '-';
+
+  const parsedDate = new Date(date);
+  if (Number.isNaN(parsedDate.getTime())) return '-';
+
+  return parsedDate.toLocaleDateString('en-GB', {
+    day: '2-digit',
+    month: 'long',
+    year: 'numeric',
+  });
+};
+
 type NoticesSectionProps = {
   embedded?: boolean;
 };
@@ -41,7 +54,7 @@ export default function NoticesSection({
     >
       <div
         className={
-         embedded
+          embedded
             ? 'mx-auto w-full max-w-[1480px] px-4'
             : 'mx-auto w-full max-w-[1480px] px-4'
         }
@@ -89,16 +102,12 @@ export default function NoticesSection({
                 </h3>
 
                 <p className="line-clamp-3 flex-1 text-xs leading-relaxed text-gray-500">
-                  {notice.content}
+                  {notice.content || '-'}
                 </p>
 
                 <div className="mt-3 flex items-center gap-1.5 border-t border-gray-100 pt-3 text-[11px] text-gray-400">
                   <CalendarDays className="h-3.5 w-3.5" />
-                  {new Date(notice.date).toLocaleDateString('en-GB', {
-                    day: '2-digit',
-                    month: 'long',
-                    year: 'numeric',
-                  })}
+                  {formatDate(notice.date)}
                 </div>
               </div>
             );
