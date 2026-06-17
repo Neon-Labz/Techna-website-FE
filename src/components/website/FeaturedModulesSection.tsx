@@ -31,7 +31,8 @@ export default function FeaturedModulesSection() {
     const fetchModules = async () => {
       try {
         const res = await api.get('/modules');
-        setModules((res as unknown as Module[]).slice(0, 6));
+        const data: Module[] = Array.isArray(res.data) ? res.data : [];
+        setModules(data.slice(0, 6));
       } catch (err) {
         console.error('Failed to fetch modules:', err);
       } finally {
@@ -80,7 +81,7 @@ export default function FeaturedModulesSection() {
         )}
 
         {/* Grid */}
-        {!loading && (
+        {!loading && modules.length > 0 && (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
             {modules.map((module) => {
               const Icon = getIcon(module.name);
