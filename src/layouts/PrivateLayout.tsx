@@ -4,9 +4,12 @@ import WhatsAppButton from '../components/shared/WhatsAppButton';
 import { useAuthStore } from '../store/authStore';
 
 export default function PrivateLayout() {
-  const { isAuthenticated } = useAuthStore();
+  const { hasHydrated, isAuthenticated, student, token } = useAuthStore();
+  const hasValidSession = Boolean(isAuthenticated && student && token);
 
-  if (!isAuthenticated) {
+  if (!hasHydrated) return null;
+
+  if (!hasValidSession) {
     return <Navigate to="/login" replace />;
   }
 

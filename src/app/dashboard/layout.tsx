@@ -1,4 +1,5 @@
 'use client';
+
 import PrivateHeader from '../../components/shared/PrivateHeader';
 import WhatsAppButton from '../../components/shared/WhatsAppButton';
 import ProtectedRoute from '../../components/auth/ProtectedRoute';
