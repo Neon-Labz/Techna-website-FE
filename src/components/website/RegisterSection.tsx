@@ -1,10 +1,10 @@
 'use client';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
-import { Check, ChevronRight, ChevronLeft, GraduationCap, User, MapPin, BookOpen, FileText, Plus, Trash2 } from 'lucide-react';
-import { SUBJECTS, DISTRICTS, RACES, RELIGIONS, GRADES } from '../../data/mockData';
+import { Check, ChevronRight, ChevronLeft, User, MapPin, BookOpen, FileText, Plus, Trash2, Upload, GraduationCap } from 'lucide-react';
 import Image from 'next/image';
+import { registerStudent } from '../../api/auth.api';
+import apiClient from '../../lib/axios';
 
 const STEPS = [
   { id: 1, label: 'Basic Info', icon: User, desc: 'Personal details' },
@@ -14,18 +14,48 @@ const STEPS = [
   { id: 5, label: 'Subjects & Confirm', icon: FileText, desc: 'Subject selection' },
 ];
 
+const DISTRICTS = [
+  'Colombo', 'Gampaha', 'Kalutara', 'Kandy', 'Matale', 'Nuwara Eliya',
+  'Galle', 'Matara', 'Hambantota', 'Jaffna', 'Kilinochchi', 'Mannar',
+  'Mullaitivu', 'Vavuniya', 'Puttalam', 'Kurunegala', 'Anuradhapura',
+  'Polonnaruwa', 'Badulla', 'Monaragala', 'Ratnapura', 'Kegalle',
+  'Ampara', 'Batticaloa', 'Trincomalee',
+];
+
+const GRADES = ['A', 'B', 'C', 'S', 'W', 'Absent'];
+const RACE_OPTIONS = ['Sinhala', 'Tamil', 'Indian Tamil', 'Muslim', 'Burgher', 'Malay', 'Other'];
+const RELIGION_OPTIONS = ['Buddhism', 'Hinduism', 'Islam', 'Christianity', 'Catholicism', 'Other'];
 interface OLRow { year: string; indexNumber: string; english: string; mathematics: string; science: string; sinhala: string; tamil: string; }
 const emptyOL: OLRow = { year: '', indexNumber: '', english: '', mathematics: '', science: '', sinhala: '', tamil: '' };
 
+type ModuleOption = {
+  name?: string;
+};
+
+const getApiErrorMessage = (error: unknown, fallback: string) => {
+  const responseData = (error as { response?: { data?: { message?: string | string[] } } })?.response?.data;
+  const message = responseData?.message;
+
+  if (Array.isArray(message)) return message.join(', ');
+  if (message) return message;
+  if (error instanceof Error) return error.message;
+  return fallback;
+};
+
 export default function RegisterSection() {
-  const router = useRouter();
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const [submitError, setSubmitError] = useState('');
+  const [submissionReference, setSubmissionReference] = useState('');
+  const [profilePhoto, setProfilePhoto] = useState<File | null>(null);
+  const [subjectOptions, setSubjectOptions] = useState<string[]>([]);
+  const [loadingSubjects, setLoadingSubjects] = useState(true);
+  const [subjectsError, setSubjectsError] = useState('');
 
   // Form state
   const [form, setForm] = useState({
-    fullNameTamil: '', fullNameEnglish: '', dobDay: '', dobMonth: '', dobYear: '',
+    fullNameTamil: '', fullNameEnglish: '', dateOfBirth: '',
     nicNo: '', address: '', school: '', whatsappNo: '', parentsNo: '', email: '', password: '', confirmPassword: '',
     // Address
     permanentAddress: '', administrativeDistrict: '', fixedTelephone: '', residingSince: '',
@@ -39,15 +69,55 @@ export default function RegisterSection() {
     olCategory: 'Local O/L', olYear: '', olIndexNumber: '', olNameUsed: '',
     olAccept: 'Accept' as 'Accept' | 'Change',
     // Subjects
+    batch: '',
     subjects: [] as string[],
     // Agreement
-    agreed: false,
+    declarationRules: false,
+    declarationAccuracy: false,
   });
 
   const [olRows, setOlRows] = useState<OLRow[]>([{ ...emptyOL }]);
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   const set = (key: string, value: string | boolean | string[]) => setForm(f => ({ ...f, [key]: value }));
+
+  useEffect(() => {
+    let active = true;
+
+    const loadSubjects = async () => {
+      setLoadingSubjects(true);
+      setSubjectsError('');
+
+      try {
+        const result = await apiClient.get('/modules');
+
+        const modules = Array.isArray(result.data)
+          ? result.data
+          : Array.isArray(result.data?.data)
+            ? result.data.data
+            : [];
+
+        const options = modules
+          .map((module: ModuleOption) => module.name || '')
+          .filter((name: string) => Boolean(name.trim()));
+
+        if (active) setSubjectOptions(Array.from(new Set(options)));
+      } catch {
+        if (active) {
+          setSubjectOptions([]);
+          setSubjectsError('Unable to load subjects');
+        }
+      } finally {
+        if (active) setLoadingSubjects(false);
+      }
+    };
+
+    loadSubjects();
+
+    return () => {
+      active = false;
+    };
+  }, []);
 
   const toggleSubject = (sub: string) => {
     const current = form.subjects;
@@ -65,7 +135,7 @@ export default function RegisterSection() {
     const e: Record<string, string> = {};
     if (step === 1) {
       if (!form.fullNameEnglish) e.fullNameEnglish = 'Full name (English) is required';
-      if (!form.dobDay || !form.dobMonth || !form.dobYear) e.dob = 'Date of birth is required';
+      if (!form.dateOfBirth) e.dateOfBirth = 'Date of birth is required';
       if (!form.nicNo) e.nicNo = 'NIC number is required';
       if (!form.whatsappNo) e.whatsappNo = 'WhatsApp number is required';
       if (!form.email) e.email = 'Email is required';
@@ -77,8 +147,9 @@ export default function RegisterSection() {
       if (!form.administrativeDistrict) e.administrativeDistrict = 'District is required';
     }
     if (step === 5) {
+      if (!form.batch) e.batch = 'Batch is required';
       if (form.subjects.length === 0) e.subjects = 'Select at least one subject';
-      if (!form.agreed) e.agreed = 'You must agree to the terms';
+      if (!form.declarationRules || !form.declarationAccuracy) e.declaration = 'Both declarations are required';
     }
     setErrors(e);
     return Object.keys(e).length === 0;
@@ -87,32 +158,128 @@ export default function RegisterSection() {
   const next = () => { if (validateStep()) setStep(s => Math.min(s + 1, 5)); };
   const prev = () => setStep(s => Math.max(s - 1, 1));
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (!validateStep()) return;
     setLoading(true);
-    setTimeout(() => {
+    setSubmitError('');
+
+    const payload = {
+      account: {
+        email: form.email,
+        password: form.password,
+      },
+      personal: {
+        fullNameTamil: form.fullNameTamil,
+        fullNameEnglish: form.fullNameEnglish,
+        dateOfBirth: form.dateOfBirth,
+        nicNo: form.nicNo,
+        school: form.school,
+        whatsappNo: form.whatsappNo,
+        parentsNo: form.parentsNo,
+        permanentAddress: form.permanentAddress || form.address,
+        administrativeDistrict: form.administrativeDistrict,
+        fixedTelephone: form.fixedTelephone,
+        residingSince: form.residingSince,
+        race: form.race || undefined,
+        religion: form.religion || undefined,
+        citizenByDescent: form.citizenByDescent || undefined,
+        contactAddress: form.contactAddress,
+        postalCode: form.postalCode,
+      },
+      parent: {
+        fatherName: form.fatherName,
+        motherName: form.motherName,
+        guardianName: form.guardianName,
+        contactPerson: form.contactPerson || undefined,
+        guardianAddress: form.guardianAddress,
+        guardianFixedTel: form.guardianFixedTel,
+        guardianMobile: form.guardianMobile,
+      },
+      olRecords: {
+        olCategory: form.olCategory || undefined,
+        olYear: form.olYear,
+        olIndexNumber: form.olIndexNumber,
+        olNameUsed: form.olNameUsed,
+        olAccept: form.olAccept || undefined,
+        olResults: olRows
+          .filter(row => row.year && row.indexNumber)
+          .map(row => ({
+            year: row.year,
+            indexNumber: row.indexNumber,
+            english: row.english || undefined,
+            mathematics: row.mathematics || undefined,
+            science: row.science || undefined,
+            sinhala: row.sinhala || undefined,
+            tamil: row.tamil || undefined,
+          })),
+      },
+      subjectSelection: {
+        subjects: form.subjects,
+        //modules: form.subjects,
+        agreed: form.declarationRules && form.declarationAccuracy,
+      },
+      batch: form.batch,
+    };
+
+    const formData = new FormData();
+    formData.append('payload', JSON.stringify(payload));
+    if (profilePhoto) {
+      formData.append('profilePhoto', profilePhoto);
+    }
+
+    try {
+      const result = await registerStudent(formData);
+
+      setSubmissionReference(
+        result.data?.applicationReference ||
+          result.applicationReference ||
+          result.data?.reference ||
+          result.reference ||
+          '',
+      );
       setLoading(false);
       setSubmitted(true);
-    }, 2000);
+    } catch (error) {
+      setSubmitError(getApiErrorMessage(error, 'Registration failed. Please try again.'));
+      setLoading(false);
+    }
   };
 
   if (submitted) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-950 to-blue-900 flex items-center justify-center px-4">
-        <div className="bg-white rounded-3xl shadow-2xl p-10 max-w-md w-full text-center">
-          <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
-            <Check className="w-10 h-10 text-green-600" />
+      <div className="relative min-h-screen overflow-hidden bg-gradient-to-br from-sky-500 via-cyan-400 to-sky-600 flex items-center justify-center px-4 py-12">
+        <GraduationCap className="absolute -left-12 top-10 h-80 w-80 rotate-12 text-white/10 stroke-[1.5] sm:h-[30rem] sm:w-[30rem]" />
+        <BookOpen className="absolute -right-16 bottom-6 h-72 w-72 -rotate-12 text-white/10 stroke-[1.5] sm:h-[26rem] sm:w-[26rem]" />
+        <GraduationCap className="absolute bottom-24 right-16 h-24 w-24 rotate-12 text-white/10 stroke-[1.5] sm:h-36 sm:w-36" />
+
+        <div className="relative w-full max-w-md rounded-3xl bg-white px-7 py-8 text-center shadow-2xl sm:px-10 sm:py-10">
+          <div className="mx-auto mb-5 flex h-24 w-24 items-center justify-center rounded-full bg-sky-100">
+            <div className="flex h-[72px] w-[72px] items-center justify-center rounded-full bg-sky-400 shadow-lg shadow-sky-300/40">
+              <Check className="h-10 w-10 text-white" />
+            </div>
           </div>
-          <h2 className="text-2xl font-bold text-gray-900 mb-2">Application Submitted!</h2>
-          <p className="text-gray-500 mb-2">Your admission form has been successfully submitted.</p>
-          <p className="text-gray-500 text-sm mb-6">A confirmation email will be sent to <strong>{form.email}</strong>. Our team will review your application and assign your admission number.</p>
-          <div className="bg-blue-50 rounded-xl p-4 mb-6 text-sm text-blue-700">
-            <p><strong>Application Reference:</strong></p>
-            <p className="font-mono text-lg mt-1">APP-2024-{Math.floor(Math.random() * 9000 + 1000)}</p>
+
+          <h2 className="mb-3 text-2xl font-bold text-slate-950">Application Submitted!</h2>
+          <p className="mb-7 text-base text-gray-500">You can login only after admin approval.</p>
+
+          <div className="mb-5 border-t border-gray-200 pt-3">
+            <p className="text-sm text-gray-600">A confirmation email will be sent to</p>
+            <p className="mt-1 break-words text-base font-bold text-sky-600">{form.email}</p>
+            <p className="mx-auto mt-2 max-w-sm text-sm leading-6 text-gray-600">
+              Our admin will review your application and assign your admission number.
+            </p>
           </div>
-          <button onClick={() => router.push('/login')} className="w-full py-3 bg-blue-900 text-white font-semibold rounded-xl hover:bg-blue-800 transition-all">
-            Go to Login
-          </button>
+
+          <div className="mb-6 border-t border-gray-200 pt-4">
+            <div className="rounded-xl bg-sky-100 px-4 py-5 text-sky-600">
+              <p className="text-sm font-bold">Application Reference:</p>
+              <p className="mt-2 break-words text-xl font-medium tracking-wide">{submissionReference || 'Pending'}</p>
+            </div>
+          </div>
+
+          <p className="text-xs text-gray-400">
+            Need help? Contact our support team at support@techna.edu
+          </p>
         </div>
       </div>
     );
@@ -176,18 +343,34 @@ export default function RegisterSection() {
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Date of Birth <span className="text-red-500">*</span></label>
-                <div className="grid grid-cols-3 gap-3">
-                  <div><input value={form.dobDay} onChange={e => set('dobDay', e.target.value)} maxLength={2} placeholder="DD" className={inputCls(errors.dob ? errors.dob : undefined)} /></div>
-                  <div><input value={form.dobMonth} onChange={e => set('dobMonth', e.target.value)} maxLength={2} placeholder="MM" className={inputCls(errors.dob ? errors.dob : undefined)} /></div>
-                  <div><input value={form.dobYear} onChange={e => set('dobYear', e.target.value)} maxLength={4} placeholder="YYYY" className={inputCls(errors.dob ? errors.dob : undefined)} /></div>
-                </div>
-                {errors.dob && <p className="text-red-500 text-xs mt-1">{errors.dob}</p>}
+                <input
+                  type="date"
+                  value={form.dateOfBirth}
+                  onChange={e => set('dateOfBirth', e.target.value)}
+                  className={inputCls(errors.dateOfBirth)}
+                />
+                {errors.dateOfBirth && <p className="text-red-500 text-xs mt-1">{errors.dateOfBirth}</p>}
               </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">NIC Number <span className="text-red-500">*</span></label>
-                <input value={form.nicNo} onChange={e => set('nicNo', e.target.value)} placeholder="NIC No. (National Identity Card)" className={inputCls(errors.nicNo)} />
-                {errors.nicNo && <p className="text-red-500 text-xs mt-1">{errors.nicNo}</p>}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">NIC Number <span className="text-red-500">*</span></label>
+                  <input value={form.nicNo} onChange={e => set('nicNo', e.target.value)} placeholder="NIC No. (National Identity Card)" className={inputCls(errors.nicNo)} />
+                  {errors.nicNo && <p className="text-red-500 text-xs mt-1">{errors.nicNo}</p>}
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Profile Picture</label>
+                  <label className="flex h-[42px] w-full cursor-pointer items-center justify-center gap-2 rounded-xl border border-dashed border-blue-300 bg-blue-50 px-3 text-sm font-semibold text-blue-800 transition-all hover:border-blue-500 hover:bg-blue-100">
+                    <Upload className="h-4 w-4" />
+                    <span className="truncate">{profilePhoto ? profilePhoto.name : 'Upload Photo'}</span>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={e => setProfilePhoto(e.target.files?.[0] || null)}
+                      className="sr-only"
+                    />
+                  </label>
+                </div>
               </div>
 
               <div>
@@ -214,19 +397,19 @@ export default function RegisterSection() {
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Email Address <span className="text-red-500">*</span></label>
-                <input type="email" value={form.email} onChange={e => set('email', e.target.value)} placeholder="student@email.com" className={inputCls(errors.email)} />
+                <input type="email" value={form.email} onChange={e => set('email', e.target.value)} placeholder="student@email.com" autoComplete="new-email" className={inputCls(errors.email)} />
                 {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email}</p>}
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">Password <span className="text-red-500">*</span></label>
-                  <input type="password" value={form.password} onChange={e => set('password', e.target.value)} placeholder="Create a password" className={inputCls(errors.password)} />
+                  <input type="password" value={form.password} onChange={e => set('password', e.target.value)} placeholder="Create a password" autoComplete="new-password" className={inputCls(errors.password)} />
                   {errors.password && <p className="text-red-500 text-xs mt-1">{errors.password}</p>}
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">Confirm Password <span className="text-red-500">*</span></label>
-                  <input type="password" value={form.confirmPassword} onChange={e => set('confirmPassword', e.target.value)} placeholder="Confirm password" className={inputCls(errors.confirmPassword)} />
+                  <input type="password" value={form.confirmPassword} onChange={e => set('confirmPassword', e.target.value)} placeholder="Confirm password" autoComplete="new-password" className={inputCls(errors.confirmPassword)} />
                   {errors.confirmPassword && <p className="text-red-500 text-xs mt-1">{errors.confirmPassword}</p>}
                 </div>
               </div>
@@ -266,19 +449,20 @@ export default function RegisterSection() {
                   <label className="block text-sm font-medium text-gray-700 mb-1">Race</label>
                   <select value={form.race} onChange={e => set('race', e.target.value)} className={inputCls()}>
                     <option value="">Select Race</option>
-                    {RACES.map(r => <option key={r} value={r}>{r}</option>)}
+                    {RACE_OPTIONS.map(r => <option key={r} value={r}>{r}</option>)}
                   </select>
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">Religion</label>
                   <select value={form.religion} onChange={e => set('religion', e.target.value)} className={inputCls()}>
                     <option value="">Select Religion</option>
-                    {RELIGIONS.map(r => <option key={r} value={r}>{r}</option>)}
+                    {RELIGION_OPTIONS.map(r => <option key={r} value={r}>{r}</option>)}
                   </select>
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">Citizen by Descent</label>
                   <select value={form.citizenByDescent} onChange={e => set('citizenByDescent', e.target.value)} className={inputCls()}>
+                    <option value="">Select</option>
                     <option value="YES">YES</option>
                     <option value="NO">NO</option>
                   </select>
@@ -361,18 +545,14 @@ export default function RegisterSection() {
                   <div>
                     <label className="block text-xs font-medium text-gray-600 mb-1">Category of G.C.E.(O/L)</label>
                     <select value={form.olCategory} onChange={e => set('olCategory', e.target.value)} className={inputCls()}>
-                      <option>Local O/L</option>
-                      <option>London O/L</option>
+                      <option value="">Select Category</option>
+                      <option value="Local O/L">Local O/L</option>
+                      <option value="London O/L">London O/L</option>
                     </select>
                   </div>
                   <div>
                     <label className="block text-xs font-medium text-gray-600 mb-1">Year</label>
-                    <select value={form.olYear} onChange={e => set('olYear', e.target.value)} className={inputCls()}>
-                      <option value="">Select Year</option>
-                      {Array.from({ length: 8 }, (_, i) => 2024 - i).map(y => (
-                        <option key={y} value={String(y)}>{y}</option>
-                      ))}
-                    </select>
+                    <input value={form.olYear} onChange={e => set('olYear', e.target.value)} placeholder="e.g. 2022" className={inputCls()} />
                   </div>
                   <div>
                     <label className="block text-xs font-medium text-gray-600 mb-1">Index Number</label>
@@ -447,9 +627,20 @@ export default function RegisterSection() {
           {step === 5 && (
             <div className="space-y-6">
               <div>
+                <label className="block text-sm font-semibold text-gray-800 mb-2">Batch <span className="text-red-500">*</span></label>
+                <input
+                  value={form.batch}
+                  onChange={e => set('batch', e.target.value)}
+                  placeholder="Enter selected batch"
+                  className={inputCls(errors.batch)}
+                />
+                {errors.batch && <p className="text-red-500 text-xs mt-1">{errors.batch}</p>}
+              </div>
+
+              <div>
                 <label className="block text-sm font-semibold text-gray-800 mb-3">Select Subjects <span className="text-red-500">*</span></label>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  {SUBJECTS.map(sub => {
+                  {subjectOptions.map(sub => {
                     const selected = form.subjects.includes(sub);
                     return (
                       <label
@@ -468,6 +659,9 @@ export default function RegisterSection() {
                     );
                   })}
                 </div>
+                {loadingSubjects && <p className="text-gray-500 text-xs mt-2">Loading subjects...</p>}
+                {!loadingSubjects && subjectsError && <p className="text-red-500 text-xs mt-2">{subjectsError}</p>}
+                {!loadingSubjects && !subjectsError && subjectOptions.length === 0 && <p className="text-gray-500 text-xs mt-2">No subjects are available.</p>}
                 {errors.subjects && <p className="text-red-500 text-xs mt-2">{errors.subjects}</p>}
               </div>
 
@@ -475,11 +669,14 @@ export default function RegisterSection() {
               <div className="bg-blue-50 rounded-2xl p-5 border border-blue-100">
                 <h4 className="font-semibold text-blue-900 mb-3 text-sm">Application Summary</h4>
                 <div className="space-y-1.5 text-sm text-gray-700">
+                  <div className="flex justify-between"><span className="text-gray-500">Race:</span><span className="font-medium">{form.race || 'â€“'}</span></div>
+                  <div className="flex justify-between"><span className="text-gray-500">Religion:</span><span className="font-medium">{form.religion || 'â€“'}</span></div>
                   <div className="flex justify-between"><span className="text-gray-500">Name:</span><span className="font-medium">{form.fullNameEnglish || '–'}</span></div>
                   <div className="flex justify-between"><span className="text-gray-500">NIC:</span><span className="font-medium">{form.nicNo || '–'}</span></div>
                   <div className="flex justify-between"><span className="text-gray-500">Email:</span><span className="font-medium">{form.email || '–'}</span></div>
                   <div className="flex justify-between"><span className="text-gray-500">District:</span><span className="font-medium">{form.administrativeDistrict || '–'}</span></div>
-                  <div className="flex justify-between"><span className="text-gray-500">Subjects:</span><span className="font-medium">{form.subjects.length > 0 ? form.subjects.length + ' selected' : '–'}</span></div>
+                  <div className="flex justify-between"><span className="text-gray-500">Batch:</span><span className="font-medium">{form.batch || '–'}</span></div>
+                  <div className="flex justify-between gap-4"><span className="text-gray-500">Subjects:</span><span className="font-medium text-right">{form.subjects.length > 0 ? form.subjects.join(', ') : '–'}</span></div>
                 </div>
               </div>
 
@@ -488,16 +685,25 @@ export default function RegisterSection() {
                 I hereby declare that all the information provided in this admission form is true and correct to the best of my knowledge. I agree to follow all the rules and regulations of the institution.
               </div>
 
-              <label className={`flex items-start gap-3 cursor-pointer p-3 rounded-xl border-2 ${errors.agreed ? 'border-red-300 bg-red-50' : 'border-gray-200 bg-gray-50'}`}>
+              <label className={`flex items-start gap-3 cursor-pointer p-3 rounded-xl border-2 ${errors.declaration ? 'border-red-300 bg-red-50' : 'border-gray-200 bg-gray-50'}`}>
                 <input
                   type="checkbox"
-                  checked={form.agreed}
-                  onChange={e => set('agreed', e.target.checked)}
+                  checked={form.declarationRules}
+                  onChange={e => set('declarationRules', e.target.checked)}
                   className="text-blue-600 rounded mt-0.5 w-4 h-4"
                 />
-                <span className="text-sm text-gray-700">I agree to the terms and conditions and hereby declare that all provided information is accurate.</span>
+                <span className="text-sm text-gray-700">I agree to follow all institute rules and regulations.</span>
               </label>
-              {errors.agreed && <p className="text-red-500 text-xs">{errors.agreed}</p>}
+              <label className={`flex items-start gap-3 cursor-pointer p-3 rounded-xl border-2 ${errors.declaration ? 'border-red-300 bg-red-50' : 'border-gray-200 bg-gray-50'}`}>
+                <input
+                  type="checkbox"
+                  checked={form.declarationAccuracy}
+                  onChange={e => set('declarationAccuracy', e.target.checked)}
+                  className="text-blue-600 rounded mt-0.5 w-4 h-4"
+                />
+                <span className="text-sm text-gray-700">I declare that all provided information is true and accurate.</span>
+              </label>
+              {errors.declaration && <p className="text-red-500 text-xs">{errors.declaration}</p>}
             </div>
           )}
 
@@ -528,6 +734,7 @@ export default function RegisterSection() {
               )}
             </div>
           </div>
+          {submitError && <p className="text-red-500 text-sm mt-4 text-right">{submitError}</p>}
         </div>
 
         <div className="text-center mt-6">

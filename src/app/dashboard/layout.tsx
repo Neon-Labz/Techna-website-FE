@@ -6,14 +6,15 @@ import WhatsAppButton from '../../components/shared/WhatsAppButton';
 import { useAuthStore } from '../../store/authStore';
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
-  const { isAuthenticated } = useAuthStore();
+  const { hasHydrated, isAuthenticated, student, token } = useAuthStore();
   const router = useRouter();
+  const hasValidSession = Boolean(isAuthenticated && student && token);
 
   useEffect(() => {
-    if (!isAuthenticated) router.replace('/login');
-  }, [isAuthenticated, router]);
+    if (hasHydrated && !hasValidSession) router.replace('/login');
+  }, [hasHydrated, hasValidSession, router]);
 
-  if (!isAuthenticated) return null;
+  if (!hasHydrated || !hasValidSession) return null;
 
   return (
     <div className="min-h-screen bg-gray-50">

@@ -12,6 +12,9 @@ export default function PrivateHeader() {
   const pathname = usePathname();
   const router = useRouter();
   const { student, logout } = useAuthStore();
+  const studentData = student as any;
+  const profileImage =
+    studentData?.profilePhoto || studentData?.avatar || studentData?.profileImage || '';
 
   const navLinks = [
     { label: 'Home', path: '/dashboard' },
@@ -70,8 +73,16 @@ export default function PrivateHeader() {
                 onClick={() => setDropdownOpen(!dropdownOpen)}
                 className="flex items-center gap-2 px-3 py-2 rounded-lg bg-white/10 hover:bg-white/20 text-white transition-all"
               >
-                <div className="w-7 h-7 bg-yellow-400 rounded-full flex items-center justify-center">
-                  <User className="w-4 h-4 text-blue-900" />
+                <div className="w-7 h-7 bg-yellow-400 rounded-full flex items-center justify-center overflow-hidden">
+                  {profileImage ? (
+                    <img
+                      src={profileImage}
+                      alt={student?.fullNameEnglish || 'Profile photo'}
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <User className="w-4 h-4 text-blue-900" />
+                  )}
                 </div>
                 <span className="text-sm font-medium">{student?.fullNameEnglish?.split(' ')[0] || 'Student'}</span>
               </button>
@@ -113,9 +124,22 @@ export default function PrivateHeader() {
         {menuOpen && (
           <div className="md:hidden pb-4 border-t border-white/10">
             <div className="flex flex-col gap-1 pt-3">
-              <div className="px-4 py-3 bg-white/10 rounded-lg mb-2">
-                <p className="text-sm font-semibold text-white">{student?.fullNameEnglish}</p>
-                <p className="text-xs text-blue-300">{student?.admissionNumber}</p>
+              <div className="px-4 py-3 bg-white/10 rounded-lg mb-2 flex items-center gap-3">
+                <div className="w-9 h-9 bg-yellow-400 rounded-full flex items-center justify-center overflow-hidden shrink-0">
+                  {profileImage ? (
+                    <img
+                      src={profileImage}
+                      alt={student?.fullNameEnglish || 'Profile photo'}
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <User className="w-5 h-5 text-blue-900" />
+                  )}
+                </div>
+                <div>
+                  <p className="text-sm font-semibold text-white">{student?.fullNameEnglish}</p>
+                  <p className="text-xs text-blue-300">{student?.admissionNumber}</p>
+                </div>
               </div>
               {navLinks.map(link => (
                 <Link

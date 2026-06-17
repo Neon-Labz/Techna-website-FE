@@ -114,7 +114,9 @@ export interface AuthState {
   isAuthenticated: boolean;
   student: Student | null;
   token: string | null;
-  login: (student: Student, token: string) => void;
+  hasHydrated: boolean;
+  login: (student: Student, token: string, rememberMe?: boolean) => void;
   logout: () => void;
+  setHasHydrated: (hasHydrated: boolean) => void;
   updateStudent: (student: Student) => void;
 }

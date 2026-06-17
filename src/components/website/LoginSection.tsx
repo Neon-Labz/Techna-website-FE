@@ -1,20 +1,37 @@
 'use client';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { Eye, EyeOff, Mail, Lock, GraduationCap, ArrowRight } from 'lucide-react';
+import { Eye, EyeOff, Mail, Lock, ArrowRight } from 'lucide-react';
 import { useAuthStore } from '../../store/authStore';
-import { mockStudent } from '../../data/mockData';
+import { getSession, studentLogin } from '../../api/auth.api';
 import Image from 'next/image';
+
+const getApiErrorMessage = (error: unknown, fallback: string) => {
+  const responseData = (error as { response?: { data?: { message?: string | string[] } } })?.response?.data;
+  const message = responseData?.message;
+
+  if (Array.isArray(message)) return message.join(', ');
+  if (message) return message;
+  if (error instanceof Error) return error.message;
+  return fallback;
+};
 
 export default function LoginSection() {
   const router = useRouter();
-  const { login } = useAuthStore();
+  const { hasHydrated, isAuthenticated, login, student, token } = useAuthStore();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [rememberMe, setRememberMe] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+
+  useEffect(() => {
+    if (hasHydrated && isAuthenticated && student && token) {
+      router.replace('/dashboard');
+    }
+  }, [hasHydrated, isAuthenticated, router, student, token]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -22,11 +39,31 @@ export default function LoginSection() {
     setError('');
     setLoading(true);
 
-    setTimeout(() => {
-      setLoading(false);
-      login(mockStudent, 'mock-jwt-token-123456789');
+    try {
+      const result = await studentLogin(email, password);
+
+      const token = result.access_token || result.token || result.accessToken || result.data?.access_token || result.data?.token || result.data?.accessToken;
+
+      if (!token) {
+        throw new Error('Login response was missing access token.');
+      }
+
+      const sessionResult = await getSession(token);
+      const student = sessionResult.student || sessionResult.user || sessionResult.data?.student || sessionResult.data?.user || sessionResult.data;
+
+      if (!student) {
+        throw new Error('Failed to load student session.');
+      }
+
+      login(student, token, rememberMe);
       router.push('/dashboard');
-    }, 1500);
+    } catch (error) {
+      localStorage.removeItem('token');
+      sessionStorage.removeItem('token');
+      setError(getApiErrorMessage(error, 'Login failed. Please check your credentials.'));
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -58,6 +95,7 @@ export default function LoginSection() {
                   value={email}
                   onChange={e => setEmail(e.target.value)}
                   placeholder="student@techna.lk"
+                  autoComplete="new-email"
                   className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-gray-50 text-gray-900 placeholder-gray-400"
                 />
               </div>
@@ -72,6 +110,7 @@ export default function LoginSection() {
                   value={password}
                   onChange={e => setPassword(e.target.value)}
                   placeholder="Enter your password"
+                  autoComplete="new-password"
                   className="w-full pl-10 pr-11 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-gray-50 text-gray-900 placeholder-gray-400"
                 />
                 <button
@@ -86,7 +125,12 @@ export default function LoginSection() {
 
             <div className="flex items-center justify-between text-sm">
               <label className="flex items-center gap-2 text-gray-600 cursor-pointer">
-                <input type="checkbox" className="rounded border-gray-300 text-blue-600" />
+                <input
+                  type="checkbox"
+                  checked={rememberMe}
+                  onChange={(e) => setRememberMe(e.target.checked)}
+                  className="rounded border-gray-300 text-blue-600"
+                />
                 Remember me
               </label>
               <a href="#" className="text-blue-700 font-medium hover:underline">Forgot password?</a>
@@ -112,10 +156,6 @@ export default function LoginSection() {
                 Register Now
               </Link>
             </p>
-          </div>
-
-          <div className="mt-4 p-3 bg-blue-50 rounded-xl text-xs text-blue-700 text-center">
-            <strong>Demo:</strong> Use any email & password to login
           </div>
         </div>
 
