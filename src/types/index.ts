@@ -1,5 +1,6 @@
 export interface Student {
   id: string;
+  status?: 'pending' | 'approved' | 'rejected';
   admissionNumber: string;
   serialNumber: string;
   fullNameTamil: string;
@@ -12,6 +13,7 @@ export interface Student {
   parentsNo: string;
   email: string;
   subjects: string[];
+
   // Personal Details
   permanentAddress: string;
   administrativeDistrict: string;
@@ -29,12 +31,14 @@ export interface Student {
   guardianAddress: string;
   guardianFixedTel: string;
   guardianMobile: string;
+
   // OL Results
   olCategory: string;
   olYear: string;
   olIndexNumber: string;
   olNameUsed: string;
   olResults: OLResult[];
+
   profilePhoto?: string;
   createdAt: string;
 }
@@ -115,8 +119,16 @@ export interface AuthState {
   student: Student | null;
   token: string | null;
   hasHydrated: boolean;
-  login: (student: Student, token: string, rememberMe?: boolean) => void;
+
+  login: (
+    student: Student | null,
+    token: string,
+    rememberMe?: boolean
+  ) => void;
+
   logout: () => void;
+
   setHasHydrated: (hasHydrated: boolean) => void;
+
   updateStudent: (student: Student) => void;
 }

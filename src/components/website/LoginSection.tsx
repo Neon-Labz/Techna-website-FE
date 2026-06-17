@@ -1,11 +1,12 @@
 'use client';
+
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 import { Eye, EyeOff, Mail, Lock, ArrowRight } from 'lucide-react';
 import { useAuthStore } from '../../store/authStore';
 import { getSession, studentLogin } from '../../api/auth.api';
-import Image from 'next/image';
 
 const getApiErrorMessage = (error: unknown, fallback: string) => {
   const responseData = (error as { response?: { data?: { message?: string | string[] } } })?.response?.data;
@@ -20,6 +21,7 @@ const getApiErrorMessage = (error: unknown, fallback: string) => {
 export default function LoginSection() {
   const router = useRouter();
   const { hasHydrated, isAuthenticated, login, student, token } = useAuthStore();
+
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [rememberMe, setRememberMe] = useState(false);
@@ -35,31 +37,52 @@ export default function LoginSection() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!email || !password) { setError('Please fill in all fields.'); return; }
+
+    if (!email || !password) {
+      setError('Please fill in all fields.');
+      return;
+    }
+
     setError('');
     setLoading(true);
 
     try {
-      const result = await studentLogin(email, password);
+      const result = await studentLogin(email.trim(), password);
 
-      const token = result.access_token || result.token || result.accessToken || result.data?.access_token || result.data?.token || result.data?.accessToken;
+      const accessToken =
+        result.access_token ||
+        result.token ||
+        result.accessToken ||
+        result.data?.access_token ||
+        result.data?.token ||
+        result.data?.accessToken;
 
-      if (!token) {
+      if (!accessToken) {
         throw new Error('Login response was missing access token.');
       }
 
-      const sessionResult = await getSession(token);
-      const student = sessionResult.student || sessionResult.user || sessionResult.data?.student || sessionResult.data?.user || sessionResult.data;
+      const sessionResult = await getSession(accessToken);
+      const studentData =
+        sessionResult.student ||
+        sessionResult.user ||
+        sessionResult.data?.student ||
+        sessionResult.data?.user ||
+        sessionResult.data;
 
-      if (!student) {
+      if (!studentData) {
         throw new Error('Failed to load student session.');
       }
 
-      login(student, token, rememberMe);
+      login(studentData, accessToken, rememberMe);
       router.push('/dashboard');
     } catch (error) {
       localStorage.removeItem('token');
+      localStorage.removeItem('access_token');
+      localStorage.removeItem('accessToken');
       sessionStorage.removeItem('token');
+      sessionStorage.removeItem('access_token');
+      sessionStorage.removeItem('accessToken');
+
       setError(getApiErrorMessage(error, 'Login failed. Please check your credentials.'));
     } finally {
       setLoading(false);
@@ -128,12 +151,14 @@ export default function LoginSection() {
                 <input
                   type="checkbox"
                   checked={rememberMe}
-                  onChange={(e) => setRememberMe(e.target.checked)}
+                  onChange={e => setRememberMe(e.target.checked)}
                   className="rounded border-gray-300 text-blue-600"
                 />
                 Remember me
               </label>
-              <a href="#" className="text-blue-700 font-medium hover:underline">Forgot password?</a>
+              <Link href="/forgot-password" className="text-blue-700 font-medium hover:underline">
+                Forgot password?
+              </Link>
             </div>
 
             <button

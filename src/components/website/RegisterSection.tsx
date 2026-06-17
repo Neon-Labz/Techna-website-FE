@@ -707,6 +707,12 @@ export default function RegisterSection() {
             </div>
           )}
 
+          {submitError && (
+            <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl text-sm mt-4">
+              {submitError}
+            </div>
+          )}
+
           {/* Navigation Buttons */}
           <div className="flex items-center justify-between mt-8 pt-6 border-t border-gray-100">
             <div>
