@@ -1,6 +1,8 @@
 import api from '@/lib/axios';
 
-export interface PaymentRecord {
+// ─── Interface ────────────────────────────────────────────────────────────────
+
+export interface PaymentFromApi {
   _id: string;
   studentId: string;
   studentName: string;
@@ -17,23 +19,27 @@ export interface PaymentRecord {
   updatedAt?: string;
 }
 
-export const getPayments = (): Promise<PaymentRecord[]> =>
-  api.get('/payments');
+// ─── Payment API ──────────────────────────────────────────────────────────────
 
-export const createPayment = (data: any): Promise<PaymentRecord> =>
-  api.post('/payments', data);
+export const paymentApi = {
+  getAll(): Promise<PaymentFromApi[]> {
+    return api.get('/payments');
+  },
 
-export const updatePayment = (id: string, data: any): Promise<PaymentRecord> =>
-  api.patch(`/payments/${id}`, data);
+  create(data: Partial<PaymentFromApi>): Promise<PaymentFromApi> {
+    return api.post('/payments', data);
+  },
 
+  update(id: string, data: Partial<PaymentFromApi>): Promise<PaymentFromApi> {
+    return api.patch(`/payments/${id}`, data);
+  },
 
-export const getStudentPayments = async (studentId: string): Promise<PaymentRecord[]> => {
-  try {
-   
-    return await api.get(`/payments/student/${studentId}`);
-  } catch {
-    
-    const all: PaymentRecord[] = await api.get('/payments');
-    return all.filter(p => p.studentId === studentId);
-  }
+  getByStudent(studentId: string): Promise<PaymentFromApi[]> {
+    return (api.get(`/payments/student/${studentId}`) as Promise<PaymentFromApi[]>)
+      .catch(() =>
+        (api.get('/payments') as Promise<PaymentFromApi[]>).then((all) =>
+          all.filter((p) => p.studentId === studentId)
+        )
+      );
+  },
 };

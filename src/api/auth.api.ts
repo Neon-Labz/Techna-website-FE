@@ -1,51 +1,21 @@
-import api from '@/lib/axios';
+import apiClient from '../lib/axios';
 
-// --------------------
-// Types
-// --------------------
+export const registerStudent = async (formData: FormData) => {
+  const response = await apiClient.post('/students/register', formData);
+  return response.data;
+};
 
-export interface LoginResponse {
-  access_token: string;
-  role: string;
-}
+export const studentLogin = async (email: string, password: string) => {
+  const response = await apiClient.post('/auth/student/login', {
+    email,
+    password,
+  });
+  return response.data;
+};
 
-export interface SessionResponse {
-  _id?: string;
-  studentId?: string;
-  fullNameEnglish?: string;
-  fullNameTamil?: string;
-  email?: string;
-  role?: string;
-  phone?: string;
-  createdAt?: string;
-}
-
-// --------------------
-// Auth API
-// --------------------
-
-export const authApi = {
-  /**
-   * Student register
-   */
-  registerStudent: (formData: FormData): Promise<any> =>
-    api.post('/students/register', formData),
-
-  /**
-   * Student login
-   */
-  studentLogin: (email: string, password: string): Promise<LoginResponse> =>
-    api.post('/auth/student/login', { email, password }),
-
-  /**
-   * Get current session
-   */
-  getSession: (): Promise<SessionResponse> =>
-    api.get('/auth/session'),
-
-  /**
-   * Logout user
-   */
-  logout: (): Promise<{ message: string }> =>
-    api.post('/auth/logout'),
+export const getSession = async (token?: string) => {
+  const response = await apiClient.get('/auth/session', {
+    headers: token ? { Authorization: `Bearer ${token}` } : undefined,
+  });
+  return response.data;
 };
