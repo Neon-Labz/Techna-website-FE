@@ -1,78 +1,142 @@
 'use client';
 import { useRouter } from 'next/navigation';
-import { ArrowRight, Clock, User, Layers } from 'lucide-react';
-import { mockModules } from '../../data/mockData';
+import { useEffect, useState } from 'react';
+import { ArrowRight, Cpu, FlaskConical, Leaf, Globe, Calculator, Dna, BookOpen } from 'lucide-react';
+import api from '@/lib/axios';
 
-const moduleColors = [
-  'from-blue-600 to-blue-800',
-  'from-purple-600 to-purple-800',
-  'from-emerald-600 to-emerald-800',
-  'from-orange-600 to-orange-800',
-  'from-rose-600 to-rose-800',
-  'from-teal-600 to-teal-800',
-  'from-indigo-600 to-indigo-800',
-];
+const iconMap: Record<string, React.ElementType> = {
+  'Engineering Technology': Cpu,
+  'Science For Technology': FlaskConical,
+  'Bio Systems Technology': Dna,
+  'Agricultural Science': Leaf,
+  'Geography': Globe,
+  'Mathematics': Calculator,
+};
+
+const getIcon = (name: string) => iconMap[name] ?? BookOpen;
+
+interface Module {
+  _id: string;
+  name: string;
+  description: string;
+  code?: string;
+}
 
 export default function FeaturedModulesSection() {
   const router = useRouter();
-  const featured = mockModules.slice(0, 6);
+  const [modules, setModules] = useState<Module[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchModules = async () => {
+      try {
+        const res = await api.get('/modules');
+        setModules((res as unknown as Module[]).slice(0, 6));
+      } catch (err) {
+        console.error('Failed to fetch modules:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchModules();
+  }, []);
 
   return (
-    <section className="py-20 bg-white">
+    <section className="py-20 bg-[#F8FAFC]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex flex-col md:flex-row items-start md:items-end justify-between mb-12 gap-4">
+
+        {/* Header */}
+        <div className="flex flex-col md:flex-row items-start md:items-end justify-between mb-10 gap-4">
           <div>
-            <span className="text-blue-900 font-semibold text-sm uppercase tracking-wider">What We Offer</span>
-            <h2 className="text-4xl font-bold text-gray-900 mt-2">Our Modules</h2>
-            <p className="text-gray-500 mt-2 max-w-lg">Comprehensive subjects designed for A/L Technology Stream students to excel academically and professionally.</p>
+            <span className="text-[#34BFF3] font-semibold text-[12px] uppercase tracking-[0.1em]">
+              OUR PROGRAMS
+            </span>
+            <h2 className="text-[32px] font-bold text-[#0a0a0f] mt-1">
+              Explore Our Programs
+            </h2>
+            <p className="text-[#6b7280] text-[14px] mt-2 max-w-md leading-relaxed">
+              Discover a wide range of undergraduate, postgraduate and diploma
+              programs designed for your success.
+            </p>
           </div>
           <button
             onClick={() => router.push('/modules')}
-            className="flex items-center gap-2 text-blue-900 font-semibold hover:gap-3 transition-all"
+            className="flex items-center gap-2 bg-[#34BFF3] hover:bg-[#2aadd8] text-white text-[13px] font-semibold px-4 py-2.5 rounded-full transition-all duration-200"
           >
-            View All Modules <ArrowRight className="w-4 h-4" />
+            View All Programs <ArrowRight className="w-4 h-4" />
           </button>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {featured.map((module, i) => (
-            <div
-              key={module.id}
-              className="group rounded-2xl overflow-hidden border border-gray-100 shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-1 cursor-pointer"
-              onClick={() => router.push('/modules')}
-            >
-              {/* Card Header */}
-              <div className={`bg-gradient-to-br ${moduleColors[i % moduleColors.length]} p-6 relative overflow-hidden`}>
-                <div className="absolute -right-6 -top-6 w-20 h-20 bg-white/10 rounded-full" />
-                <div className="absolute -right-2 -bottom-4 w-12 h-12 bg-white/10 rounded-full" />
-                <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center mb-4">
-                  <Layers className="w-6 h-6 text-white" />
-                </div>
-                <p className="text-white/70 text-xs font-medium uppercase tracking-wider mb-1">{module.code}</p>
-                <h3 className="text-white font-bold text-lg leading-snug">{module.name}</h3>
+        {/* Loading */}
+        {loading && (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+            {[...Array(6)].map((_, i) => (
+              <div key={i} className="rounded-2xl overflow-hidden border border-[#e5e7eb] animate-pulse">
+                <div className="h-[160px] bg-[#34BFF3]/20" />
+                <div className="px-6 py-4 bg-white h-[52px]" />
               </div>
+            ))}
+          </div>
+        )}
 
-              {/* Card Body */}
-              <div className="p-5 bg-white">
-                <p className="text-gray-500 text-sm leading-relaxed mb-4 line-clamp-2">{module.description}</p>
-                <div className="flex flex-wrap gap-3 text-xs text-gray-500">
-                  <span className="flex items-center gap-1">
-                    <Clock className="w-3.5 h-3.5 text-blue-500" /> {module.duration}
-                  </span>
-                  <span className="flex items-center gap-1">
-                    <User className="w-3.5 h-3.5 text-blue-500" /> {module.instructor}
-                  </span>
+        {/* Grid */}
+        {!loading && (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+            {modules.map((module) => {
+              const Icon = getIcon(module.name);
+              return (
+                <div
+                  key={module._id}
+                  className="group rounded-2xl overflow-hidden border border-[#e5e7eb] shadow-sm hover:shadow-lg transition-all duration-300 hover:-translate-y-1 cursor-pointer bg-white"
+                  onClick={() => router.push('/modules')}
+                >
+                  {/* Card Top - Gradient */}
+                  <div
+                    className="p-6 relative overflow-hidden"
+                    style={{
+                      background: 'linear-gradient(135deg, #34BFF3 0%, #1a9fd4 60%, #0e7ab5 100%)',
+                    }}
+                  >
+                    <div className="absolute -right-4 -top-4 w-20 h-20 bg-white/10 rounded-full" />
+                    <div className="absolute right-4 -bottom-6 w-14 h-14 bg-white/10 rounded-full" />
+
+                    <div className="w-11 h-11 bg-white/20 rounded-xl flex items-center justify-center mb-4">
+                      <Icon className="w-5 h-5 text-white" />
+                    </div>
+
+                    <h3 className="text-white font-bold text-[16px] leading-snug">
+                      {module.name}
+                    </h3>
+
+                    <p className="text-white/80 text-[13px] mt-2 leading-relaxed line-clamp-2">
+                      {module.description}
+                    </p>
+                  </div>
+
+                  {/* Card Bottom */}
+                  <div className="px-6 py-4 bg-white">
+                    <button
+                      className="flex items-center gap-1.5 text-[#34BFF3] text-[13px] font-semibold hover:gap-3 transition-all duration-200"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        router.push('/modules');
+                      }}
+                    >
+                      Learn More <ArrowRight className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
                 </div>
-                <div className="mt-4 pt-4 border-t border-gray-100 flex items-center justify-between">
-                  <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-blue-50 text-blue-700 text-xs font-semibold rounded-lg">
-                    {module.category}
-                  </span>
-                  <span className="text-xs text-gray-400">{module.credits} Credits</span>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
+              );
+            })}
+          </div>
+        )}
+
+        {/* Empty state */}
+        {!loading && modules.length === 0 && (
+          <p className="text-center text-[#6b7280] text-[14px] py-10">
+            No programs found.
+          </p>
+        )}
       </div>
     </section>
   );
