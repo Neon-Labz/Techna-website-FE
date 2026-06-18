@@ -247,7 +247,13 @@ export default function RegisterSection() {
 
   if (submitted) {
     return (
-      <div className="relative min-h-screen overflow-hidden bg-gradient-to-br from-sky-500 via-cyan-400 to-sky-600 flex items-center justify-center px-4 py-12">
+      <div
+  className="relative min-h-screen overflow-hidden flex items-center justify-center px-4 py-12"
+  style={{
+    background:
+      'radial-gradient(circle at center, #34BFF3 0%, #1EA6E6 50%, #0183CB 100%)',
+  }}
+>
         <GraduationCap className="absolute -left-12 top-10 h-80 w-80 rotate-12 text-white/10 stroke-[1.5] sm:h-[30rem] sm:w-[30rem]" />
         <BookOpen className="absolute -right-16 bottom-6 h-72 w-72 -rotate-12 text-white/10 stroke-[1.5] sm:h-[26rem] sm:w-[26rem]" />
         <GraduationCap className="absolute bottom-24 right-16 h-24 w-24 rotate-12 text-white/10 stroke-[1.5] sm:h-36 sm:w-36" />
@@ -288,36 +294,67 @@ export default function RegisterSection() {
   const inputCls = (err?: string) => `w-full px-3 py-2.5 border ${err ? 'border-red-400 bg-red-50' : 'border-gray-200 bg-gray-50'} rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 placeholder-gray-400`;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-950 via-blue-900 to-blue-800 py-10 px-4">
+    <div
+  className="min-h-screen py-10 px-4"
+  style={{
+    background:
+      'radial-gradient(circle at center, #34BFF3 0%, #1EA6E6 50%, #0183CB 100%)',
+  }}
+>
       <div className="max-w-3xl mx-auto">
         {/* Header */}
         <div className="text-center mb-8">
-          <Image src="/logo.png" alt="Techna Logo" width={120} height={50} className="mx-auto mb-4 rounded-full" />
+          {/* <Image src="/logo.png" alt="Techna Logo" width={120} height={50} className="mx-auto mb-4 rounded-full" /> */}
           <h1 className="text-2xl font-bold text-white">Techna Technical Institute</h1>
           <p className="text-blue-300 text-sm">A/L Technology Stream – Admission Form 2024</p>
         </div>
 
-        {/* Stepper */}
-        <div className="flex items-center justify-between mb-8 px-2">
-          {STEPS.map((s, i) => {
-            const Icon = s.icon;
-            const active = step === s.id;
-            const done = step > s.id;
-            return (
-              <div key={s.id} className="flex items-center flex-1">
-                <div className="flex flex-col items-center">
-                  <div className={`w-10 h-10 rounded-full flex items-center justify-center border-2 transition-all ${done ? 'bg-green-500 border-green-500' : active ? 'bg-yellow-400 border-yellow-400' : 'bg-white/10 border-white/30'}`}>
-                    {done ? <Check className="w-5 h-5 text-white" /> : <Icon className={`w-5 h-5 ${active ? 'text-blue-900' : 'text-blue-300'}`} />}
-                  </div>
-                  <p className={`text-xs mt-1.5 font-medium hidden sm:block ${active ? 'text-yellow-400' : done ? 'text-green-400' : 'text-blue-400'}`}>{s.label}</p>
-                </div>
-                {i < STEPS.length - 1 && (
-                  <div className={`flex-1 h-0.5 mx-2 ${done ? 'bg-green-500' : 'bg-white/20'}`} />
-                )}
-              </div>
-            );
-          })}
+       {/* Stepper */}
+<div className="flex items-center justify-between mb-8 px-2">
+  {STEPS.map((s, i) => {
+    const Icon = s.icon;
+    const active = step === s.id;
+    const done = step > s.id;
+
+    return (
+      <div key={s.id} className="flex items-center flex-1">
+        <div className="flex flex-col items-center">
+          <div
+            className={`w-10 h-10 rounded-full flex items-center justify-center transition-all ${
+              done
+                ? 'bg-[#1E40AF]'
+                : 'bg-white'
+            }`}
+          >
+            {done ? (
+              <Check className="w-5 h-5 text-white" />
+            ) : (
+              <Icon className="w-5 h-5 text-[#1E40AF]" />
+            )}
+          </div>
+
+          <p
+            className={`text-xs mt-1.5 font-medium hidden sm:block ${
+              active || done
+                ? 'text-white'
+                : 'text-blue-100'
+            }`}
+          >
+            {s.label}
+          </p>
         </div>
+
+        {i < STEPS.length - 1 && (
+          <div
+            className={`flex-1 h-0.5 mx-2 ${
+              done ? 'bg-[#1E40AF]' : 'bg-white'
+            }`}
+          />
+        )}
+      </div>
+    );
+  })}
+</div>
 
         {/* Form Card */}
         <div className="bg-white rounded-3xl shadow-2xl p-6 md:p-8">
@@ -725,18 +762,27 @@ export default function RegisterSection() {
             <div className="flex items-center gap-3">
               <span className="text-xs text-gray-400">Step {step} of {STEPS.length}</span>
               {step < 5 ? (
-                <button onClick={next} className="flex items-center gap-2 px-6 py-2.5 bg-blue-900 hover:bg-blue-800 text-white font-semibold rounded-xl transition-all text-sm shadow-md">
+                <button onClick={next} className="flex items-center gap-2 px-6 py-2.5 text-white font-semibold rounded-xl transition-all text-sm shadow-md" style={{
+                    background: 'linear-gradient(135deg, #0183CB 0%, #34BFF3 100%)'
+                  }}>
                   Next <ChevronRight className="w-4 h-4" />
                 </button>
               ) : (
-                <button
-                  onClick={handleSubmit}
-                  disabled={loading}
-                  className="flex items-center gap-2 px-6 py-2.5 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-xl transition-all text-sm shadow-md disabled:opacity-60"
-                >
-                  {loading ? <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" /> : <Check className="w-4 h-4" />}
-                  {loading ? 'Submitting...' : 'Submit Application'}
-                </button>
+                              <button
+                onClick={handleSubmit}
+                disabled={loading}
+                className="flex items-center gap-2 px-6 py-2.5 text-white font-semibold rounded-xl transition-all text-sm shadow-md disabled:opacity-60"
+                style={{
+                  background: 'linear-gradient(135deg, #0183CB 0%, #34BFF3 100%)',
+                }}
+              >
+                {loading ? (
+                  <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                ) : (
+                  <Check className="w-4 h-4" />
+                )}
+                {loading ? 'Submitting...' : 'Submit Application'}
+              </button>
               )}
             </div>
           </div>

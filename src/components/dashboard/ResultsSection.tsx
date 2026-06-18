@@ -199,7 +199,7 @@ export default function ResultsSection() {
     // Exams table
     autoTable(doc, {
       startY: y,
-      head: [['Module', 'Title', 'Date', 'Time', 'Venue', 'Batch']],
+      head: [['Subject', 'Title', 'Date', 'Time', 'Venue', 'Batch']],
       body: filtered.map(e => [
         e.moduleName,
         e.title,
@@ -280,7 +280,7 @@ export default function ResultsSection() {
             </div>
             <div className="bg-white/10 rounded-xl px-4 py-2.5 text-center">
               <p className="text-yellow-400 font-bold text-xl">{modules.length}</p>
-              <p className="text-blue-200 text-xs">Modules</p>
+              <p className="text-blue-200 text-xs">Subjects</p>
             </div>
           </div>
         </div>
@@ -294,9 +294,9 @@ export default function ResultsSection() {
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
-            <label className="block text-xs text-gray-500 mb-1.5 font-medium">Module</label>
+            <label className="block text-xs text-gray-500 mb-1.5 font-medium">Subject</label>
             <select value={moduleFilter} onChange={e => setModuleFilter(e.target.value)} className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm bg-gray-50 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
-              <option value="all">All Modules</option>
+              <option value="all">All Subjects</option>
               {modules.map(m => <option key={m} value={m}>{m}</option>)}
             </select>
           </div>
@@ -344,7 +344,7 @@ export default function ResultsSection() {
             <table className="w-full">
               <thead className="bg-gray-50 border-b border-gray-100">
                 <tr>
-                  {['Module', 'Title', 'Date', 'Time', 'Venue', 'Batch'].map(h => (
+                  {['Subject', 'Title', 'Date', 'Time', 'Venue', 'Batch'].map(h => (
                     <th key={h} className="text-left px-5 py-3.5 text-xs font-semibold text-gray-500 uppercase tracking-wider">{h}</th>
                   ))}
                 </tr>

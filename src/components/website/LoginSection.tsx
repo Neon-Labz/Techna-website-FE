@@ -20,7 +20,7 @@ const getApiErrorMessage = (error: unknown, fallback: string) => {
 
 export default function LoginSection() {
   const router = useRouter();
-  const { hasHydrated, isAuthenticated, login, student, token } = useAuthStore();
+  const { hasHydrated, isAuthenticated, login, student: authStudent, token } = useAuthStore();
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -30,10 +30,10 @@ export default function LoginSection() {
   const [error, setError] = useState('');
 
   useEffect(() => {
-    if (hasHydrated && isAuthenticated && student && token) {
+    if (hasHydrated && isAuthenticated && authStudent && token) {
       router.replace('/dashboard');
     }
-  }, [hasHydrated, isAuthenticated, router, student, token]);
+  }, [hasHydrated, isAuthenticated, router, authStudent, token]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -47,33 +47,37 @@ export default function LoginSection() {
     setLoading(true);
 
     try {
-      const result = await studentLogin(email.trim(), password);
+      const data = await studentLogin(email.trim(), password);
+      console.log('Student login response:', data);
 
       const accessToken =
-        result.access_token ||
-        result.token ||
-        result.accessToken ||
-        result.data?.access_token ||
-        result.data?.token ||
-        result.data?.accessToken;
+        data?.access_token ||
+        data?.token ||
+        data?.data?.access_token ||
+        data?.data?.token;
 
       if (!accessToken) {
-        throw new Error('Login response was missing access token.');
+        throw new Error('Login token not found');
       }
 
       const sessionResult = await getSession(accessToken);
-      const studentData =
-        sessionResult.student ||
-        sessionResult.user ||
-        sessionResult.data?.student ||
-        sessionResult.data?.user ||
-        sessionResult.data;
+      const isStudentObject = (value: any) =>
+        value && typeof value === 'object' && !value.access_token && !value.token;
 
-      if (!studentData) {
+      const student =
+        sessionResult?.student ||
+        sessionResult?.user ||
+        sessionResult?.data?.student ||
+        sessionResult?.data?.user ||
+        (isStudentObject(sessionResult?.data) ? sessionResult.data : undefined) ||
+        (isStudentObject(sessionResult) ? sessionResult : undefined);
+
+      if (!student) {
         throw new Error('Failed to load student session.');
       }
 
-      login(studentData, accessToken, rememberMe);
+      console.log('Student object before login():', student);
+      login(student, accessToken, rememberMe);
       router.push('/dashboard');
     } catch (error) {
       localStorage.removeItem('token');
@@ -90,16 +94,25 @@ export default function LoginSection() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-950 via-blue-900 to-blue-800 flex items-center justify-center px-4 py-12">
-      <div className="absolute top-20 left-20 w-64 h-64 bg-yellow-400/10 rounded-full blur-3xl pointer-events-none" />
-      <div className="absolute bottom-20 right-20 w-80 h-80 bg-blue-400/10 rounded-full blur-3xl pointer-events-none" />
-
-      <div className="w-full max-w-md relative">
+    <div
+      className="min-h-screen flex items-center justify-center px-4 relative overflow-hidden"
+      style={{
+        background:
+          'radial-gradient(circle at center, #34BFF3 0%, #1EA6E6 50%, #0183CB 100%)',
+      }}
+    >
+      <div className="w-full max-w-md relative z-10">
         <div className="bg-white rounded-3xl shadow-2xl p-8">
           <div className="text-center mb-8">
-            <Image src="/logo.png" alt="Techna Logo" width={150} height={80} className="mx-auto mb-4 rounded-full" />
+            <Image
+              src="/logo.png"
+              alt="Techna Logo"
+              width={150}
+              height={80}
+              className="mx-auto mb-4 rounded-full"
+            />
             <h1 className="text-2xl font-bold text-gray-900">Welcome Back</h1>
-            <p className="text-gray-500 text-sm mt-1">Sign in to your Techna Student Portal</p>
+            <p className="text-gray-500 text-sm mt-1">Sign in to your Techna LMS</p>
           </div>
 
           {error && (
@@ -110,7 +123,9 @@ export default function LoginSection() {
 
           <form onSubmit={handleSubmit} className="space-y-5">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1.5">Email Address</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                Email Address
+              </label>
               <div className="relative">
                 <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
                 <input
@@ -125,7 +140,9 @@ export default function LoginSection() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1.5">Password</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                Password
+              </label>
               <div className="relative">
                 <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
                 <input
@@ -156,20 +173,26 @@ export default function LoginSection() {
                 />
                 Remember me
               </label>
-              <Link href="/forgot-password" className="text-blue-700 font-medium hover:underline">
-                Forgot password?
-              </Link>
+                              <Link
+                  href="/forgot-password"
+                  className="font-medium hover:underline transition-colors"
+                  style={{ color: '#0183CB' }}
+                >
+                  Forgot password?
+                </Link>
             </div>
 
             <button
               type="submit"
               disabled={loading}
-              className="w-full flex items-center justify-center gap-2 py-3.5 bg-gradient-to-r from-blue-900 to-blue-700 hover:from-blue-800 hover:to-blue-600 text-white font-semibold rounded-xl transition-all duration-200 disabled:opacity-60 shadow-lg hover:shadow-xl"
+              className="w-full flex items-center justify-center gap-2 py-3.5 bg-gradient-to-r from-[#0183CB] to-[#34BFF3] hover:from-[#0175B5] hover:to-[#20AEE5] text-white font-semibold rounded-xl transition-all duration-200 disabled:opacity-60 shadow-lg hover:shadow-xl"
             >
               {loading ? (
                 <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
               ) : (
-                <>Sign In <ArrowRight className="w-4 h-4" /></>
+                <>
+                  Sign In <ArrowRight className="w-4 h-4" />
+                </>
               )}
             </button>
           </form>
@@ -177,7 +200,11 @@ export default function LoginSection() {
           <div className="text-center mt-6 pt-6 border-t border-gray-100">
             <p className="text-gray-500 text-sm">
               Don&apos;t have an account?{' '}
-              <Link href="/register" className="text-blue-700 font-semibold hover:underline">
+                            <Link
+                href="/register"
+                className="font-semibold hover:underline transition-colors"
+                style={{ color: '#0183CB' }}
+              >
                 Register Now
               </Link>
             </p>
@@ -185,7 +212,7 @@ export default function LoginSection() {
         </div>
 
         <div className="text-center mt-6">
-          <Link href="/" className="text-blue-200 text-sm hover:text-white transition-colors">
+          <Link href="/" className="text-blue-100 text-sm hover:text-white transition-colors">
             ← Back to Home
           </Link>
         </div>
