@@ -1,7 +1,5 @@
 import api from '@/lib/axios';
 
-// ─── Interfaces ───────────────────────────────────────────────────────────────
-
 export interface ResourceFromApi {
   _id: string;
   title: string;
@@ -30,34 +28,32 @@ export interface ModuleFromApi {
   updatedAt?: string;
 }
 
-// ─── Module API ───────────────────────────────────────────────────────────────
-
 export const moduleApi = {
   getAll(): Promise<ModuleFromApi[]> {
-    return api.get('/modules');
+    return api.get('/modules').then((res) => res.data);
   },
 
   getById(id: string): Promise<ModuleFromApi> {
-    return api.get(`/modules/${id}`);
+    return api.get(`/modules/${id}`).then((res) => res.data);
   },
 
   create(payload: Partial<ModuleFromApi>): Promise<ModuleFromApi> {
-    return api.post('/modules', payload);
+    return api.post('/modules', payload).then((res) => res.data);
   },
 
   update(id: string, payload: Partial<ModuleFromApi>): Promise<ModuleFromApi> {
-    return api.patch(`/modules/${id}`, payload);
+    return api.patch(`/modules/${id}`, payload).then((res) => res.data);
   },
 
   delete(id: string): Promise<{ message: string }> {
-    return api.delete(`/modules/${id}`);
+    return api.delete(`/modules/${id}`).then((res) => res.data);
   },
 
-  addResourceUrl(moduleId: string, data: any): Promise<any> {
-    return api.post(`/modules/${moduleId}/add-resource-url`, data);
+  addResourceUrl(moduleId: string, data: unknown): Promise<unknown> {
+    return api.post(`/modules/${moduleId}/add-resource-url`, data).then((res) => res.data);
   },
 
-  toggleResourcePublish(moduleId: string, resourceId: string): Promise<any> {
-    return api.patch(`/modules/${moduleId}/resources/${resourceId}/toggle-publish`);
+  toggleResourcePublish(moduleId: string, resourceId: string): Promise<unknown> {
+    return api.patch(`/modules/${moduleId}/resources/${resourceId}/toggle-publish`).then((res) => res.data);
   },
 };

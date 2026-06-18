@@ -2,7 +2,7 @@
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { ArrowRight, Cpu, FlaskConical, Leaf, Globe, Calculator, Dna, BookOpen } from 'lucide-react';
-import api from '@/lib/axios';
+import { moduleApi, ModuleFromApi } from '@/api/module.api';
 
 const iconMap: Record<string, React.ElementType> = {
   'Engineering Technology': Cpu,
@@ -15,30 +15,24 @@ const iconMap: Record<string, React.ElementType> = {
 
 const getIcon = (name: string) => iconMap[name] ?? BookOpen;
 
-interface Module {
-  _id: string;
-  name: string;
-  description: string;
-  code?: string;
-}
-
 export default function FeaturedModulesSection() {
   const router = useRouter();
-  const [modules, setModules] = useState<Module[]>([]);
+  const [modules, setModules] = useState<ModuleFromApi[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchModules = async () => {
-      try {
-        const res = await api.get('/modules');
-        setModules((res as unknown as Module[]).slice(0, 6));
-      } catch (err) {
-        console.error('Failed to fetch modules:', err);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchModules();
+    moduleApi.getAll()
+      .then((res: unknown) => {
+        let data: ModuleFromApi[] = [];
+        if (Array.isArray(res)) {
+          data = res;
+        } else if (res && typeof res === 'object' && Array.isArray((res as any).data)) {
+          data = (res as any).data;
+        }
+        setModules(data.slice(0, 6));
+      })
+      .catch((err: unknown) => console.error('Failed to fetch modules:', err))
+      .finally(() => setLoading(false));
   }, []);
 
   return (
@@ -67,7 +61,7 @@ export default function FeaturedModulesSection() {
           </button>
         </div>
 
-        {/* Loading */}
+        {/* Loading Skeleton */}
         {loading && (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
             {[...Array(6)].map((_, i) => (
@@ -80,7 +74,7 @@ export default function FeaturedModulesSection() {
         )}
 
         {/* Grid */}
-        {!loading && (
+        {!loading && modules.length > 0 && (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
             {modules.map((module) => {
               const Icon = getIcon(module.name);
@@ -125,7 +119,7 @@ export default function FeaturedModulesSection() {
           </div>
         )}
 
-        {/* Empty state */}
+        {/* Empty State */}
         {!loading && modules.length === 0 && (
           <p className="text-center text-[#6b7280] text-[14px] py-10">
             No programs found.
