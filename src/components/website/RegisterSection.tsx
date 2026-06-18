@@ -292,7 +292,7 @@ export default function RegisterSection() {
       <div className="max-w-3xl mx-auto">
         {/* Header */}
         <div className="text-center mb-8">
-          <Image src="/logo.png" alt="Techna Logo" width={120} height={50} className="mx-auto mb-4 rounded-full" />
+          <Image src="/techna-logo.png" alt="Techna Logo" width={120} height={50} className="mx-auto mb-4 rounded-full" />
           <h1 className="text-2xl font-bold text-white">Techna Technical Institute</h1>
           <p className="text-blue-300 text-sm">A/L Technology Stream – Admission Form 2024</p>
         </div>

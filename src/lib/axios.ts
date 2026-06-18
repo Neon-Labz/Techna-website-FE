@@ -1,41 +1,59 @@
 import axios from 'axios';
 
-const apiClient = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api',
+const AUTH_STORAGE_KEY = 'techna-auth';
+
+const PUBLIC_PATHS = ['/', '/about', '/contact', '/modules', '/programs', '/login', '/register', '/pending'];
+
+const api = axios.create({
+  baseURL: process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:4000/api',
+  headers: {
+    'Content-Type': 'application/json',
+  },
+  timeout: 15000,
 });
 
-const readStoredToken = () => {
-  if (typeof window === 'undefined') return null;
-
-  const storages = [window.localStorage, window.sessionStorage];
-  const directToken =
-    storages.find((storage) => storage.getItem('token'))?.getItem('token') ||
-    storages.find((storage) => storage.getItem('access_token'))?.getItem('access_token') ||
-    storages.find((storage) => storage.getItem('accessToken'))?.getItem('accessToken');
-
-  if (directToken) return directToken;
-
-  const persistedAuth =
-    window.localStorage.getItem('techna-auth') ||
-    window.sessionStorage.getItem('techna-auth');
-  if (!persistedAuth) return null;
-
-  try {
-    const parsed = JSON.parse(persistedAuth);
-    return parsed?.state?.token || parsed?.token || null;
-  } catch {
-    return null;
+// REQUEST interceptor — attach JWT token
+api.interceptors.request.use((config) => {
+  if (typeof window !== 'undefined') {
+    try {
+      const authData =
+        localStorage.getItem(AUTH_STORAGE_KEY) ||
+        sessionStorage.getItem(AUTH_STORAGE_KEY);
+      if (authData) {
+        const token = JSON.parse(authData)?.state?.token;
+        if (token) {
+          config.headers.Authorization = `Bearer ${token}`;
+        }
+      }
+    } catch (err) {
+      console.error('Failed to read auth token:', err);
+    }
   }
-};
-
-apiClient.interceptors.request.use((config) => {
-  const token = readStoredToken();
-
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
-  }
-
   return config;
 });
 
-export default apiClient;
+// RESPONSE interceptor — unwrap { success, message, data } envelope
+api.interceptors.response.use(
+  (response) => response.data?.data ?? response.data,
+  (error) => {
+    if (error.response?.status === 401) {
+      if (typeof window !== 'undefined') {
+        const currentPath = window.location.pathname;
+
+        // Public pages-ல் 401 வந்தாலும் login-க்கு போகாதே
+        const isPublicPath = PUBLIC_PATHS.some(
+          (path) => currentPath === path || currentPath.startsWith(path + '/')
+        );
+
+        if (!isPublicPath) {
+          localStorage.removeItem(AUTH_STORAGE_KEY);
+          sessionStorage.removeItem(AUTH_STORAGE_KEY);
+          window.location.href = '/login';
+        }
+      }
+    }
+    return Promise.reject(error);
+  }
+);
+
+export default api;
