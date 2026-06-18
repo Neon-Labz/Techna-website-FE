@@ -2,8 +2,9 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { Menu, X, GraduationCap, LogOut, Bell, User } from 'lucide-react';
+import { Menu, X, LogOut, Bell, User } from 'lucide-react';
 import { useAuthStore } from '../../store/authStore';
+import { logoutApi } from '../../api/auth.api';
 import Image from 'next/image';
 
 export default function PrivateHeader() {
@@ -25,10 +26,15 @@ export default function PrivateHeader() {
 
   const isActive = (path: string) => pathname === path;
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    try {
+      await logoutApi();
+    } catch {
+      // Ignore backend errors — still clear local session
+    }
     logout();
-    router.push('/');
     setDropdownOpen(false);
+    router.replace('/login');
   };
 
   return (
@@ -37,7 +43,7 @@ export default function PrivateHeader() {
         <div className="flex items-center justify-between h-18 py-3">
           {/* Logo */}
           <Link href="/dashboard" className="flex items-center gap-0">
-            <Image src="/logo.png" alt="Techna Logo" width={105} height={40} className="rounded-full" />
+            <Image src="/techna-logo.png" alt="Techna Logo" width={105} height={40} className="rounded-full" />
             <div>
               <p className="text-lg font-bold text-white leading-tight">Techna</p>
               <p className="text-xs text-blue-300 leading-tight">Student Portal</p>

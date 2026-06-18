@@ -1,64 +1,84 @@
-import { Shield, Cpu, Users, BookOpen, Award, Clock } from 'lucide-react';
+import {
+  GraduationCap,
+  User,
+  FlaskConical,
+  Briefcase,
+  Globe,
+  Users,
+} from 'lucide-react';
 
 const features = [
   {
-    icon: Award,
-    title: 'Experienced Faculty',
-    desc: 'Our lecturers hold advanced degrees and bring years of real-world industry experience to the classroom.',
-    color: 'bg-blue-50 text-blue-600',
+    icon: GraduationCap,
+    title: 'Quality Education',
+    desc: 'Industry-focused curriculum designed for real-world success.',
   },
   {
-    icon: Cpu,
-    title: 'Modern Labs & Resources',
-    desc: 'State-of-the-art computer labs, engineering workshops, and digital libraries for hands-on learning.',
-    color: 'bg-purple-50 text-purple-600',
+    icon: User,
+    title: 'Expert Faculty',
+    desc: 'Learn from experienced educators and industry professionals.',
   },
   {
-    icon: Shield,
-    title: 'Safe Learning Environment',
-    desc: 'We provide a secure, inclusive campus with CCTV monitoring and student welfare programs.',
-    color: 'bg-green-50 text-green-600',
+    icon: FlaskConical,
+    title: 'Modern Facilities',
+    desc: 'State-of-the-art labs, libraries and smart classrooms.',
   },
   {
-    icon: BookOpen,
-    title: 'Comprehensive Curriculum',
-    desc: 'Our syllabus aligns with national A/L standards while incorporating modern technological trends.',
-    color: 'bg-yellow-50 text-yellow-600',
+    icon: Briefcase,
+    title: 'Career Support',
+    desc: 'Placement assistance and career guidance for a bright future.',
+  },
+  {
+    icon: Globe,
+    title: 'Global Exposure',
+    desc: 'International tie-ups and exchange opportunities.',
   },
   {
     icon: Users,
-    title: 'Small Batch Sizes',
-    desc: 'Limited students per batch ensure personalized attention and better learning outcomes for every student.',
-    color: 'bg-rose-50 text-rose-600',
-  },
-  {
-    icon: Clock,
-    title: 'Flexible Scheduling',
-    desc: 'Morning, afternoon, and weekend batches available to accommodate students from all areas.',
-    color: 'bg-teal-50 text-teal-600',
+    title: 'Vibrant Campus',
+    desc: 'Engage in clubs, events and activities beyond academics.',
   },
 ];
 
 export default function WhyUsSection() {
   return (
-    <section className="py-20 bg-gradient-to-br from-blue-950 to-blue-900">
+    <section className="py-20 bg-[#EEF6FB]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-12">
-          <span className="text-yellow-400 font-semibold text-sm uppercase tracking-wider">Why Choose Us</span>
-          <h2 className="text-4xl font-bold text-white mt-2">Excellence in Every Aspect</h2>
-          <p className="text-blue-300 mt-3 max-w-xl mx-auto">We are committed to providing the best A/L technology education in the region.</p>
+
+        {/* Header */}
+        <div className="text-center mb-14">
+          <span className="text-[#34BFF3] font-semibold text-[12px] uppercase tracking-[0.12em]">
+            WHY CHOOSE US
+          </span>
+          <h2 className="text-[36px] font-bold text-[#0a0a0f] mt-2">
+            Excellence in Every Aspect
+          </h2>
+          <div className="w-12 h-[3px] bg-[#34BFF3] rounded-full mx-auto mt-4" />
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {features.map(f => {
+        {/* Features Grid */}
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-6">
+          {features.map((f) => {
             const Icon = f.icon;
             return (
-              <div key={f.title} className="bg-white/5 hover:bg-white/10 border border-white/10 rounded-2xl p-6 transition-all duration-300 hover:-translate-y-1 group">
-                <div className={`w-12 h-12 ${f.color} rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform`}>
-                  <Icon className="w-6 h-6" />
+              <div
+                key={f.title}
+                className="flex flex-col items-center text-center group"
+              >
+                {/* Icon Circle */}
+                <div className="w-[80px] h-[80px] rounded-full bg-white shadow-sm flex items-center justify-center mb-5 group-hover:shadow-md transition-shadow duration-200">
+                  <Icon className="w-[30px] h-[30px] text-[#1a6fa8]" />
                 </div>
-                <h3 className="text-white font-semibold text-lg mb-2">{f.title}</h3>
-                <p className="text-blue-300 text-sm leading-relaxed">{f.desc}</p>
+
+                {/* Title */}
+                <h3 className="text-[#0a0a0f] font-bold text-[14px] mb-2">
+                  {f.title}
+                </h3>
+
+                {/* Description */}
+                <p className="text-[#6b7280] text-[12px] leading-relaxed">
+                  {f.desc}
+                </p>
               </div>
             );
           })}

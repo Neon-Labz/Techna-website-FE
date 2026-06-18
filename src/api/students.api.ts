@@ -27,7 +27,7 @@ const getStoredToken = () => {
 export const updateStudentProfile = async (
   studentId: string,
   payload: Record<string, unknown>,
-) => {
+): Promise<any> => {
   const endpoint = `/students/${studentId}`;
   const token = getStoredToken();
   const endpointUrl = `${process.env.NEXT_PUBLIC_API_URL || ''}${endpoint}`;
@@ -39,15 +39,9 @@ export const updateStudentProfile = async (
   try {
     const response = await apiClient.patch(endpoint, payload);
 
-    console.log(
-      '[Profile update] Authorization header sent:',
-      response.config.headers.Authorization,
-    );
+    console.log('[Profile update] response body:', response);
 
-    console.log('[Profile update] response status:', response.status);
-    console.log('[Profile update] response body:', response.data);
-
-    return response.data;
+    return response;
   } catch (error) {
     const response = (error as {
       response?: {

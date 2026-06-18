@@ -67,7 +67,8 @@ export default function LoginSection() {
         sessionResult.user ||
         sessionResult.data?.student ||
         sessionResult.data?.user ||
-        sessionResult.data;
+        sessionResult.data ||
+        (sessionResult?.email || sessionResult?._id ? sessionResult : null);
 
       if (!studentData) {
         throw new Error('Failed to load student session.');
@@ -97,7 +98,7 @@ export default function LoginSection() {
       <div className="w-full max-w-md relative">
         <div className="bg-white rounded-3xl shadow-2xl p-8">
           <div className="text-center mb-8">
-            <Image src="/logo.png" alt="Techna Logo" width={150} height={80} className="mx-auto mb-4 rounded-full" />
+            <Image src="/techna-logo.png" alt="Techna Logo" width={150} height={80} className="mx-auto mb-4 rounded-full" />
             <h1 className="text-2xl font-bold text-gray-900">Welcome Back</h1>
             <p className="text-gray-500 text-sm mt-1">Sign in to your Techna Student Portal</p>
           </div>

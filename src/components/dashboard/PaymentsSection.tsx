@@ -1,8 +1,8 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { CreditCard, Download, CheckCircle, Clock, AlertCircle, Filter, Receipt, DollarSign } from 'lucide-react';
-import { mockPayments } from '../../data/mockData';
-import type { Payment } from '../../types';
+import { getStudentPayments, type PaymentRecord } from '@/api/payment.api';
+import jsPDF from 'jspdf';
 
 const statusConfig = {
   paid: { label: 'Paid', color: 'bg-green-100 text-green-700 border-green-200', icon: CheckCircle, dot: 'bg-green-500' },
@@ -10,85 +10,179 @@ const statusConfig = {
   overdue: { label: 'Overdue', color: 'bg-red-100 text-red-700 border-red-200', icon: AlertCircle, dot: 'bg-red-500' },
 };
 
+interface StudentInfo {
+  name: string;
+  admissionNumber: string;
+  batch: string;
+  studentId: string;
+}
+
 export default function PaymentsSection() {
   const [statusFilter, setStatusFilter] = useState('all');
-  const [semesterFilter, setSemesterFilter] = useState('all');
+  const [moduleFilter, setModuleFilter] = useState('all');
+  const [payments, setPayments] = useState<PaymentRecord[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [student, setStudent] = useState<StudentInfo>({
+    name: 'N/A',
+    admissionNumber: 'N/A',
+    batch: 'N/A',
+    studentId: '',
+  });
 
-  const semesters = [...new Set(mockPayments.map(p => p.semester))];
+  // ── Read student info from localStorage (edu-auth Zustand store) ──
+  useEffect(() => {
+    try {
+      const authData = localStorage.getItem('edu-auth');
+      if (authData) {
+        const parsed = JSON.parse(authData);
+        const user = parsed?.state?.user;
+        if (user) {
+          setStudent({
+            name: user.fullNameEnglish ?? user.fullNameTamil ?? user.email ?? 'N/A',
+            admissionNumber: user.studentId ?? 'N/A',
+            batch: user.batch ?? 'N/A',
+            studentId: user._id ?? user.studentId ?? '',
+          });
+        }
+      }
+    } catch (err) {
+      console.error('Failed to read student info:', err);
+    }
+  }, []);
 
-  const filtered = mockPayments.filter(p => {
+  // ── Fetch this student's payments ──
+  useEffect(() => {
+    if (!student.studentId) {
+      setLoading(false);
+      return;
+    }
+    const fetch = async () => {
+      try {
+        setLoading(true);
+        const data = await getStudentPayments(student.studentId);
+        setPayments(data);
+      } catch (err) {
+        console.error('Failed to fetch payments:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetch();
+  }, [student.studentId]);
+
+  const modules = [...new Set(payments.map(p => p.moduleName))];
+  const filtered = payments.filter(p => {
     if (statusFilter !== 'all' && p.status !== statusFilter) return false;
-    if (semesterFilter !== 'all' && p.semester !== semesterFilter) return false;
+    if (moduleFilter !== 'all' && p.moduleName !== moduleFilter) return false;
     return true;
   });
 
-  const totalPaid = mockPayments.filter(p => p.status === 'paid').reduce((a, p) => a + p.amount, 0);
-  const totalPending = mockPayments.filter(p => p.status === 'pending').reduce((a, p) => a + p.amount, 0);
-  const totalOverdue = mockPayments.filter(p => p.status === 'overdue').reduce((a, p) => a + p.amount, 0);
+  const totalPaid = payments.filter(p => p.status === 'paid').reduce((a, p) => a + p.amount, 0);
+  const totalPending = payments.filter(p => p.status === 'pending').reduce((a, p) => a + p.amount, 0);
+  const totalOverdue = payments.filter(p => p.status === 'overdue').reduce((a, p) => a + p.amount, 0);
 
-  const generateReceipt = (payment: Payment) => {
-    const content = `
-TECHNA TECHNICAL INSTITUTE
-A/L Technology Stream
-Payment Receipt
-===============================
-Receipt No : ${payment.receiptNumber}
-Date       : ${new Date(payment.date).toLocaleDateString('en-GB')}
-Description: ${payment.description}
-Amount     : LKR ${payment.amount.toLocaleString()}.00
-Method     : ${payment.method}
-Status     : ${payment.status.toUpperCase()}
-Semester   : ${payment.semester}
-===============================
-Student    : RAVEENDRAN GANESH
-Admission  : ADM-2024-0042
-===============================
-Thank you for your payment.
-This is a computer generated receipt.
-    `.trim();
-    const blob = new Blob([content], { type: 'text/plain' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `${payment.receiptNumber}.txt`;
-    a.click();
-    URL.revokeObjectURL(url);
+  // ── PDF Receipt Generator ──
+  const generateReceipt = (payment: PaymentRecord) => {
+    const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+    const pageW = 210;
+    const blue = '#34BFF3';
+    const darkBlue = '#1a6fa8';
+    const textDark = '#0a0a0f';
+    const textGray = '#6b7280';
+    const rowBg = '#EEF6FB';
+    let built = false;
+
+    const buildPDF = () => {
+      if (built) return;
+      built = true;
+
+      doc.setFont('helvetica', 'bold'); doc.setFontSize(32); doc.setTextColor(blue);
+      doc.text('TECHNA', pageW / 2, 24, { align: 'center' });
+      doc.setFont('helvetica', 'normal'); doc.setFontSize(8); doc.setTextColor(darkBlue);
+      doc.text('Techna', 28, 41, { align: 'center' });
+      doc.text('Technical Institute', 28, 45, { align: 'center' });
+      doc.setFontSize(10); doc.setTextColor(darkBlue);
+      doc.text('A/L Technology Stream', pageW / 2, 34, { align: 'center' });
+      doc.setFontSize(8); doc.setTextColor(textGray);
+      doc.text('Email: sivasakthy22@gmail.com  |  Contact: +94 77 170 3549', pageW / 2, 40, { align: 'center' });
+      doc.setFont('helvetica', 'bold'); doc.setFontSize(13); doc.setTextColor(blue);
+      doc.text('PAYMENT RECEIPT', pageW / 2, 49, { align: 'center' });
+      doc.setDrawColor(blue); doc.setLineWidth(0.8);
+      doc.line(14, 54, pageW - 14, 54);
+
+      const drawSectionHeader = (x: number, y: number, label: string) => {
+        doc.setFillColor(blue); doc.rect(x, y - 4, 2.5, 5, 'F');
+        doc.setFont('helvetica', 'bold'); doc.setFontSize(10); doc.setTextColor(darkBlue);
+        doc.text(label, x + 5, y);
+      };
+      const drawRow = (x: number, y: number, w: number, label: string, value: string, shaded: boolean) => {
+        if (shaded) { doc.setFillColor(rowBg); doc.rect(x, y - 5, w, 8, 'F'); }
+        doc.setFont('helvetica', 'bold'); doc.setFontSize(9); doc.setTextColor(textDark);
+        doc.text(label, x + 3, y);
+        doc.setFont('helvetica', 'normal'); doc.setTextColor(textDark);
+        doc.text(value, x + w * 0.5, y);
+      };
+
+      const col1X = 14, col2X = pageW / 2 + 6, colW = pageW / 2 - 20;
+      let y = 66;
+      drawSectionHeader(col1X, y, 'STUDENT INFORMATION');
+      drawSectionHeader(col2X, y, 'PAYMENT DETAILS');
+      y += 6;
+
+      const studentRows = [
+        ['Student Name', student.name],
+        ['Admission No', student.admissionNumber],
+        ['Batch', student.batch],
+      ];
+      const paymentRows = [
+        ['Receipt No', payment.receiptNo],
+        ['Date', new Date(payment.paidDate).toLocaleDateString('en-GB')],
+        ['Module', payment.moduleName],
+        ['Amount', `LKR ${payment.amount.toLocaleString()}.00`],
+        ['Method', payment.method],
+        ['Status', payment.status.toUpperCase()],
+        ['Notes', payment.notes ?? '-'],
+      ];
+
+      studentRows.forEach((row, i) => drawRow(col1X, y + i * 10, colW, row[0], row[1], i % 2 === 0));
+      paymentRows.forEach((row, i) => drawRow(col2X, y + i * 10, colW, row[0], row[1], i % 2 === 0));
+
+      y += Math.max(studentRows.length, paymentRows.length) * 10 + 16;
+      doc.setFillColor(blue);
+      doc.roundedRect(14, y, pageW - 28, 36, 6, 6, 'F');
+      doc.setFont('helvetica', 'normal'); doc.setFontSize(9); doc.setTextColor('#ffffff');
+      doc.text('TOTAL AMOUNT PAID', pageW / 2, y + 10, { align: 'center' });
+      doc.setFont('helvetica', 'bold'); doc.setFontSize(24);
+      doc.text(`LKR ${payment.amount.toLocaleString()}.00`, pageW / 2, y + 26, { align: 'center' });
+      y += 50;
+      doc.setFont('helvetica', 'italic'); doc.setFontSize(8); doc.setTextColor(textGray);
+      doc.text('This is a computer-generated receipt. No signature required.', pageW / 2, y, { align: 'center' });
+      doc.save(`${payment.receiptNo}.pdf`);
+    };
+
+    const logo = new Image();
+    logo.src = '/techna-logo.png';
+    logo.onload = () => { doc.addImage(logo, 'PNG', 14, 10, 28, 28); buildPDF(); };
+    logo.onerror = () => buildPDF();
   };
+
+  if (loading) {
+    return (
+      <div className="space-y-4">
+        {[...Array(3)].map((_, i) => (
+          <div key={i} className="bg-white rounded-2xl border border-gray-100 h-24 animate-pulse" />
+        ))}
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <div className="bg-gradient-to-r from-blue-950 to-blue-800 rounded-3xl p-6 text-white">
-        <div className="flex items-center justify-between flex-wrap gap-4">
-          <div>
-            <h1 className="text-2xl font-bold flex items-center gap-2">
-              <CreditCard className="w-7 h-7 text-yellow-400" /> Payments
-            </h1>
-            <p className="text-blue-300 text-sm mt-1">View payment history and download receipts</p>
-          </div>
-          <div className="flex flex-wrap gap-3">
-            <div className="bg-white/10 rounded-xl px-4 py-2.5 text-center">
-              <p className="text-green-400 font-bold text-lg">LKR {totalPaid.toLocaleString()}</p>
-              <p className="text-blue-200 text-xs">Total Paid</p>
-            </div>
-            <div className="bg-white/10 rounded-xl px-4 py-2.5 text-center">
-              <p className="text-yellow-400 font-bold text-lg">LKR {totalPending.toLocaleString()}</p>
-              <p className="text-blue-200 text-xs">Pending</p>
-            </div>
-            <div className="bg-white/10 rounded-xl px-4 py-2.5 text-center">
-              <p className="text-red-400 font-bold text-lg">LKR {totalOverdue.toLocaleString()}</p>
-              <p className="text-blue-200 text-xs">Overdue</p>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Summary Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         {[
-          { label: 'Total Paid', value: totalPaid, icon: CheckCircle, color: 'text-green-600 bg-green-50', count: mockPayments.filter(p => p.status === 'paid').length },
-          { label: 'Pending Payments', value: totalPending, icon: Clock, color: 'text-yellow-600 bg-yellow-50', count: mockPayments.filter(p => p.status === 'pending').length },
-          { label: 'Overdue Payments', value: totalOverdue, icon: AlertCircle, color: 'text-red-600 bg-red-50', count: mockPayments.filter(p => p.status === 'overdue').length },
+          { label: 'Total Paid', value: totalPaid, icon: CheckCircle, color: 'text-green-600 bg-green-50', count: payments.filter(p => p.status === 'paid').length },
+          { label: 'Pending Payments', value: totalPending, icon: Clock, color: 'text-yellow-600 bg-yellow-50', count: payments.filter(p => p.status === 'pending').length },
+          { label: 'Overdue Payments', value: totalOverdue, icon: AlertCircle, color: 'text-red-600 bg-red-50', count: payments.filter(p => p.status === 'overdue').length },
         ].map(item => {
           const Icon = item.icon;
           return (
@@ -106,7 +200,6 @@ This is a computer generated receipt.
         })}
       </div>
 
-      {/* Filters */}
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5">
         <div className="flex flex-wrap items-center gap-4">
           <div className="flex items-center gap-2">
@@ -115,7 +208,8 @@ This is a computer generated receipt.
           </div>
           <div className="flex items-center gap-2">
             <label className="text-xs text-gray-500">Status:</label>
-            <select value={statusFilter} onChange={e => setStatusFilter(e.target.value)} className="border border-gray-200 rounded-xl px-3 py-2 text-sm bg-gray-50 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <select value={statusFilter} onChange={e => setStatusFilter(e.target.value)}
+              className="border border-gray-200 rounded-xl px-3 py-2 text-sm bg-gray-50 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
               <option value="all">All Status</option>
               <option value="paid">Paid</option>
               <option value="pending">Pending</option>
@@ -123,10 +217,11 @@ This is a computer generated receipt.
             </select>
           </div>
           <div className="flex items-center gap-2">
-            <label className="text-xs text-gray-500">Semester:</label>
-            <select value={semesterFilter} onChange={e => setSemesterFilter(e.target.value)} className="border border-gray-200 rounded-xl px-3 py-2 text-sm bg-gray-50 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
-              <option value="all">All Semesters</option>
-              {semesters.map(s => <option key={s} value={s}>{s}</option>)}
+            <label className="text-xs text-gray-500">Module:</label>
+            <select value={moduleFilter} onChange={e => setModuleFilter(e.target.value)}
+              className="border border-gray-200 rounded-xl px-3 py-2 text-sm bg-gray-50 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
+              <option value="all">All Modules</option>
+              {modules.map(m => <option key={m} value={m}>{m}</option>)}
             </select>
           </div>
           <div className="ml-auto">
@@ -135,7 +230,6 @@ This is a computer generated receipt.
         </div>
       </div>
 
-      {/* Payments Table */}
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
         <div className="p-5 border-b border-gray-100 flex items-center gap-2">
           <Receipt className="w-5 h-5 text-blue-700" />
@@ -145,21 +239,20 @@ This is a computer generated receipt.
         {filtered.length === 0 ? (
           <div className="text-center py-12 text-gray-400">
             <CreditCard className="w-10 h-10 mx-auto mb-3 opacity-30" />
-            <p>No payments match your filters.</p>
+            <p>No payments found.</p>
           </div>
         ) : (
           <>
-            {/* Mobile Cards */}
             <div className="sm:hidden divide-y divide-gray-50">
               {filtered.map(payment => {
                 const cfg = statusConfig[payment.status];
                 const Icon = cfg.icon;
                 return (
-                  <div key={payment.id} className="p-4">
+                  <div key={payment._id} className="p-4">
                     <div className="flex items-start justify-between mb-2">
                       <div>
-                        <p className="font-semibold text-gray-900 text-sm">{payment.description}</p>
-                        <p className="text-xs text-gray-400 mt-0.5">{payment.receiptNumber}</p>
+                        <p className="font-semibold text-gray-900 text-sm">{payment.moduleName}</p>
+                        <p className="text-xs text-gray-400 mt-0.5">{payment.receiptNo}</p>
                       </div>
                       <span className={`flex items-center gap-1 px-2.5 py-1 text-xs font-semibold rounded-xl border ${cfg.color}`}>
                         <Icon className="w-3 h-3" /> {cfg.label}
@@ -168,10 +261,11 @@ This is a computer generated receipt.
                     <div className="flex items-center justify-between">
                       <div>
                         <p className="font-bold text-gray-900">LKR {payment.amount.toLocaleString()}</p>
-                        <p className="text-xs text-gray-400">{new Date(payment.date).toLocaleDateString('en-GB')}</p>
+                        <p className="text-xs text-gray-400">{new Date(payment.paidDate).toLocaleDateString('en-GB')}</p>
                       </div>
                       {payment.status === 'paid' && (
-                        <button onClick={() => generateReceipt(payment)} className="flex items-center gap-1.5 px-3 py-1.5 bg-blue-50 text-blue-700 text-xs font-medium rounded-xl hover:bg-blue-100 transition-all">
+                        <button onClick={() => generateReceipt(payment)}
+                          className="flex items-center gap-1.5 px-3 py-1.5 bg-blue-50 text-blue-700 text-xs font-medium rounded-xl hover:bg-blue-100 transition-all">
                           <Download className="w-3.5 h-3.5" /> Receipt
                         </button>
                       )}
@@ -181,37 +275,33 @@ This is a computer generated receipt.
               })}
             </div>
 
-            {/* Desktop Table */}
             <div className="hidden sm:block overflow-x-auto">
               <table className="w-full">
                 <thead className="bg-gray-50 border-b border-gray-100">
                   <tr>
-                    {['Receipt No.', 'Description', 'Semester', 'Amount', 'Method', 'Date', 'Status', 'Action'].map(h => (
+                    {['Receipt No.', 'Module', 'Amount', 'Method', 'Date', 'Status', 'Action'].map(h => (
                       <th key={h} className="text-left px-5 py-3.5 text-xs font-semibold text-gray-500 uppercase tracking-wider">{h}</th>
                     ))}
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-50">
                   {filtered.map(payment => {
-                      const cfg = statusConfig[payment.status];
+                    const cfg = statusConfig[payment.status];
                     return (
-                      <tr key={payment.id} className="hover:bg-gray-50 transition-all">
-                        <td className="px-5 py-4 text-xs font-mono text-gray-500">{payment.receiptNumber}</td>
+                      <tr key={payment._id} className="hover:bg-gray-50 transition-all">
+                        <td className="px-5 py-4 text-xs font-mono text-gray-500">{payment.receiptNo}</td>
                         <td className="px-5 py-4">
                           <div className="flex items-center gap-2">
                             <div className="w-8 h-8 bg-blue-50 rounded-lg flex items-center justify-center">
                               <DollarSign className="w-4 h-4 text-blue-700" />
                             </div>
-                            <p className="font-medium text-gray-900 text-sm">{payment.description}</p>
+                            <p className="font-medium text-gray-900 text-sm">{payment.moduleName}</p>
                           </div>
                         </td>
-                        <td className="px-5 py-4">
-                          <span className="px-2.5 py-1 bg-gray-100 text-gray-600 text-xs font-medium rounded-lg">{payment.semester}</span>
-                        </td>
                         <td className="px-5 py-4 font-bold text-gray-900 text-sm">LKR {payment.amount.toLocaleString()}</td>
-                        <td className="px-5 py-4 text-sm text-gray-500">{payment.method}</td>
+                        <td className="px-5 py-4 text-sm text-gray-500 capitalize">{payment.method}</td>
                         <td className="px-5 py-4 text-sm text-gray-500">
-                          {new Date(payment.date).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}
+                          {new Date(payment.paidDate).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}
                         </td>
                         <td className="px-5 py-4">
                           <span className={`flex items-center gap-1.5 px-2.5 py-1 text-xs font-semibold rounded-xl border w-fit ${cfg.color}`}>
@@ -221,7 +311,8 @@ This is a computer generated receipt.
                         </td>
                         <td className="px-5 py-4">
                           {payment.status === 'paid' ? (
-                            <button onClick={() => generateReceipt(payment)} className="flex items-center gap-1.5 px-3 py-1.5 bg-blue-50 hover:bg-blue-100 text-blue-700 text-xs font-medium rounded-xl transition-all">
+                            <button onClick={() => generateReceipt(payment)}
+                              className="flex items-center gap-1.5 px-3 py-1.5 bg-blue-50 hover:bg-blue-100 text-blue-700 text-xs font-medium rounded-xl transition-all">
                               <Download className="w-3.5 h-3.5" /> Receipt
                             </button>
                           ) : (
@@ -238,9 +329,7 @@ This is a computer generated receipt.
             </div>
 
             <div className="p-4 border-t border-gray-100 bg-gray-50 flex items-center justify-between">
-              <p className="text-xs text-gray-400">
-                Total: <strong>LKR {filtered.reduce((a, p) => a + p.amount, 0).toLocaleString()}</strong>
-              </p>
+              <p className="text-xs text-gray-400">Total: <strong>LKR {filtered.reduce((a, p) => a + p.amount, 0).toLocaleString()}</strong></p>
               <p className="text-xs text-gray-400">Only paid receipts can be downloaded</p>
             </div>
           </>
