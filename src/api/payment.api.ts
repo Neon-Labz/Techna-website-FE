@@ -1,5 +1,6 @@
 import api from '@/lib/axios';
 
+
 // ─── Interface ────────────────────────────────────────────────────────────────
 
 export interface PaymentFromApi {
@@ -42,4 +43,21 @@ export const paymentApi = {
         )
       );
   },
+};
+export const getStudentPayments = paymentApi.getByStudent;
+export type PaymentRecord = {
+  notes?: string;
+  id?: string;
+  _id?: string;
+  studentId?: string;
+  studentName?: string;
+  moduleId?: string;
+  moduleName?: string;
+  amount?: number;
+  method?: string;
+  status?: string;
+  receiptNo?: string;
+  batch?: string;
+  paidDate?: string;
+  createdAt?: string;
 };
