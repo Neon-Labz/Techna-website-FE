@@ -3,10 +3,16 @@ import type { Student } from '@/types';
 
 type LoginResponse = {
   access_token?: string;
+  accessToken?: string;
   token?: string;
+  student?: Student;
+  user?: Student;
   data?: {
     access_token?: string;
+    accessToken?: string;
     token?: string;
+    student?: Student;
+    user?: Student;
   };
 };
 
@@ -82,57 +88,68 @@ export type RegisterStudentResponse = {
 
 const getLoginToken = (resData: LoginResponse) =>
   resData?.access_token ||
+  resData?.accessToken ||
   resData?.token ||
   resData?.data?.access_token ||
+  resData?.data?.accessToken ||
   resData?.data?.token;
+
+const getLoginStudent = (resData: LoginResponse): Student | undefined =>
+  resData?.student || resData?.user || resData?.data?.student || resData?.data?.user;
 
 const getSessionStudent = (resData: SessionResponse): Student =>
   'data' in resData && resData.data ? resData.data : (resData as Student);
 
 export const authApi = {
-  async loginStudent(email: string, password: string) {
-    const loginRes = await api.post<LoginResponse>(
-      '/auth/student/login',
-      { email, password },
-      { headers: { 'X-Skip-Auth': 'true' } }
-    );
+ async loginStudent(email: string, password: string) {
+  const loginData = (await api.post(
+    '/auth/student/login',
+    { email, password },
+    { headers: { 'X-Skip-Auth': 'true' } },
+  )) as LoginResponse;
 
-    const token = getLoginToken(loginRes.data);
+  console.log('LOGIN RESPONSE:', loginData);
 
-    if (!token) {
-      throw new Error('Login succeeded, but no auth token was returned.');
-    }
+  const token = getLoginToken(loginData);
 
-    const sessionRes = await api.get<SessionResponse>('/auth/session', {
+  if (!token) {
+    throw new Error('Login succeeded, but no auth token was returned.');
+  }
+
+  let student = getLoginStudent(loginData);
+
+  if (!student) {
+    const sessionData = (await api.get('/auth/session', {
       headers: { Authorization: `Bearer ${token}` },
-    });
+    })) as SessionResponse;
 
-    const student = getSessionStudent(sessionRes.data);
+    student = getSessionStudent(sessionData);
+  }
 
-    if (!student?.email) {
-      throw new Error('Login succeeded, but no student profile was returned.');
-    }
+  if (!student?.email) {
+    throw new Error('Login succeeded, but no student profile was returned.');
+  }
 
-    return { student, token };
-  },
+  return { student, token };
+},
 
   async registerStudent(payload: RegisterStudentPayload | FormData) {
     const res = await api.post<RegisterStudentResponse>(
       '/students/register',
       payload,
-      { headers: { 'X-Skip-Auth': 'true' } }
+      { headers: { 'X-Skip-Auth': 'true' } },
     );
 
     return res.data;
   },
 
-  async getSession(token?: string) {
-    const res = await api.get<SessionResponse>('/auth/session', {
-      headers: token ? { Authorization: `Bearer ${token}` } : undefined,
-    });
+ async getSession(token?: string) {
+  const sessionData = (await api.get('/auth/session', {
+    headers: token ? { Authorization: `Bearer ${token}` } : undefined,
+  })) as SessionResponse;
 
-    return getSessionStudent(res.data);
-  },
+  return getSessionStudent(sessionData);
+},
 
   async logout() {
     return api.post('/auth/logout');

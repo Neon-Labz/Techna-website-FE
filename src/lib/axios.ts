@@ -1,8 +1,15 @@
 import axios from 'axios';
 
+const AUTH_STORAGE_KEYS = ['techna-auth', 'edu-auth'];
+
+const PUBLIC_PATHS = ['/', '/about', '/contact', '/modules', '/programs'];
+
 const api = axios.create({
-  baseURL:
-    process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api',
+  baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api',
+  headers: {
+    'Content-Type': 'application/json',
+  },
+  timeout: 15000,
 });
 
 const readStoredToken = () => {
@@ -10,25 +17,32 @@ const readStoredToken = () => {
 
   const storages = [window.localStorage, window.sessionStorage];
 
-  const directToken =
-    storages.find((storage) => storage.getItem('token'))?.getItem('token') ||
-    storages.find((storage) => storage.getItem('access_token'))?.getItem('access_token') ||
-    storages.find((storage) => storage.getItem('accessToken'))?.getItem('accessToken');
+  for (const storage of storages) {
+    const directToken =
+      storage.getItem('token') ||
+      storage.getItem('access_token') ||
+      storage.getItem('accessToken');
 
-  if (directToken) return directToken;
-
-  const persistedAuth =
-    window.localStorage.getItem('techna-auth') ||
-    window.sessionStorage.getItem('techna-auth');
-
-  if (!persistedAuth) return null;
-
-  try {
-    const parsed = JSON.parse(persistedAuth);
-    return parsed?.state?.token || parsed?.token || null;
-  } catch {
-    return null;
+    if (directToken) return directToken;
   }
+
+  for (const key of AUTH_STORAGE_KEYS) {
+    const stored =
+      window.localStorage.getItem(key) || window.sessionStorage.getItem(key);
+
+    if (!stored) continue;
+
+    try {
+      const parsed = JSON.parse(stored);
+      const token = parsed?.state?.token || parsed?.token;
+
+      if (token) return token;
+    } catch {
+      // ignore invalid storage json
+    }
+  }
+
+  return null;
 };
 
 api.interceptors.request.use((config) => {
@@ -49,5 +63,32 @@ api.interceptors.request.use((config) => {
 
   return config;
 });
+
+api.interceptors.response.use(
+(response) => response.data?.data ?? response.data,
+  (error) => {
+    if (error.response?.status === 401 && typeof window !== 'undefined') {
+      const currentPath = window.location.pathname;
+
+      const isPublicPath = PUBLIC_PATHS.some(
+        (path) => currentPath === path || currentPath.startsWith(path + '/'),
+      );
+
+      const isLoginPath =
+        currentPath === '/login' || currentPath.includes('/login');
+
+      if (!isPublicPath && !isLoginPath) {
+        AUTH_STORAGE_KEYS.forEach((key) => {
+          localStorage.removeItem(key);
+          sessionStorage.removeItem(key);
+        });
+
+        window.location.href = '/login';
+      }
+    }
+
+    return Promise.reject(error);
+  },
+);
 
 export default api;

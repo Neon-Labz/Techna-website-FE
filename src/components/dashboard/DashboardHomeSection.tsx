@@ -24,7 +24,15 @@ type Notice = {
   type?: NoticeType;
   moduleId?: string;
   moduleName?: string;
-  module?: string;
+  module?:
+    | string
+    | {
+        id?: string;
+        _id?: string;
+        name?: string;
+        moduleId?: string;
+        moduleName?: string;
+      };
   subject?: string;
   batch?: string;
   title?: string;
@@ -54,6 +62,8 @@ type Video = {
   fileType?: string;
   fileUrl?: string;
   url?: string;
+  videoUrl?: string;
+  link?: string;
   isPublished?: boolean | string;
   published?: boolean | string;
   status?: string;
@@ -66,6 +76,8 @@ type Module = {
   batch?: string;
   videos?: Video[];
   resources?: Video[];
+  recordings?: Video[];
+  lectureRecordings?: Video[];
 };
 
 type Result = {
@@ -104,7 +116,8 @@ const typeDots: Record<NoticeType, string> = {
   holiday: 'bg-green-500',
 };
 
-const normalizeText = (value?: string) => (value || '').trim().toLowerCase();
+const normalizeText = (value?: unknown) =>
+  String(value ?? '').trim().toLowerCase();
 
 const moduleKey = (module: Module) =>
   module._id || module.id || module.name || '';
@@ -124,6 +137,40 @@ const selectionKeys = (selection: ModuleSelection) => {
   ]
     .map(normalizeText)
     .filter(Boolean);
+};
+
+const moduleReferenceKeys = (
+  value:
+    | string
+    | {
+        id?: string;
+        _id?: string;
+        name?: string;
+        moduleId?: string;
+        moduleName?: string;
+      }
+    | undefined
+) => {
+  if (!value) return [];
+  if (typeof value === 'string') return [normalizeText(value)].filter(Boolean);
+
+  return [
+    value._id,
+    value.id,
+    value.moduleId,
+    value.moduleName,
+    value.name,
+  ]
+    .map(normalizeText)
+    .filter(Boolean);
+};
+
+const moduleReferenceLabel = (
+  value: Parameters<typeof moduleReferenceKeys>[0]
+) => {
+  if (!value) return '';
+  if (typeof value === 'string') return value;
+  return value.moduleName || value.name || value.moduleId || value._id || value.id || '';
 };
 
 const formatNoticeDate = (value?: string) => {
@@ -163,9 +210,10 @@ const isPublished = (item: {
 
 const isVideoResource = (resource: Video) => {
   const fileType = normalizeText(resource.fileType);
-  const url = resource.fileUrl || resource.url || '';
+  const url = resource.fileUrl || resource.url || resource.videoUrl || resource.link || '';
 
   return (
+    (fileType === '' && Boolean(url)) ||
     fileType === 'video' ||
     fileType.startsWith('video/') ||
     /\.(mp4|webm|mov|m4v|avi)$/i.test(url) ||
@@ -253,19 +301,16 @@ export default function DashboardHomeSection() {
     [studentModuleSelections]
   );
 
-  const selectedModules = useMemo(() => {
-    if (studentModuleSelections.length === 0) return [];
-
-    return modules.filter((module) => {
-      const id = normalizeText(module._id || module.id);
-      const name = normalizeText(module.name);
-
-      return (
-        studentModuleSelectionSet.has(id) ||
-        studentModuleSelectionSet.has(name)
-      );
-    });
-  }, [modules, studentModuleSelectionSet, studentModuleSelections.length]);
+  const selectedModules = useMemo(
+    () =>
+      modules.filter((module) =>
+        [module._id, module.id, module.name]
+          .map(normalizeText)
+          .filter(Boolean)
+          .some((key) => studentModuleSelectionSet.has(key))
+      ),
+    [modules, studentModuleSelectionSet]
+  );
 
   const selectedModuleIds = useMemo(
     () =>
@@ -287,10 +332,12 @@ export default function DashboardHomeSection() {
     [selectedModules]
   );
 
-  const isSelectedModuleContent = (...moduleRefs: Array<string | undefined>) => {
-    if (studentModuleSelections.length === 0) return true;
+  const isSelectedModuleContent = (
+    ...moduleRefs: Array<Parameters<typeof moduleReferenceKeys>[0]>
+  ) => {
+    if (studentModuleSelections.length === 0) return false;
 
-    const refs = moduleRefs.map(normalizeText).filter(Boolean);
+    const refs = moduleRefs.flatMap(moduleReferenceKeys);
 
     return refs.some(
       (ref) =>
@@ -319,7 +366,12 @@ export default function DashboardHomeSection() {
 
   const allVideos = useMemo(() => {
     return modules.flatMap((m) =>
-      (m.resources || m.videos || [])
+      [
+        ...(m.resources ?? []),
+        ...(m.videos ?? []),
+        ...(m.recordings ?? []),
+        ...(m.lectureRecordings ?? []),
+      ]
         .filter((resource) => isPublished(resource) && isVideoResource(resource))
         .map((video) => ({
           ...video,
@@ -329,7 +381,7 @@ export default function DashboardHomeSection() {
     );
   }, [modules]);
 
-  const studentModules = selectedModules.length > 0 ? selectedModules : modules;
+  const studentModules = selectedModules;
 
   const filteredVideos =
     activeModule === 'all'
@@ -338,18 +390,19 @@ export default function DashboardHomeSection() {
         )
       : allVideos.filter(
           (v) =>
-            normalizeText(v.moduleId) === normalizeText(activeModule) ||
-            normalizeText(v.moduleName) === normalizeText(activeModule)
+            isSelectedModuleContent(v.moduleId, v.moduleName) &&
+            (normalizeText(v.moduleId) === normalizeText(activeModule) ||
+              normalizeText(v.moduleName) === normalizeText(activeModule))
         );
 
   const recentResults = results.slice(0, 3);
 
   return (
-    <section className="mx-auto w-full max-w-[1480px] px-4 py-6">
+    <section className="mx-auto w-full max-w-[1250px] px-4 py-6">
       <div className="space-y-8">
-        <div className="grid grid-cols-1 gap-6 lg:grid-cols-3 lg:gap-8">
+        <div className="grid grid-cols-1 gap-5 lg:grid-cols-3 lg:gap-6">
           <div className="lg:col-span-1">
-            <div className="rounded-2xl border border-gray-100 bg-white p-4 shadow-sm sm:p-5">
+            <div className="h-full rounded-2xl border border-gray-100 bg-white p-4 shadow-sm sm:p-5">
               <div className="mb-4 flex items-center justify-between gap-3">
                 <h2 className="flex items-center gap-2 font-bold text-gray-900">
                   <Bell className="h-5 w-5 text-[#0183CB]" /> Exam Notices
@@ -361,11 +414,11 @@ export default function DashboardHomeSection() {
 
               <div className="space-y-3">
                 {loading ? (
-                  <p className="rounded-xl border border-gray-100 p-4 text-center text-sm text-gray-400">
+                  <p className="rounded-xl border border-gray-100 px-4 py-5 text-center text-sm text-gray-400">
                     Loading notices...
                   </p>
                 ) : examNotices.length === 0 ? (
-                  <p className="rounded-xl border border-gray-100 p-4 text-center text-sm text-gray-400">
+                  <p className="rounded-xl border border-gray-100 px-4 py-5 text-center text-sm text-gray-400">
                     No exam notices available.
                   </p>
                 ) : (
@@ -410,7 +463,7 @@ export default function DashboardHomeSection() {
           </div>
 
           <div className="lg:col-span-2">
-            <div className="rounded-2xl border border-gray-100 bg-white p-4 shadow-sm sm:p-5">
+            <div className="h-full rounded-2xl border border-gray-100 bg-white p-4 shadow-sm sm:p-5">
               <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                 <h2 className="flex items-center gap-2 font-bold text-gray-900">
                   <Play className="h-5 w-5 text-[#0183CB]" /> Lecture Recordings
@@ -435,13 +488,13 @@ export default function DashboardHomeSection() {
 
               <div className="space-y-3">
                 {loading ? (
-                  <div className="py-8 text-center text-gray-400">
-                    <Play className="mx-auto mb-2 h-8 w-8 opacity-30" />
+                  <div className="flex min-h-[112px] flex-col items-center justify-center rounded-xl border border-gray-100 px-4 py-6 text-center text-gray-400">
+                    <Play className="mb-2 h-8 w-8 opacity-30" />
                     <p className="text-sm">Loading videos...</p>
                   </div>
                 ) : filteredVideos.length === 0 ? (
-                  <div className="py-8 text-center text-gray-400">
-                    <Play className="mx-auto mb-2 h-8 w-8 opacity-30" />
+                  <div className="flex min-h-[112px] flex-col items-center justify-center rounded-xl border border-gray-100 px-4 py-6 text-center text-gray-400">
+                    <Play className="mb-2 h-8 w-8 opacity-30" />
                     <p className="text-sm">
                       {studentModuleSelections.length === 0
                         ? 'No modules selected for this student yet.'
@@ -626,7 +679,7 @@ export default function DashboardHomeSection() {
                 <p className="text-xs text-gray-400">Module</p>
                 <p className="mt-1 font-semibold text-gray-800">
                   {selectedNotice.moduleName ||
-                    selectedNotice.module ||
+                    moduleReferenceLabel(selectedNotice.module) ||
                     selectedNotice.subject ||
                     '-'}
                 </p>
