@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react';
 import { CreditCard, Download, CheckCircle, Clock, AlertCircle, Filter, Receipt, DollarSign } from 'lucide-react';
 import { paymentApi, type PaymentFromApi } from '@/api/payment.api';
+import { useAuthStore } from '@/store/authStore';
 import jsPDF from 'jspdf';
 
 type PaymentRecord = PaymentFromApi;
@@ -24,44 +25,33 @@ export default function PaymentsSection() {
   const [moduleFilter, setModuleFilter] = useState('all');
   const [payments, setPayments] = useState<PaymentRecord[]>([]);
   const [loading, setLoading] = useState(true);
-  const [student, setStudent] = useState<StudentInfo>({
-    name: 'N/A',
-    admissionNumber: 'N/A',
-    batch: 'N/A',
-    studentId: '',
-  });
 
-  // ── Read student info from localStorage (edu-auth Zustand store) ──
-  useEffect(() => {
-    try {
-      const authData = localStorage.getItem('edu-auth');
-      if (authData) {
-        const parsed = JSON.parse(authData);
-        const user = parsed?.state?.user;
-        if (user) {
-          setStudent({
-            name: user.fullNameEnglish ?? user.fullNameTamil ?? user.email ?? 'N/A',
-            admissionNumber: user.studentId ?? 'N/A',
-            batch: user.batch ?? 'N/A',
-            studentId: user._id ?? user.studentId ?? '',
-          });
-        }
-      }
-    } catch (err) {
-      console.error('Failed to read student info:', err);
-    }
-  }, []);
+  const { student } = useAuthStore();
 
-  // ── Fetch this student's payments ──
+  const studentInfo: StudentInfo = {
+    name:
+      student?.fullNameEnglish ??
+      student?.fullNameTamil ??
+      (student as any)?.name ??
+      student?.email ??
+      'N/A',
+    admissionNumber:
+      (student as any)?.admissionNumber ??
+      (student as any)?.studentId ??
+      'N/A',
+    batch: (student as any)?.batch ?? 'N/A',
+    studentId: (student as any)?._id ?? (student as any)?.id ?? '',
+  };
+
   useEffect(() => {
-    if (!student.studentId) {
+    if (!studentInfo.studentId) {
       setLoading(false);
       return;
     }
     const fetchPayments = async () => {
       try {
         setLoading(true);
-        const data = await paymentApi.getByStudent(student.studentId);
+        const data = await paymentApi.getByStudent(studentInfo.studentId);
         setPayments(data);
       } catch (err) {
         console.error('Failed to fetch payments:', err);
@@ -70,7 +60,7 @@ export default function PaymentsSection() {
       }
     };
     fetchPayments();
-  }, [student.studentId]);
+  }, [studentInfo.studentId]);
 
   const modules = [...new Set(payments.map(p => p.moduleName))];
   const filtered = payments.filter(p => {
@@ -93,6 +83,17 @@ export default function PaymentsSection() {
     const textGray = '#6b7280';
     const rowBg = '#EEF6FB';
     let built = false;
+
+    // Truncate text to fit within a max width in the PDF
+    const truncate = (text: string, maxWidth: number, fontSize: number): string => {
+      doc.setFontSize(fontSize);
+      if (doc.getTextWidth(text) <= maxWidth) return text;
+      let truncated = text;
+      while (doc.getTextWidth(truncated + '…') > maxWidth && truncated.length > 0) {
+        truncated = truncated.slice(0, -1);
+      }
+      return truncated + '…';
+    };
 
     const buildPDF = () => {
       if (built) return;
@@ -117,12 +118,17 @@ export default function PaymentsSection() {
         doc.setFont('helvetica', 'bold'); doc.setFontSize(10); doc.setTextColor(darkBlue);
         doc.text(label, x + 5, y);
       };
+
       const drawRow = (x: number, y: number, w: number, label: string, value: string, shaded: boolean) => {
         if (shaded) { doc.setFillColor(rowBg); doc.rect(x, y - 5, w, 8, 'F'); }
         doc.setFont('helvetica', 'bold'); doc.setFontSize(9); doc.setTextColor(textDark);
         doc.text(label, x + 3, y);
         doc.setFont('helvetica', 'normal'); doc.setTextColor(textDark);
-        doc.text(value, x + w * 0.5, y);
+        // value column starts at halfway, max width = remaining space minus small margin
+        const valueX = x + w * 0.5;
+        const maxValueWidth = w * 0.5 - 4;
+        const safeValue = truncate(value, maxValueWidth, 9);
+        doc.text(safeValue, valueX, y);
       };
 
       const col1X = 14, col2X = pageW / 2 + 6, colW = pageW / 2 - 20;
@@ -132,9 +138,9 @@ export default function PaymentsSection() {
       y += 6;
 
       const studentRows = [
-        ['Student Name', student.name],
-        ['Admission No', student.admissionNumber],
-        ['Batch', student.batch],
+        ['Student Name', studentInfo.name],
+        ['Admission No', studentInfo.admissionNumber],
+        ['Batch', studentInfo.batch],
       ];
       const paymentRows = [
         ['Receipt No', payment.receiptNo],
@@ -163,8 +169,8 @@ export default function PaymentsSection() {
     };
 
     const logo = new Image();
-    logo.src = '/logo.png';
-    logo.onload = () => { doc.addImage(logo, 'PNG', 14, 10, 28, 28); buildPDF(); };
+    logo.src = '/logo copy.png';              // ← fixed: was /logo.png
+    logo.onload = () => { doc.addImage(logo, 'JPEG', 14, 10, 28, 28); buildPDF(); };
     logo.onerror = () => buildPDF();
   };
 
@@ -294,7 +300,7 @@ export default function PaymentsSection() {
                         <td className="px-5 py-4 text-xs font-mono text-gray-500">{payment.receiptNo}</td>
                         <td className="px-5 py-4">
                           <div className="flex items-center gap-2">
-                            <div className="w-8 h-8 bg-blue-50 rounded-lg flex items-center justify-center">
+                            <div className="w-8 h-8 bg-blue-50 rounded-lg flex items-center justify-center shrink-0">
                               <DollarSign className="w-4 h-4 text-blue-700" />
                             </div>
                             <p className="font-medium text-gray-900 text-sm">{payment.moduleName}</p>
