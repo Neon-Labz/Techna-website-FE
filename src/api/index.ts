@@ -5,3 +5,4 @@ export * from './students.api';
 export * from './teacher.api';
 export * from './attendance.api';
 export * from './exam.api';
+export * from './notification.api';

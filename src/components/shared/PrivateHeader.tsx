@@ -2,10 +2,11 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { Menu, X, LogOut, Bell, User } from 'lucide-react';
+import { Menu, X, LogOut, User } from 'lucide-react';
 import { useAuthStore } from '../../store/authStore';
 import { logoutApi } from '../../api/auth.api';
 import Image from 'next/image';
+import NotificationBell from './NotificationBell';
 
 export default function PrivateHeader() {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -69,10 +70,7 @@ export default function PrivateHeader() {
 
           {/* Right Side */}
           <div className="hidden md:flex items-center gap-3">
-            <button className="p-2 text-blue-200 hover:text-white hover:bg-white/10 rounded-lg transition-all relative">
-              <Bell className="w-5 h-5" />
-              <span className="absolute top-1 right-1 w-2 h-2 bg-yellow-400 rounded-full"></span>
-            </button>
+            <NotificationBell />
 
             <div className="relative">
               <button
@@ -118,12 +116,15 @@ export default function PrivateHeader() {
           </div>
 
           {/* Mobile Toggle */}
-          <button
-            className="md:hidden p-2 rounded-lg text-blue-200 hover:text-white hover:bg-white/10"
-            onClick={() => setMenuOpen(!menuOpen)}
-          >
-            {menuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-          </button>
+          <div className="md:hidden flex items-center gap-2">
+            <NotificationBell />
+            <button
+              className="p-2 rounded-lg text-blue-200 hover:text-white hover:bg-white/10"
+              onClick={() => setMenuOpen(!menuOpen)}
+            >
+              {menuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+            </button>
+          </div>
         </div>
 
         {/* Mobile Menu */}
