@@ -24,7 +24,7 @@ export default function PublicHeader() {
         <div className="flex items-center justify-between h-18 py-3">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-0">
-            <Image src="/logo.png" alt="Techna Logo" width={105} height={40} className="rounded-full" />
+            <Image src="/logo copy.png" alt="Techna Logo" width={105} height={40} className="rounded-full" />
             <div>
               <p className="text-lg font-bold text-blue-900 leading-tight font-poppins">Techna</p>
               <p className="text-xs text-gray-500 leading-tight">Technical Institute</p>
