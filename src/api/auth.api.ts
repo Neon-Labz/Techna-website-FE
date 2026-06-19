@@ -1,26 +1,45 @@
 import apiClient from '../lib/axios';
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const registerStudent = async (formData: FormData): Promise<any> => {
-  const response = await apiClient.post('/students/register', formData);
-  return response;
+export type AuthApiResult = {
+  access_token?: string;
+  accessToken?: string;
+  token?: string;
+  applicationReference?: string;
+  reference?: string;
+  student?: AuthApiResult;
+  user?: AuthApiResult;
+  profile?: AuthApiResult;
+  result?: AuthApiResult;
+  data?: AuthApiResult;
+  email?: string;
+  _id?: string;
+  id?: string;
+  [key: string]: unknown;
 };
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const studentLogin = async (email: string, password: string): Promise<any> => {
+export const registerStudent = async (formData: FormData): Promise<AuthApiResult> => {
+  const response = await apiClient.post('/students/register', formData);
+  return response as unknown as AuthApiResult;
+};
+
+export const studentLogin = async (
+  email: string,
+  password: string
+): Promise<AuthApiResult> => {
   const response = await apiClient.post('/auth/student/login', {
     email,
     password,
   });
-  return response;
+
+  return response as unknown as AuthApiResult;
 };
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const getSession = async (token?: string): Promise<any> => {
+export const getSession = async (token?: string): Promise<AuthApiResult> => {
   const response = await apiClient.get('/auth/session', {
     headers: token ? { Authorization: `Bearer ${token}` } : undefined,
   });
-  return response;
+
+  return response as unknown as AuthApiResult;
 };
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any

@@ -63,4 +63,10 @@ export const updateStudentProfile = async (
 
     throw error;
   }
+
+  const response = await apiClient.patch(endpoint, payload, {
+    headers: token ? { Authorization: `Bearer ${token}` } : undefined,
+  });
+
+  return response;
 };

@@ -8,7 +8,6 @@ import {
   X,
   Eye,
   EyeOff,
-  Camera,
   CheckCircle,
   BookOpen,
   Phone,
@@ -17,6 +16,7 @@ import {
 } from 'lucide-react';
 import { useAuthStore } from '../../store/authStore';
 import { updateStudentProfile } from '../../api/students.api';
+import { DISTRICTS, RACE_OPTIONS, RELIGION_OPTIONS } from '../website/RegisterSection';
 import { changePassword } from '../../api/auth.api';
 
 const getApiErrorMessage = (error: unknown, fallback: string) => {
@@ -45,8 +45,32 @@ const getApiErrorMessage = (error: unknown, fallback: string) => {
   return fallback;
 };
 
-const getUpdatedStudentData = (result: any) =>
-  result?.data?.student || result?.data?.user || result?.data || result?.student || result?.user || result;
+const getUpdatedStudentData = (result: any) => {
+  const candidates = [
+    result?.student,
+    result?.user,
+    result?.profile,
+    result?.data?.student,
+    result?.data?.user,
+    result?.data?.profile,
+    result?.data?.data,
+    result?.result,
+    result?.data,
+  ];
+
+  return candidates.find((candidate) => {
+    if (!candidate || typeof candidate !== 'object' || Array.isArray(candidate)) return false;
+
+    return Boolean(
+      candidate.email ||
+      candidate.id ||
+      candidate._id ||
+      candidate.studentId ||
+      candidate.fullNameEnglish ||
+      candidate.fullNameTamil
+    );
+  }) || null;
+};
 
 export default function ProfileSection() {
   const { student, updateStudent } = useAuthStore();
@@ -58,7 +82,6 @@ export default function ProfileSection() {
   const [saving, setSaving] = useState(false);
   const [profileMessage, setProfileMessage] = useState('');
   const [profileError, setProfileError] = useState('');
-  const [photoMessage, setPhotoMessage] = useState('');
   const [showOld, setShowOld] = useState(false);
   const [showNew, setShowNew] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
@@ -93,12 +116,7 @@ export default function ProfileSection() {
     setEditForm({ ...studentData });
     setProfileMessage('');
     setProfileError('');
-    setPhotoMessage('');
     setEditing(false);
-  };
-
-  const handleCameraClick = () => {
-    setPhotoMessage('Profile photo update is not available yet.');
   };
 
   const handleSave = async () => {
@@ -111,25 +129,36 @@ export default function ProfileSection() {
     }
 
     const payload = {
-      fullNameEnglish: editForm?.fullNameEnglish,
-      fullNameTamil: editForm?.fullNameTamil,
-      whatsappNo: editForm?.whatsappNo,
-      parentsNo: editForm?.parentsNo,
-      school: editForm?.school,
-      address: editForm?.address,
-    };
+  fullNameEnglish: editForm.fullNameEnglish,
+  fullNameTamil: editForm.fullNameTamil,
+  dateOfBirth: editForm.dateOfBirth,
+  dob: editForm.dob,
+  nicNo: editForm.nicNo,
+  whatsappNo: editForm.whatsappNo,
+  parentsNo: editForm.parentsNo,
+  school: editForm.school,
+  address: editForm.address,
+  permanentAddress: editForm.permanentAddress,
+  administrativeDistrict: editForm.administrativeDistrict,
+  race: editForm.race,
+  religion: editForm.religion,
+  citizenByDescent: editForm.citizenByDescent,
+  fatherName: editForm.fatherName,
+  motherName: editForm.motherName,
+  guardianName: editForm.guardianName,
+};
 
     setSaving(true);
     setProfileMessage('');
     setProfileError('');
-    setPhotoMessage('');
 
     try {
       const result = await updateStudentProfile(studentId, payload);
       const updatedStudent = getUpdatedStudentData(result);
+      const mergedStudent = { ...studentData, ...payload, ...(updatedStudent || {}) };
 
-      updateStudent({ ...studentData, ...updatedStudent });
-      setEditForm({ ...studentData, ...updatedStudent });
+      updateStudent(mergedStudent);
+      setEditForm(mergedStudent);
       setEditing(false);
       setSaved(true);
       setProfileMessage('Profile updated successfully.');
@@ -195,20 +224,6 @@ export default function ProfileSection() {
                 </div>
               )}
             </div>
-
-            <button
-              type="button"
-              onClick={handleCameraClick}
-              className="absolute -bottom-2 -right-2 w-8 h-8 bg-white rounded-full flex items-center justify-center shadow-md hover:bg-gray-50 transition-all"
-            >
-              <Camera className="w-4 h-4 text-blue-900" />
-            </button>
-
-            {photoMessage && (
-              <div className="absolute left-1/2 top-full z-10 mt-4 w-64 -translate-x-1/2 rounded-xl border border-blue-100 bg-white px-4 py-3 text-center text-xs text-blue-800 shadow-lg">
-                {photoMessage}
-              </div>
-            )}
           </div>
 
           <div className="text-center md:text-left flex-1">
@@ -217,7 +232,7 @@ export default function ProfileSection() {
 
             <div className="flex flex-wrap justify-center md:justify-start gap-3 mt-3">
               <span className="px-3 py-1 bg-white/10 rounded-full text-xs font-medium">
-                {studentData?.admissionNumber || studentData?.studentId}
+                {studentData?.studentId || studentData?.admissionNumber || studentData?.id}
               </span>
               <span className="px-3 py-1 bg-white border border-[#34BFF3] text-[#34BFF3] rounded-full text-xs font-medium">
                 Active Student
@@ -263,7 +278,7 @@ export default function ProfileSection() {
             {!editing ? (
               <button
                 onClick={handleEdit}
-                className="flex items-center gap-2 px-4 py-2 text-sm bg-blue-50 text-blue-700 rounded-xl hover:bg-blue-100 font-medium"
+                className="flex items-center gap-2 px-4 py-2 text-sm bg-blue-50 text-[#34BFF3] rounded-xl hover:bg-blue-100 font-medium"
               >
                 <Edit2 className="w-4 h-4" /> Edit
               </button>
@@ -302,8 +317,14 @@ export default function ProfileSection() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
             <Input label="Full Name (English)" value={editing ? editForm?.fullNameEnglish : studentData?.fullNameEnglish} disabled={!editing} onChange={v => setEditForm((f: any) => ({ ...f, fullNameEnglish: v }))} inputCls={inputCls} />
             <Input label="Full Name (Tamil)" value={editing ? editForm?.fullNameTamil : studentData?.fullNameTamil} disabled={!editing} onChange={v => setEditForm((f: any) => ({ ...f, fullNameTamil: v }))} inputCls={inputCls} />
-            <Input label="Date of Birth" value={studentData?.dateOfBirth || studentData?.dob} disabled inputCls={inputCls} />
-            <Input label="NIC Number" value={studentData?.nicNo} disabled inputCls={inputCls} />
+            <Input label="Date of Birth" value={editing ? editForm?.dateOfBirth || editForm?.dob : studentData?.dateOfBirth || studentData?.dob} disabled={!editing} onChange={v => setEditForm((f: any) => ({ ...f, dateOfBirth: v }))} inputCls={inputCls} />
+            <Input
+  label="NIC Number"
+  value={editing ? editForm?.nicNo : studentData?.nicNo}
+  disabled={!editing}
+  onChange={v => setEditForm((f: any) => ({ ...f, nicNo: v }))}
+  inputCls={inputCls}
+/>
             <Input label="Email Address" value={studentData?.email} disabled inputCls={inputCls} />
             <Input label="WhatsApp No." value={editing ? editForm?.whatsappNo : studentData?.whatsappNo} disabled={!editing} onChange={v => setEditForm((f: any) => ({ ...f, whatsappNo: v }))} inputCls={inputCls} />
             <Input label="Parent's No." value={editing ? editForm?.parentsNo : studentData?.parentsNo} disabled={!editing} onChange={v => setEditForm((f: any) => ({ ...f, parentsNo: v }))} inputCls={inputCls} />
@@ -325,25 +346,37 @@ export default function ProfileSection() {
 
           <div className="mt-8 pt-6 border-t border-gray-100">
             <h3 className="font-semibold text-gray-800 mb-4 flex items-center gap-2 text-sm">
-              <MapPin className="w-4 h-4 text-blue-600" /> Residence Details
+              <MapPin className="w-4 h-4 text-[#34BFF3]" /> Residence Details
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <Input label="Permanent Address" value={studentData?.permanentAddress} disabled inputCls={inputCls} className="md:col-span-2" />
-              <Input label="District" value={studentData?.administrativeDistrict} disabled inputCls={inputCls} />
-              <Input label="Race" value={studentData?.race} disabled inputCls={inputCls} />
-              <Input label="Religion" value={studentData?.religion} disabled inputCls={inputCls} />
-              <Input label="Citizen by Descent" value={studentData?.citizenByDescent} disabled inputCls={inputCls} />
+              <Input label="Permanent Address" value={editing ? editForm?.permanentAddress : studentData?.permanentAddress} disabled={!editing} onChange={v => setEditForm((f: any) => ({ ...f, permanentAddress: v }))} inputCls={inputCls} className="md:col-span-2" />
+              {editing ? (
+                <SelectInput label="District" value={editForm?.administrativeDistrict} options={DISTRICTS} placeholder="Select District" onChange={v => setEditForm((f: any) => ({ ...f, administrativeDistrict: v }))} inputCls={inputCls} />
+              ) : (
+                <Input label="District" value={studentData?.administrativeDistrict} disabled inputCls={inputCls} />
+              )}
+              {editing ? (
+                <SelectInput label="Race" value={editForm?.race} options={RACE_OPTIONS} placeholder="Select Race" onChange={v => setEditForm((f: any) => ({ ...f, race: v }))} inputCls={inputCls} />
+              ) : (
+                <Input label="Race" value={studentData?.race} disabled inputCls={inputCls} />
+              )}
+              {editing ? (
+                <SelectInput label="Religion" value={editForm?.religion} options={RELIGION_OPTIONS} placeholder="Select Religion" onChange={v => setEditForm((f: any) => ({ ...f, religion: v }))} inputCls={inputCls} />
+              ) : (
+                <Input label="Religion" value={studentData?.religion} disabled inputCls={inputCls} />
+              )}
+              <Input label="Citizen by Descent" value={editing ? editForm?.citizenByDescent : studentData?.citizenByDescent} disabled={!editing} onChange={v => setEditForm((f: any) => ({ ...f, citizenByDescent: v }))} inputCls={inputCls} />
             </div>
           </div>
 
           <div className="mt-8 pt-6 border-t border-gray-100">
             <h3 className="font-semibold text-gray-800 mb-4 flex items-center gap-2 text-sm">
-              <Phone className="w-4 h-4 text-blue-600" /> Parent / Guardian Details
+              <Phone className="w-4 h-4 text-[#34BFF3]" /> Parent / Guardian Details
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <Input label="Father's Name" value={studentData?.fatherName} disabled inputCls={inputCls} />
-              <Input label="Mother's Name" value={studentData?.motherName} disabled inputCls={inputCls} />
-              <Input label="Guardian's Name" value={studentData?.guardianName} disabled inputCls={inputCls} />
+              <Input label="Father's Name" value={editing ? editForm?.fatherName : studentData?.fatherName} disabled={!editing} onChange={v => setEditForm((f: any) => ({ ...f, fatherName: v }))} inputCls={inputCls} />
+              <Input label="Mother's Name" value={editing ? editForm?.motherName : studentData?.motherName} disabled={!editing} onChange={v => setEditForm((f: any) => ({ ...f, motherName: v }))} inputCls={inputCls} />
+              <Input label="Guardian's Name" value={editing ? editForm?.guardianName : studentData?.guardianName} disabled={!editing} onChange={v => setEditForm((f: any) => ({ ...f, guardianName: v }))} inputCls={inputCls} />
             </div>
           </div>
         </div>
@@ -354,15 +387,14 @@ export default function ProfileSection() {
           <h2 className="font-bold text-gray-900 text-lg mb-6">Academic Information</h2>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-6">
-            <Input label="Admission Number" value={studentData?.admissionNumber} disabled inputCls={inputCls} />
-            <Input label="Serial Number" value={studentData?.serialNumber} disabled inputCls={inputCls} />
-          </div>
+  <Input label="Admission Number" value={studentData?.admissionNumber} disabled inputCls={inputCls} />
+</div>
 
           <div className="mb-6">
             <h3 className="font-semibold text-gray-800 mb-3 text-sm">Enrolled Subjects</h3>
             <div className="flex flex-wrap gap-2">
               {(studentData?.subjects || studentData?.modules || []).map((sub: string) => (
-                <span key={sub} className="px-3 py-1.5 bg-blue-50 text-blue-800 text-sm font-medium rounded-xl border border-blue-100">
+                <span key={sub} className="px-3 py-1.5 bg-blue-50 text-[#34BFF3] text-sm font-medium rounded-xl border border-blue-100">
                   {sub}
                 </span>
               ))}
@@ -491,6 +523,42 @@ function Input({
         onChange={e => onChange?.(e.target.value)}
         className={inputCls(disabled)}
       />
+    </div>
+  );
+}
+
+function SelectInput({
+  label,
+  value,
+  options,
+  placeholder,
+  onChange,
+  inputCls,
+}: {
+  label: string;
+  value?: string;
+  options: string[];
+  placeholder: string;
+  onChange: (value: string) => void;
+  inputCls: (disabled?: boolean) => string;
+}) {
+  return (
+    <div>
+      <label className="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1.5">
+        {label}
+      </label>
+      <select
+        value={value || ''}
+        onChange={e => onChange(e.target.value)}
+        className={inputCls(false)}
+      >
+        <option value="">{placeholder}</option>
+        {options.map(option => (
+          <option key={option} value={option}>
+            {option}
+          </option>
+        ))}
+      </select>
     </div>
   );
 }
