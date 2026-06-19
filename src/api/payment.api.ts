@@ -46,8 +46,6 @@ export const paymentApi = {
   },
 };
 
-export type PaymentRecord = PaymentFromApi;
-
 export const getStudentPayments = (
   studentId: string
 ): Promise<PaymentRecord[]> => paymentApi.getByStudent(studentId);

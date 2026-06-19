@@ -209,7 +209,6 @@ export default function ProfileSection() {
   return (
     <div className="space-y-6">
       <div className="bg-gradient-to-r from-[#0183CB] to-[#34BFF3] rounded-3xl p-6 md:p-8 text-white">
-      <div className="bg-gradient-to-r from-[#0183CB] to-[#34BFF3] rounded-3xl p-6 md:p-8 text-white">
         <div className="flex flex-col md:flex-row items-center md:items-start gap-6">
           <div className="relative">
             <div className="w-24 h-24 rounded-2xl overflow-hidden bg-white shadow-xl">
@@ -235,7 +234,6 @@ export default function ProfileSection() {
               <span className="px-3 py-1 bg-white/10 rounded-full text-xs font-medium">
                 {studentData?.studentId || studentData?.admissionNumber || studentData?.id}
               </span>
-              <span className="px-3 py-1 bg-white border border-white text-[#34BFF3] rounded-full text-xs font-medium">
               <span className="px-3 py-1 bg-white border border-[#34BFF3] text-[#34BFF3] rounded-full text-xs font-medium">
                 Active Student
               </span>
@@ -262,8 +260,6 @@ export default function ProfileSection() {
               onClick={() => setActiveTab(tab.id)}
               className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium transition-all ${
                 activeTab === tab.id
-                  ? 'bg-[#34BFF3] text-white shadow-md'
-                  : 'bg-white text-gray-600 border border-gray-200 hover:border-gray-800/20'
                   ? 'bg-[#34BFF3] text-white shadow-md'
                   : 'bg-white text-[#4A5565] border border-[#E5E7EB] hover:border-[#34BFF3]'
               }`}
