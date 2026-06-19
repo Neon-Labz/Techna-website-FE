@@ -23,6 +23,7 @@ export default function PrivateHeader() {
     { label: 'Profile', path: '/dashboard/profile' },
     { label: 'Results', path: '/dashboard/results' },
     { label: 'Payments', path: '/dashboard/payments' },
+    { label: 'Notifications', path: '/dashboard/notifications' },
   ];
 
   const isActive = (path: string) => pathname === path;
