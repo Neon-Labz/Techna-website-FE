@@ -10,12 +10,12 @@ export const studentLogin = async (email: string, password: string) => {
     email,
     password,
   });
-  return response.data;
+  return response as any;
 };
 
 export const getSession = async (token?: string) => {
   const response = await apiClient.get('/auth/session', {
     headers: token ? { Authorization: `Bearer ${token}` } : undefined,
   });
-  return response.data;
+  return response as any;
 };
