@@ -49,6 +49,11 @@ export default function LoginSection() {
     try {
       const result = await studentLogin(email.trim(), password);
 
+      console.log('=== LOGIN DEBUG ===');
+      console.log('result:', result);
+      console.log('access_token:', result?.access_token);
+      console.log('role:', result?.role);
+
       const accessToken =
         result.access_token ||
         result.token ||
@@ -62,12 +67,19 @@ export default function LoginSection() {
       }
 
       const sessionResult = await getSession(accessToken);
+
+      console.log('=== SESSION DEBUG ===');
+      console.log('sessionResult:', sessionResult);
+
+      // interceptor returns the student object directly (no wrapper),
+      // so fall back to sessionResult itself if nested paths are absent
       const studentData =
         sessionResult.student ||
         sessionResult.user ||
         sessionResult.data?.student ||
         sessionResult.data?.user ||
-        sessionResult.data;
+        sessionResult.data ||
+        (sessionResult?.email || sessionResult?._id ? sessionResult : null);
 
       if (!studentData) {
         throw new Error('Failed to load student session.');
