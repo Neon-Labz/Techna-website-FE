@@ -4,13 +4,13 @@ import Image from 'next/image';
 
 export default function Footer() {
   return (
-    <footer className="w-full" style={{ background: '#fff' }}>
+    <footer className="w-full overflow-hidden" style={{ background: '#fff' }}>
       <div
         className="w-full"
         style={{ background: '#fff', borderTop: '1px solid #e5e7eb' }}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10">
+          <div className="-ml-16 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10">
 
             {/* Brand */}
             <div>
@@ -115,13 +115,15 @@ export default function Footer() {
 
       {/* Bottom Bar */}
       <div className="w-full py-4" style={{ background: '#0183CB' }}>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center justify-between gap-2">
-          <p className="text-xs text-white">
-            {`© ${new Date().getFullYear()} Techna Technical Institute. All Rights Reserved.`}
-          </p>
-          <p className="text-xs text-white">
-            Developed by NeonLabz
-          </p>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="-ml-16 flex flex-col md:flex-row items-center justify-between gap-2">
+            <p className="text-xs text-white">
+              {`© ${new Date().getFullYear()} Techna Technical Institute. All Rights Reserved.`}
+            </p>
+            <p className="text-xs text-white">
+              Developed by NeonLabz
+            </p>
+          </div>
         </div>
       </div>
     </footer>

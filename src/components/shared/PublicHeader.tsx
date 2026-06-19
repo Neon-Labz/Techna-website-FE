@@ -21,15 +21,15 @@ export default function PublicHeader() {
   return (
     <header className="bg-white shadow-md sticky top-0 z-40">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-18 py-3">
-          {/* Logo */}
-          <Link href="/" className="flex items-center gap-0">
-            <Image src="/logo copy.png" alt="Techna Logo" width={105} height={40} className="rounded-full" />
-            <div>
-              <p className="text-lg font-bold text-blue-900 leading-tight font-poppins">Techna</p>
-              <p className="text-xs text-gray-500 leading-tight">Technical Institute</p>
-            </div>
-          </Link>
+  <div className="flex items-center justify-between h-18 py-3">
+    {/* Logo */}
+    <Link href="/" className="flex items-center gap-0 -ml-24">
+      <Image src="/logo copy.png" alt="Techna Logo" width={105} height={40} className="rounded-full" />
+      <div>
+        <p className="text-lg font-bold text-blue-900 leading-tight font-poppins">Techna</p>
+        <p className="text-xs text-gray-500 leading-tight">Technical Institute</p>
+      </div>
+    </Link>
 
           {/* Desktop Nav */}
           <nav className="hidden md:flex items-center gap-1">

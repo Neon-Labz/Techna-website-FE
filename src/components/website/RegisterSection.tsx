@@ -270,11 +270,10 @@ export default function RegisterSection() {
             </p>
           </div>
 
-          <div className="mb-6 border-t border-gray-200 pt-4">
-            <div className="rounded-xl bg-sky-100 px-4 py-5 text-sky-600">
-              <p className="text-sm font-bold">Application Reference:</p>
-              <p className="mt-2 break-words text-xl font-medium tracking-wide">{submissionReference || 'Pending'}</p>
-            </div>
+          <div className="mt-4 flex justify-center">
+    <button className="rounded-full bg-sky-400 px-10 py-3 text-base font-bold text-white shadow-md">
+      Review in Progress
+    </button>
           </div>
 
           <p className="text-xs text-gray-400">
