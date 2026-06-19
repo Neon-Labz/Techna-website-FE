@@ -45,20 +45,30 @@ const getApiErrorMessage = (error: unknown, fallback: string) => {
 };
 
 const getUpdatedStudentData = (result: any) => {
-  const updatedStudent =
-    result?.data?.student ||
-    result?.data?.user ||
-    result?.student ||
-    result?.user ||
-    result?.data ||
-    result;
+  const candidates = [
+    result?.student,
+    result?.user,
+    result?.profile,
+    result?.data?.student,
+    result?.data?.user,
+    result?.data?.profile,
+    result?.data?.data,
+    result?.result,
+    result?.data,
+  ];
 
-  if (!updatedStudent || typeof updatedStudent !== 'object') return null;
-  if (updatedStudent.success === true && !updatedStudent.email && !updatedStudent.id && !updatedStudent._id) {
-    return null;
-  }
+  return candidates.find((candidate) => {
+    if (!candidate || typeof candidate !== 'object' || Array.isArray(candidate)) return false;
 
-  return updatedStudent;
+    return Boolean(
+      candidate.email ||
+      candidate.id ||
+      candidate._id ||
+      candidate.studentId ||
+      candidate.fullNameEnglish ||
+      candidate.fullNameTamil
+    );
+  }) || null;
 };
 
 export default function ProfileSection() {
@@ -142,13 +152,10 @@ export default function ProfileSection() {
     try {
       const result = await updateStudentProfile(studentId, payload);
       const updatedStudent = getUpdatedStudentData(result);
+      const mergedStudent = { ...studentData, ...payload, ...(updatedStudent || {}) };
 
-      if (!updatedStudent) {
-        throw new Error('Profile update succeeded, but the backend did not return updated student data.');
-      }
-
-      updateStudent({ ...studentData, ...updatedStudent });
-      setEditForm({ ...studentData, ...updatedStudent });
+      updateStudent(mergedStudent);
+      setEditForm(mergedStudent);
       setEditing(false);
       setSaved(true);
       setProfileMessage('Profile updated successfully.');

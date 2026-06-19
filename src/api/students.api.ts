@@ -35,5 +35,5 @@ export const updateStudentProfile = async (
     headers: token ? { Authorization: `Bearer ${token}` } : undefined,
   });
 
-  return response.data;
+  return response;
 };

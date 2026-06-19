@@ -49,7 +49,6 @@ export default function LoginSection() {
 
     try {
       const result = await studentLogin(email.trim(), password);
-      console.log('LOGIN RESULT:', result);
 
       const accessToken =
         result?.data?.access_token ||
@@ -64,7 +63,6 @@ export default function LoginSection() {
       }
 
       const sessionResult = await getSession(accessToken);
-      console.log('SESSION RESULT:', sessionResult);
 
       const studentData =
         sessionResult?.student ||
@@ -80,11 +78,12 @@ export default function LoginSection() {
         sessionResult?.result?.user ||
         sessionResult?.result ||
         sessionResult?.data ||
-        null;
+        (sessionResult?.email || sessionResult?._id || sessionResult?.id ? sessionResult : null);
 
       if (!studentData || (!studentData.email && !studentData._id && !studentData.id)) {
         throw new Error('Failed to load student session.');
       }
+
       login(studentData as unknown as Student, accessToken, rememberMe);
       router.push('/dashboard');
     } catch (error) {
@@ -109,7 +108,13 @@ export default function LoginSection() {
       <div className="w-full max-w-md relative">
         <div className="bg-white rounded-3xl shadow-2xl p-8">
           <div className="text-center mb-8">
-            <Image src="/logo.png" alt="Techna Logo" width={150} height={80} className="mx-auto mb-4 rounded-full" />
+            <Image
+              src="/logo.png"
+              alt="Techna Logo"
+              width={150}
+              height={80}
+              className="mx-auto mb-4 rounded-full"
+            />
             <h1 className="text-2xl font-bold text-gray-900">Welcome Back</h1>
             <p className="text-gray-500 text-sm mt-1">Sign in to your Techna Student Portal</p>
           </div>
@@ -128,9 +133,9 @@ export default function LoginSection() {
                 <input
                   type="email"
                   value={email}
-                  onChange={e => setEmail(e.target.value)}
+                  onChange={(e) => setEmail(e.target.value)}
                   placeholder="student@techna.lk"
-                  autoComplete="new-email"
+                  autoComplete="email"
                   className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-gray-50 text-gray-900 placeholder-gray-400"
                 />
               </div>
@@ -143,9 +148,9 @@ export default function LoginSection() {
                 <input
                   type={showPassword ? 'text' : 'password'}
                   value={password}
-                  onChange={e => setPassword(e.target.value)}
+                  onChange={(e) => setPassword(e.target.value)}
                   placeholder="Enter your password"
-                  autoComplete="new-password"
+                  autoComplete="current-password"
                   className="w-full pl-10 pr-11 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-gray-50 text-gray-900 placeholder-gray-400"
                 />
                 <button
@@ -163,11 +168,12 @@ export default function LoginSection() {
                 <input
                   type="checkbox"
                   checked={rememberMe}
-                  onChange={e => setRememberMe(e.target.checked)}
+                  onChange={(e) => setRememberMe(e.target.checked)}
                   className="rounded border-gray-300 text-blue-600"
                 />
                 Remember me
               </label>
+
               <Link href="/forgot-password" className="text-blue-700 font-medium hover:underline">
                 Forgot password?
               </Link>
@@ -181,7 +187,9 @@ export default function LoginSection() {
               {loading ? (
                 <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
               ) : (
-                <>Sign In <ArrowRight className="w-4 h-4" /></>
+                <>
+                  Sign In <ArrowRight className="w-4 h-4" />
+                </>
               )}
             </button>
           </form>
