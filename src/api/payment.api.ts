@@ -46,7 +46,5 @@ export const paymentApi = {
   },
 };
 
-// ─── Named export for component usage ─────────────────────────────────────────
-
 export const getStudentPayments = (studentId: string): Promise<PaymentRecord[]> =>
   paymentApi.getByStudent(studentId);
