@@ -670,7 +670,7 @@ export default function RegisterSection() {
                 <div className="space-y-1.5 text-sm text-gray-700">
                   <div className="flex justify-between"><span className="text-gray-500">Race:</span><span className="font-medium">{form.race || 'â€“'}</span></div>
                   <div className="flex justify-between"><span className="text-gray-500">Religion:</span><span className="font-medium">{form.religion || 'â€“'}</span></div>
-                  <div className="flex justify-between"><span className="text-gray-500">Name:</span><span className="font-medium">{form.fullNameEnglish || '–'}</span></div>
+                  <div className="flex justify-between"><span className="text-gray-500">Full Name:</span><span className="font-medium">{form.fullNameEnglish || '–'}</span></div>
                   <div className="flex justify-between"><span className="text-gray-500">NIC:</span><span className="font-medium">{form.nicNo || '–'}</span></div>
                   <div className="flex justify-between"><span className="text-gray-500">Email:</span><span className="font-medium">{form.email || '–'}</span></div>
                   <div className="flex justify-between"><span className="text-gray-500">District:</span><span className="font-medium">{form.administrativeDistrict || '–'}</span></div>
