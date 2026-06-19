@@ -61,6 +61,7 @@ export interface Module {
   duration: string;
   credits: number;
   instructor: string;
+  instructorPhotoUrl?: string;
   schedule: string;
   category: string;
   videos: LectureVideo[];

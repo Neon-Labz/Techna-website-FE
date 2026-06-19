@@ -45,20 +45,30 @@ const getApiErrorMessage = (error: unknown, fallback: string) => {
 };
 
 const getUpdatedStudentData = (result: any) => {
-  const updatedStudent =
-    result?.data?.student ||
-    result?.data?.user ||
-    result?.student ||
-    result?.user ||
-    result?.data ||
-    result;
+  const candidates = [
+    result?.student,
+    result?.user,
+    result?.profile,
+    result?.data?.student,
+    result?.data?.user,
+    result?.data?.profile,
+    result?.data?.data,
+    result?.result,
+    result?.data,
+  ];
 
-  if (!updatedStudent || typeof updatedStudent !== 'object') return null;
-  if (updatedStudent.success === true && !updatedStudent.email && !updatedStudent.id && !updatedStudent._id) {
-    return null;
-  }
+  return candidates.find((candidate) => {
+    if (!candidate || typeof candidate !== 'object' || Array.isArray(candidate)) return false;
 
-  return updatedStudent;
+    return Boolean(
+      candidate.email ||
+      candidate.id ||
+      candidate._id ||
+      candidate.studentId ||
+      candidate.fullNameEnglish ||
+      candidate.fullNameTamil
+    );
+  }) || null;
 };
 
 export default function ProfileSection() {
@@ -142,13 +152,10 @@ export default function ProfileSection() {
     try {
       const result = await updateStudentProfile(studentId, payload);
       const updatedStudent = getUpdatedStudentData(result);
+      const mergedStudent = { ...studentData, ...payload, ...(updatedStudent || {}) };
 
-      if (!updatedStudent) {
-        throw new Error('Profile update succeeded, but the backend did not return updated student data.');
-      }
-
-      updateStudent({ ...studentData, ...updatedStudent });
-      setEditForm({ ...studentData, ...updatedStudent });
+      updateStudent(mergedStudent);
+      setEditForm(mergedStudent);
       setEditing(false);
       setSaved(true);
       setProfileMessage('Profile updated successfully.');
@@ -365,7 +372,25 @@ export default function ProfileSection() {
           <h2 className="font-bold text-gray-900 text-lg mb-6">Academic Information</h2>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-6">
-  <Input label="Admission Number" value={studentData?.admissionNumber} disabled inputCls={inputCls} />
+  <Input
+    label="Admission Number"
+    value={studentData?.admissionNumber}
+    disabled
+    inputCls={inputCls}
+  />
+
+  <Input
+    label="Batch"
+    value={
+      studentData?.batch ||
+      studentData?.batchName ||
+      studentData?.enrolledBatch ||
+      studentData?.currentBatch ||
+      '-'
+    }
+    disabled
+    inputCls={inputCls}
+  />
 </div>
 
           <div className="mb-6">
@@ -379,46 +404,7 @@ export default function ProfileSection() {
             </div>
           </div>
 
-          <div>
-            <h3 className="font-semibold text-gray-800 mb-3 text-sm">G.C.E. (O/L) Results</h3>
-
-            <div className="bg-gray-50 rounded-xl border border-gray-200 overflow-hidden">
-              <div className="p-4 border-b border-gray-200 grid grid-cols-1 md:grid-cols-3 gap-4 text-xs text-gray-500">
-                <div><span className="font-medium text-gray-700">Category:</span> {studentData?.olCategory}</div>
-                <div><span className="font-medium text-gray-700">Year:</span> {studentData?.olYear}</div>
-                <div><span className="font-medium text-gray-700">Index:</span> {studentData?.olIndexNumber}</div>
-              </div>
-
-              <div className="p-4 overflow-x-auto">
-                <table className="w-full text-sm">
-                  <thead>
-                    <tr className="text-left text-gray-500">
-                      <th className="py-2">English</th>
-                      <th className="py-2">Maths</th>
-                      <th className="py-2">Science</th>
-                      <th className="py-2">Sinhala</th>
-                      <th className="py-2">Tamil</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {(studentData?.olResults || []).map((r: any, i: number) => (
-                      <tr key={i} className="border-t border-gray-200 text-gray-800">
-                        <td className="py-2">{r.english || '-'}</td>
-                        <td className="py-2">{r.mathematics || '-'}</td>
-                        <td className="py-2">{r.science || '-'}</td>
-                        <td className="py-2">{r.sinhala || '-'}</td>
-                        <td className="py-2">{r.tamil || '-'}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-
-                {!studentData?.olResults?.length && (
-                  <p className="text-sm text-gray-500">No O/L results available.</p>
-                )}
-              </div>
-            </div>
-          </div>
+         
         </div>
       )}
 

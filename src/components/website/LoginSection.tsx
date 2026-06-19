@@ -7,6 +7,7 @@ import Image from 'next/image';
 import { Eye, EyeOff, Mail, Lock, ArrowRight } from 'lucide-react';
 import { useAuthStore } from '../../store/authStore';
 import { getSession, studentLogin } from '../../api/auth.api';
+import type { Student } from '../../types';
 
 const getApiErrorMessage = (error: unknown, fallback: string) => {
   const responseData = (error as { response?: { data?: { message?: string | string[] } } })?.response?.data;
@@ -53,31 +54,52 @@ export default function LoginSection() {
       const accessToken =
         data?.access_token ||
         data?.token ||
+        data?.accessToken ||
         data?.data?.access_token ||
-        data?.data?.token;
+        data?.data?.token ||
+        data?.data?.accessToken;
 
       if (!accessToken) {
         throw new Error('Login token not found');
       }
 
       const sessionResult = await getSession(accessToken);
-      const isStudentObject = (value: any) =>
-        value && typeof value === 'object' && !value.access_token && !value.token;
 
-      const student =
+      const isStudentObject = (value: unknown): value is Student => {
+        if (!value || typeof value !== 'object') return false;
+
+        const obj = value as Record<string, unknown>;
+
+        return Boolean(
+          !obj.access_token &&
+            !obj.token &&
+            !obj.accessToken &&
+            (obj.email || obj._id || obj.id)
+        );
+      };
+
+      const studentData =
         sessionResult?.student ||
         sessionResult?.user ||
+        sessionResult?.profile ||
         sessionResult?.data?.student ||
         sessionResult?.data?.user ||
-        (isStudentObject(sessionResult?.data) ? sessionResult.data : undefined) ||
-        (isStudentObject(sessionResult) ? sessionResult : undefined);
+        sessionResult?.data?.profile ||
+        sessionResult?.data?.data?.student ||
+        sessionResult?.data?.data?.user ||
+        sessionResult?.data?.data ||
+        sessionResult?.result?.student ||
+        sessionResult?.result?.user ||
+        sessionResult?.result ||
+        (isStudentObject(sessionResult?.data) ? sessionResult.data : null) ||
+        (isStudentObject(sessionResult) ? sessionResult : null);
 
-      if (!student) {
+      if (!studentData || !isStudentObject(studentData)) {
         throw new Error('Failed to load student session.');
       }
 
-      console.log('Student object before login():', student);
-      login(student, accessToken, rememberMe);
+      console.log('Student object before login():', studentData);
+      login(studentData, accessToken, rememberMe);
       router.push('/dashboard');
     } catch (error) {
       localStorage.removeItem('token');
@@ -131,9 +153,9 @@ export default function LoginSection() {
                 <input
                   type="email"
                   value={email}
-                  onChange={e => setEmail(e.target.value)}
+                  onChange={(e) => setEmail(e.target.value)}
                   placeholder="student@techna.lk"
-                  autoComplete="new-email"
+                  autoComplete="email"
                   className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-gray-50 text-gray-900 placeholder-gray-400"
                 />
               </div>
@@ -148,9 +170,9 @@ export default function LoginSection() {
                 <input
                   type={showPassword ? 'text' : 'password'}
                   value={password}
-                  onChange={e => setPassword(e.target.value)}
+                  onChange={(e) => setPassword(e.target.value)}
                   placeholder="Enter your password"
-                  autoComplete="new-password"
+                  autoComplete="current-password"
                   className="w-full pl-10 pr-11 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-gray-50 text-gray-900 placeholder-gray-400"
                 />
                 <button
@@ -168,18 +190,19 @@ export default function LoginSection() {
                 <input
                   type="checkbox"
                   checked={rememberMe}
-                  onChange={e => setRememberMe(e.target.checked)}
+                  onChange={(e) => setRememberMe(e.target.checked)}
                   className="rounded border-gray-300 text-blue-600"
                 />
                 Remember me
               </label>
-                              <Link
-                  href="/forgot-password"
-                  className="font-medium hover:underline transition-colors"
-                  style={{ color: '#0183CB' }}
-                >
-                  Forgot password?
-                </Link>
+
+              <Link
+                href="/forgot-password"
+                className="font-medium hover:underline transition-colors"
+                style={{ color: '#0183CB' }}
+              >
+                Forgot password?
+              </Link>
             </div>
 
             <button
@@ -200,7 +223,7 @@ export default function LoginSection() {
           <div className="text-center mt-6 pt-6 border-t border-gray-100">
             <p className="text-gray-500 text-sm">
               Don&apos;t have an account?{' '}
-                            <Link
+              <Link
                 href="/register"
                 className="font-semibold hover:underline transition-colors"
                 style={{ color: '#0183CB' }}
