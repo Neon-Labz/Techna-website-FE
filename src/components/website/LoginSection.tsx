@@ -7,6 +7,7 @@ import Image from 'next/image';
 import { Eye, EyeOff, Mail, Lock, ArrowRight } from 'lucide-react';
 import { useAuthStore } from '../../store/authStore';
 import { getSession, studentLogin } from '../../api/auth.api';
+import type { Student } from '../../types';
 
 const getApiErrorMessage = (error: unknown, fallback: string) => {
   const responseData = (error as { response?: { data?: { message?: string | string[] } } })?.response?.data;
@@ -48,32 +49,43 @@ export default function LoginSection() {
 
     try {
       const result = await studentLogin(email.trim(), password);
+      console.log('LOGIN RESULT:', result);
 
       const accessToken =
-        result.access_token ||
-        result.token ||
-        result.accessToken ||
-        result.data?.access_token ||
-        result.data?.token ||
-        result.data?.accessToken;
+        result?.data?.access_token ||
+        result?.access_token ||
+        result?.token ||
+        result?.accessToken ||
+        result?.data?.token ||
+        result?.data?.accessToken;
 
       if (!accessToken) {
         throw new Error('Login response was missing access token.');
       }
 
       const sessionResult = await getSession(accessToken);
-      const studentData =
-        sessionResult.student ||
-        sessionResult.user ||
-        sessionResult.data?.student ||
-        sessionResult.data?.user ||
-        sessionResult.data;
+      console.log('SESSION RESULT:', sessionResult);
 
-      if (!studentData) {
+      const studentData =
+        sessionResult?.student ||
+        sessionResult?.user ||
+        sessionResult?.profile ||
+        sessionResult?.data?.student ||
+        sessionResult?.data?.user ||
+        sessionResult?.data?.profile ||
+        sessionResult?.data?.data?.student ||
+        sessionResult?.data?.data?.user ||
+        sessionResult?.data?.data ||
+        sessionResult?.result?.student ||
+        sessionResult?.result?.user ||
+        sessionResult?.result ||
+        sessionResult?.data ||
+        null;
+
+      if (!studentData || (!studentData.email && !studentData._id && !studentData.id)) {
         throw new Error('Failed to load student session.');
       }
-
-      login(studentData, accessToken, rememberMe);
+      login(studentData as unknown as Student, accessToken, rememberMe);
       router.push('/dashboard');
     } catch (error) {
       localStorage.removeItem('token');
