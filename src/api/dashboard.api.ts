@@ -26,7 +26,13 @@ export const dashboardApi = {
     }
   },
 
-  getResults: async () => {
-    return [];
+  getResults: async (studentId?: string, token?: string) => {
+    if (!studentId) return [];
+
+    const res = await api.get(`/exam-notices/student/${studentId}`, {
+      headers: token ? { Authorization: `Bearer ${token}` } : undefined,
+    });
+
+    return getArrayData(res);
   },
 };

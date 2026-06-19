@@ -17,7 +17,7 @@ const STEPS = [
   { id: 5, label: 'Subjects & Confirm', icon: FileText, desc: 'Subject selection' },
 ];
 
-const DISTRICTS = [
+export const DISTRICTS = [
   'Colombo', 'Gampaha', 'Kalutara', 'Kandy', 'Matale', 'Nuwara Eliya',
   'Galle', 'Matara', 'Hambantota', 'Jaffna', 'Kilinochchi', 'Mannar',
   'Mullaitivu', 'Vavuniya', 'Puttalam', 'Kurunegala', 'Anuradhapura',
@@ -26,8 +26,8 @@ const DISTRICTS = [
 ];
 
 const GRADES = ['A', 'B', 'C', 'S', 'W', 'Absent'];
-const RACE_OPTIONS = ['Sinhala', 'Tamil', 'Indian Tamil', 'Muslim', 'Burgher', 'Malay', 'Other'];
-const RELIGION_OPTIONS = ['Buddhism', 'Hinduism', 'Islam', 'Christianity', 'Catholicism', 'Other'];
+export const RACE_OPTIONS = ['Sinhala', 'Tamil', 'Indian Tamil', 'Muslim', 'Burgher', 'Malay', 'Other'];
+export const RELIGION_OPTIONS = ['Buddhism', 'Hinduism', 'Islam', 'Christianity', 'Catholicism', 'Other'];
 interface OLRow { year: string; indexNumber: string; english: string; mathematics: string; science: string; sinhala: string; tamil: string; }
 const emptyOL: OLRow = { year: '', indexNumber: '', english: '', mathematics: '', science: '', sinhala: '', tamil: '' };
 

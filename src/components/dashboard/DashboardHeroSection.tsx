@@ -20,15 +20,17 @@ type Module = {
 type Result = {
   id?: string;
   _id?: string;
-  marks: number;
-  maxMarks: number;
+  marks?: number | null;
+  maxMarks?: number | null;
   grade?: string;
   moduleName?: string;
+  hasResult?: boolean;
 };
 
 export default function DashboardHeroSection() {
-  const { student } = useAuthStore();
+  const { student, token } = useAuthStore();
   const studentKey = student?._id || student?.id || student?.studentId || student?.email || '';
+  const studentResultId = student?.studentId || student?._id || student?.id || '';
   const studentFullName =
     student?.fullNameEnglish?.trim() || student?.name?.trim() || 'Student';
   const studentFirstName = studentFullName?.split(' ')?.[0] || 'Student';
@@ -48,7 +50,7 @@ export default function DashboardHeroSection() {
         const [notices, modules, results] = await Promise.all([
             dashboardApi.getNotices(),
             dashboardApi.getModules(),
-            dashboardApi.getResults(),
+            dashboardApi.getResults(studentResultId, token || undefined),
           ]);
 
           setNotices(notices);
@@ -60,7 +62,7 @@ export default function DashboardHeroSection() {
     };
 
     fetchDashboardData();
-  }, [studentKey]);
+  }, [studentKey, studentResultId, token]);
 
   const greeting = () => {
     const h = new Date().getHours();
@@ -73,20 +75,36 @@ export default function DashboardHeroSection() {
     if (results.length === 0) return 0;
 
     const validResults = results.filter(
-      (r) => Number(r.marks) >= 0 && Number(r.maxMarks) > 0
+      (r) =>
+        r.hasResult !== false &&
+        r.marks !== null &&
+        r.marks !== undefined &&
+        Number(r.marks) >= 0 &&
+        Number(r.maxMarks ?? 100) > 0
     );
 
     if (validResults.length === 0) return 0;
 
     return Math.round(
       validResults.reduce(
-        (acc, r) => acc + (Number(r.marks) / Number(r.maxMarks)) * 100,
+        (acc, r) => acc + (Number(r.marks) / Number(r.maxMarks ?? 100)) * 100,
         0
       ) / validResults.length
     );
   }, [results]);
 
-  const recentResults = results.slice(0, 3);
+  const releasedResults = useMemo(
+    () =>
+      results.filter(
+        (r) =>
+          r.hasResult !== false &&
+          r.marks !== null &&
+          r.marks !== undefined,
+      ),
+    [results],
+  );
+
+  const recentResults = releasedResults.slice(0, 3);
 
   const examNoticesCount = notices.filter((n) => n.type === 'exam').length;
 
@@ -176,7 +194,7 @@ export default function DashboardHeroSection() {
               </div>
 
               <div className="min-w-[78px] rounded-lg bg-white/20 px-4 py-2">
-                <p className="text-lg font-bold">{results.length}</p>
+                <p className="text-lg font-bold">{releasedResults.length}</p>
                 <p className="text-[10px] text-white/75">Results</p>
               </div>
 

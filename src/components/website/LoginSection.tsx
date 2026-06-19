@@ -62,7 +62,7 @@ export default function LoginSection() {
     try {
       const { student, token } = await authApi.loginStudent(
         email.trim(),
-        password
+        password,
       );
 
       login(student, token, rememberMe);
@@ -121,7 +121,7 @@ export default function LoginSection() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="student@techna.lk"
-                  autoComplete="new-email"
+                  autoComplete="email"
                   className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-gray-50 text-gray-900 placeholder-gray-400"
                 />
               </div>
@@ -139,7 +139,7 @@ export default function LoginSection() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="Enter your password"
-                  autoComplete="new-password"
+                  autoComplete="current-password"
                   className="w-full pl-10 pr-11 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-gray-50 text-gray-900 placeholder-gray-400"
                 />
                 <button

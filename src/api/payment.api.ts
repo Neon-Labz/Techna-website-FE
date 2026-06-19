@@ -43,5 +43,6 @@ export const paymentApi = {
   },
 };
 
-export const getStudentPayments = (studentId: string): Promise<PaymentRecord[]> =>
-  paymentApi.getByStudent(studentId);
+export const getStudentPayments = (
+  studentId: string,
+): Promise<PaymentRecord[]> => paymentApi.getByStudent(studentId);

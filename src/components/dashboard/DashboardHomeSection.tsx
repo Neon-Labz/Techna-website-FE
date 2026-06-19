@@ -83,12 +83,19 @@ type Module = {
 type Result = {
   id?: string;
   _id?: string;
+  title?: string | null;
   moduleName?: string;
   examType?: string;
   semester?: string;
+  date?: string | null;
+  publishedAt?: string;
+  createdAt?: string;
+  updatedAt?: string;
   marks?: number;
   maxMarks?: number;
   grade?: string;
+  result?: string | null;
+  hasResult?: boolean;
 };
 
 type ModuleSelection =
@@ -222,10 +229,11 @@ const isVideoResource = (resource: Video) => {
 };
 
 export default function DashboardHomeSection() {
-  const { student } = useAuthStore();
+  const { student, token } = useAuthStore();
 
   const studentKey =
     student?._id || student?.id || student?.studentId || student?.email || '';
+  const studentResultId = student?.studentId || student?._id || student?.id || '';
 
   const [activeModule, setActiveModule] = useState<string>('all');
   const [notices, setNotices] = useState<Notice[]>([]);
@@ -247,7 +255,7 @@ export default function DashboardHomeSection() {
           await Promise.allSettled([
             dashboardApi.getNotices(),
             dashboardApi.getModules(),
-            dashboardApi.getResults(),
+            dashboardApi.getResults(studentResultId, token || undefined),
           ]);
 
         if (noticesResult.status === 'fulfilled') {
@@ -269,7 +277,7 @@ export default function DashboardHomeSection() {
     };
 
     void fetchDashboardData();
-  }, [studentKey]);
+  }, [studentKey, studentResultId, token]);
 
   const studentModuleSelections = useMemo(() => {
     const enrollmentSources = [
@@ -395,7 +403,49 @@ export default function DashboardHomeSection() {
               normalizeText(v.moduleName) === normalizeText(activeModule))
         );
 
-  const recentResults = results.slice(0, 3);
+  const latestResultsByModule = useMemo(() => {
+    const releasedResults = results.filter(
+      (result) =>
+        result.hasResult !== false &&
+        result.marks !== null &&
+        result.marks !== undefined,
+    );
+
+    const sortedResults = [...releasedResults].sort((a, b) => {
+      const aTime = new Date(
+        a.publishedAt || a.updatedAt || a.createdAt || a.date || 0,
+      ).getTime();
+      const bTime = new Date(
+        b.publishedAt || b.updatedAt || b.createdAt || b.date || 0,
+      ).getTime();
+
+      return (Number.isNaN(bTime) ? 0 : bTime) - (Number.isNaN(aTime) ? 0 : aTime);
+    });
+
+    const moduleResults = new Map<string, Result>();
+
+    sortedResults.forEach((result) => {
+      const key = normalizeText(result.moduleName);
+      if (!key || moduleResults.has(key)) return;
+
+      if (
+        studentModuleSelections.length > 0 &&
+        !isSelectedModuleContent(result.moduleName)
+      ) {
+        return;
+      }
+
+      moduleResults.set(key, result);
+    });
+
+    return Array.from(moduleResults.values());
+  }, [
+    results,
+    selectedModuleIds,
+    selectedModuleNames,
+    studentModuleSelectionSet,
+    studentModuleSelections.length,
+  ]);
 
   return (
     <section className="mx-auto w-full max-w-[1250px] px-4 py-6">
@@ -578,13 +628,13 @@ export default function DashboardHomeSection() {
             <div className="rounded-xl border border-gray-100 p-6 text-center text-sm text-gray-400">
               Loading results...
             </div>
-          ) : recentResults.length === 0 ? (
+          ) : latestResultsByModule.length === 0 ? (
             <div className="rounded-xl border border-gray-100 p-6 text-center text-sm text-gray-400">
               No results available.
             </div>
           ) : (
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-              {recentResults.map((result) => {
+              {latestResultsByModule.slice(0, 3).map((result, index) => {
                 const marks = Number(result.marks || 0);
                 const maxMarks = Number(result.maxMarks || 100);
                 const pct =
@@ -601,7 +651,11 @@ export default function DashboardHomeSection() {
 
                 return (
                   <div
-                    key={result._id || result.id}
+                    key={
+                      result._id ||
+                      result.id ||
+                      `${result.moduleName || 'module'}-${result.examType || 'exam'}-${result.marks ?? 'marks'}-${index}`
+                    }
                     className="rounded-xl border border-gray-100 p-4 transition-all hover:shadow-sm"
                   >
                     <div className="mb-2 flex items-start justify-between gap-3">

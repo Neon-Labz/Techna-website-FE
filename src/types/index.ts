@@ -75,6 +75,7 @@ export interface Module {
   duration?: string;
   credits?: number;
   instructor?: string;
+  instructorPhotoUrl?: string;
   schedule?: string;
   category?: string;
   videos?: LectureVideo[];
@@ -162,7 +163,7 @@ export interface AuthState {
   login: (
     student: Student | null,
     token: string,
-    rememberMe?: boolean
+    rememberMe?: boolean,
   ) => void;
 
   logout: () => void;

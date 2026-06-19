@@ -3,7 +3,6 @@
 import { useState } from 'react';
 import {
   Clock,
-  User,
   Play,
   ChevronDown,
   ChevronUp,
@@ -62,9 +61,7 @@ export default function ModulesSection() {
 
       <div className="max-w-7xl mx-auto px-4 py-12 sm:px-6 lg:px-8">
         <div className="flex items-center gap-2 mb-8 flex-wrap">
-          <span className="text-sm text-gray-500 font-medium">
-            Filter by:
-          </span>
+          <span className="text-sm text-gray-500 font-medium">Filter by:</span>
 
           {categories.map((cat) => (
             <button
@@ -123,7 +120,17 @@ export default function ModulesSection() {
 
                   <div className="grid grid-cols-2 gap-3 mb-4">
                     <div className="flex items-center gap-2 text-sm text-gray-600">
-                      <User className="w-4 h-4 text-blue-500" />
+                      {module.instructorPhotoUrl ? (
+                        <img
+                          src={module.instructorPhotoUrl}
+                          alt={module.instructor || 'Instructor'}
+                          className="w-6 h-6 rounded-full object-cover shrink-0"
+                        />
+                      ) : (
+                        <div className="w-6 h-6 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 text-xs font-bold shrink-0">
+                          {(module.instructor || '-').charAt(0)}
+                        </div>
+                      )}
                       <span className="truncate">
                         {module.instructor || '-'}
                       </span>
@@ -151,9 +158,7 @@ export default function ModulesSection() {
                     <>
                       <button
                         type="button"
-                        onClick={() =>
-                          setExpanded(isOpen ? null : module.id)
-                        }
+                        onClick={() => setExpanded(isOpen ? null : module.id)}
                         className="flex items-center justify-between w-full px-4 py-2.5 bg-blue-50 hover:bg-blue-100 text-blue-800 rounded-xl text-sm font-medium transition-all"
                       >
                         <span className="flex items-center gap-2">

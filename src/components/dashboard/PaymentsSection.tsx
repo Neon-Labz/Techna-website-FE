@@ -105,9 +105,7 @@ export default function PaymentsSection() {
     void fetchPayments();
   }, [student.studentId]);
 
-  const modules = [
-    ...new Set(payments.map((p) => p.moduleName).filter(Boolean)),
-  ];
+  const modules = [...new Set(payments.map((p) => p.moduleName).filter(Boolean))];
 
   const filtered = payments.filter((p) => {
     if (statusFilter !== 'all' && p.status !== statusFilter) return false;
@@ -117,15 +115,15 @@ export default function PaymentsSection() {
 
   const totalPaid = payments
     .filter((p) => p.status === 'paid')
-    .reduce((a, p) => a + p.amount, 0);
+    .reduce((a, p) => a + (p.amount ?? 0), 0);
 
   const totalPending = payments
     .filter((p) => p.status === 'pending')
-    .reduce((a, p) => a + p.amount, 0);
+    .reduce((a, p) => a + (p.amount ?? 0), 0);
 
   const totalOverdue = payments
     .filter((p) => p.status === 'overdue')
-    .reduce((a, p) => a + p.amount, 0);
+    .reduce((a, p) => a + (p.amount ?? 0), 0);
 
   const generateReceipt = (payment: PaymentRecord) => {
     const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
@@ -156,23 +154,27 @@ export default function PaymentsSection() {
     row('Student Name', student.name);
     row('Admission No', student.admissionNumber);
     row('Batch', student.batch);
+
     y += 5;
 
     row('Receipt No', payment.receiptNo);
     row('Module', payment.moduleName);
-    row('Amount', `LKR ${payment.amount.toLocaleString()}.00`);
+    row('Amount', `LKR ${(payment.amount ?? 0).toLocaleString()}.00`);
     row('Method', payment.method);
     row('Date', formatDate(payment.paidDate));
-    row('Status', payment.status.toUpperCase());
+    row('Status', (payment.status ?? '-').toUpperCase());
+    row('Notes', payment.notes ?? '-');
 
     y += 15;
+
     doc.setFont('helvetica', 'bold');
     doc.setFontSize(18);
-    doc.text(`TOTAL: LKR ${payment.amount.toLocaleString()}.00`, pageW / 2, y, {
+    doc.text(`TOTAL: LKR ${(payment.amount ?? 0).toLocaleString()}.00`, pageW / 2, y, {
       align: 'center',
     });
 
     y += 20;
+
     doc.setFont('helvetica', 'italic');
     doc.setFontSize(8);
     doc.text(
@@ -311,9 +313,8 @@ export default function PaymentsSection() {
           <>
             <div className="divide-y divide-gray-50 sm:hidden">
               {filtered.map((payment) => {
-                const cfg =
-                  statusConfig[payment.status as keyof typeof statusConfig] ||
-                  statusConfig.pending;
+                const statusKey = (payment.status ?? 'pending') as keyof typeof statusConfig;
+                const cfg = statusConfig[statusKey] || statusConfig.pending;
                 const Icon = cfg.icon;
 
                 return (
@@ -338,7 +339,7 @@ export default function PaymentsSection() {
                     <div className="flex items-center justify-between">
                       <div>
                         <p className="font-bold text-gray-900">
-                          LKR {payment.amount.toLocaleString()}
+                          LKR {(payment.amount ?? 0).toLocaleString()}
                         </p>
                         <p className="text-xs text-gray-400">
                           {formatDate(payment.paidDate)}
@@ -384,9 +385,8 @@ export default function PaymentsSection() {
 
                 <tbody className="divide-y divide-gray-50">
                   {filtered.map((payment) => {
-                    const cfg =
-                      statusConfig[payment.status as keyof typeof statusConfig] ||
-                      statusConfig.pending;
+                    const statusKey = (payment.status ?? 'pending') as keyof typeof statusConfig;
+                    const cfg = statusConfig[statusKey] || statusConfig.pending;
 
                     return (
                       <tr
@@ -409,7 +409,7 @@ export default function PaymentsSection() {
                         </td>
 
                         <td className="px-5 py-4 text-sm font-bold text-gray-900">
-                          LKR {payment.amount.toLocaleString()}
+                          LKR {(payment.amount ?? 0).toLocaleString()}
                         </td>
 
                         <td className="px-5 py-4 text-sm capitalize text-gray-500">
@@ -461,7 +461,9 @@ export default function PaymentsSection() {
                 Total:{' '}
                 <strong>
                   LKR{' '}
-                  {filtered.reduce((a, p) => a + p.amount, 0).toLocaleString()}
+                  {filtered
+                    .reduce((a, p) => a + (p.amount ?? 0), 0)
+                    .toLocaleString()}
                 </strong>
               </p>
               <p className="text-xs text-gray-400">
