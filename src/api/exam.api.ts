@@ -1,20 +1,48 @@
 import api from '@/lib/axios';
 
+export interface StudentResultsResponse {
+  student: {
+    studentId?: string;
+    fullNameEnglish?: string;
+    email?: string;
+    admissionNumber?: string;
+    nicNo?: string;
+    whatsappNo?: string;
+    batch?: string;
+    modules?: string[];
+  };
+  results: ExamNotice[];
+  summary: {
+    totalResults: number;
+    passed: number;
+    failed: number;
+    averageScore: number;
+  };
+}
+
 export interface ExamNotice {
-  _id: string;
-  title: string;
-  moduleId: string;
+  _id: string | null;
+  title: string | null;
+  moduleId?: string;
   moduleName: string;
+  examType?: string | null;
   batch: string;
-  date: string;
-  startTime: string;
-  endTime: string;
-  venue: string;
+  date: string | null;
+  startTime?: string | null;
+  endTime?: string | null;
+  venue?: string | null;
+  semester?: string | null;
   description?: string;
   isPublished?: boolean;
   publishedAt?: string;
   createdAt?: string;
   updatedAt?: string;
+  // Result fields — null when not yet published
+  marks?: number | null;
+  maxMarks?: number | null;
+  grade?: string | null;
+  result?: string | null;
+  hasResult?: boolean;
 }
 
 export const examApi = {
@@ -54,3 +82,12 @@ export const examApi = {
   },
 };
 export { examApi as examNoticeApi };
+
+export const getResultsByStudentId = async (
+  studentId: string,
+  token?: string,
+): Promise<StudentResultsResponse> => {
+  return api.get(`/exam-notices/student/${studentId}`, {
+    headers: token ? { Authorization: `Bearer ${token}` } : undefined,
+  });
+};

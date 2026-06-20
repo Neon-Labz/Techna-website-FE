@@ -1,6 +1,6 @@
 'use client';
 import { useState } from 'react';
-import { Clock, User, Play, ChevronDown, ChevronUp, BookOpen, Layers, Calendar } from 'lucide-react';
+import { Clock, Play, ChevronDown, ChevronUp, BookOpen, Layers, Calendar } from 'lucide-react';
 import { mockModules } from '../../data/mockData';
 
 const moduleColors = [
@@ -70,7 +70,17 @@ export default function ModulesSection() {
 
                   <div className="grid grid-cols-2 gap-3 mb-4">
                     <div className="flex items-center gap-2 text-sm text-gray-600">
-                      <User className="w-4 h-4 text-blue-500" />
+                      {module.instructorPhotoUrl ? (
+                        <img
+                          src={module.instructorPhotoUrl}
+                          alt={module.instructor}
+                          className="w-6 h-6 rounded-full object-cover shrink-0"
+                        />
+                      ) : (
+                        <div className="w-6 h-6 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 text-xs font-bold shrink-0">
+                          {module.instructor.charAt(0)}
+                        </div>
+                      )}
                       <span className="truncate">{module.instructor}</span>
                     </div>
                     <div className="flex items-center gap-2 text-sm text-gray-600">
