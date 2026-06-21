@@ -12,7 +12,7 @@ export default function PublicHeader() {
 
   const navLinks = [
     { label: 'Home', path: '/' },
-    { label: 'Subjects"', path: '/modules' },
+    { label: 'Subjects', path: '/modules' },
     { label: 'Contact Us', path: '/contact' },
   ];
 
@@ -22,13 +22,19 @@ export default function PublicHeader() {
     <header className="bg-white shadow-md sticky top-0 z-40">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
   <div className="flex items-center justify-between h-18 py-3">
-    {/* Logo */}
-    <Link href="/" className="flex items-center gap-0 -ml-24">
-      <Image src="/logo copy.png" alt="Techna Logo" width={105} height={40} className="rounded-full" />
-      <div>
-        <p className="text-lg font-bold text-blue-900 leading-tight font-poppins">Techna</p>
-        <p className="text-xs text-gray-500 leading-tight">Technical Institute</p>
-      </div>
+    {/* Logo - sized per Figma spec: 208x208px, lifted -86px, offset 94px */}
+    <Link
+      href="/"
+      className="relative flex items-center z-50"
+      style={{ width: '208px', height: '208px', marginBottom: '-20px', marginLeft: '-95px' }}
+    >
+      <Image
+        src="/newlogo.png"
+        alt="Techna Logo"
+        fill
+        className="object-contain"
+        priority
+      />
     </Link>
 
           {/* Desktop Nav */}
@@ -39,8 +45,8 @@ export default function PublicHeader() {
                 href={link.path}
                 className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
                   isActive(link.path)
-                    ? 'bg-blue-900 text-white'
-                    : 'text-gray-700 hover:bg-blue-50 hover:text-blue-900'
+                    ? 'bg-[#0183CB] text-white'
+                    : 'text-gray-700 hover:bg-blue-50 hover:text-[#0183CB]'
                 }`}
               >
                 {link.label}
@@ -52,13 +58,13 @@ export default function PublicHeader() {
           <div className="hidden md:flex items-center gap-3">
             <button
               onClick={() => router.push('/login')}
-              className="px-5 py-2 text-sm font-semibold text-blue-900 border-2 border-blue-900 rounded-lg hover:bg-blue-50 transition-all duration-200"
+              className="px-5 py-2 text-sm font-semibold text-[#0183CB] border-2 border-[#0183CB] rounded-lg hover:bg-blue-50 transition-all duration-200"
             >
               Login
             </button>
             <button
               onClick={() => router.push('/register')}
-              className="px-5 py-2 text-sm font-semibold text-white bg-gradient-to-r from-blue-900 to-blue-700 rounded-lg hover:from-blue-800 hover:to-blue-600 transition-all duration-200 shadow-md"
+              className="px-5 py-2 text-sm font-semibold text-white bg-[#0183CB] rounded-lg hover:bg-[#0170ad] transition-all duration-200 shadow-md"
             >
               Register
             </button>
@@ -84,7 +90,7 @@ export default function PublicHeader() {
                   onClick={() => setMenuOpen(false)}
                   className={`px-4 py-2.5 rounded-lg text-sm font-medium transition-all ${
                     isActive(link.path)
-                      ? 'bg-blue-900 text-white'
+                      ? 'bg-[#0183CB] text-white'
                       : 'text-gray-700 hover:bg-blue-50'
                   }`}
                 >
@@ -94,13 +100,13 @@ export default function PublicHeader() {
               <div className="flex gap-2 mt-3 pt-3 border-t border-gray-100">
                 <button
                   onClick={() => { router.push('/login'); setMenuOpen(false); }}
-                  className="flex-1 py-2 text-sm font-semibold text-blue-900 border-2 border-blue-900 rounded-lg hover:bg-blue-50"
+                  className="flex-1 py-2 text-sm font-semibold text-[#0183CB] border-2 border-[#0183CB] rounded-lg hover:bg-blue-50"
                 >
                   Login
                 </button>
                 <button
                   onClick={() => { router.push('/register'); setMenuOpen(false); }}
-                  className="flex-1 py-2 text-sm font-semibold text-white bg-blue-900 rounded-lg hover:bg-blue-800"
+                  className="flex-1 py-2 text-sm font-semibold text-white bg-[#0183CB] rounded-lg hover:bg-[#0170ad]"
                 >
                   Register
                 </button>

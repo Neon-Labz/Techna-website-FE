@@ -101,9 +101,6 @@ export default function PaymentsSection() {
 
       doc.setFont('helvetica', 'bold'); doc.setFontSize(32); doc.setTextColor(blue);
       doc.text('TECHNA', pageW / 2, 24, { align: 'center' });
-      doc.setFont('helvetica', 'normal'); doc.setFontSize(8); doc.setTextColor(darkBlue);
-      doc.text('Techna', 28, 41, { align: 'center' });
-      doc.text('Technical Institute', 28, 45, { align: 'center' });
       doc.setFontSize(10); doc.setTextColor(darkBlue);
       doc.text('A/L Technology Stream', pageW / 2, 34, { align: 'center' });
       doc.setFontSize(8); doc.setTextColor(textGray);
@@ -169,8 +166,20 @@ export default function PaymentsSection() {
     };
 
     const logo = new Image();
-    logo.src = '/logo copy.png';              // ← fixed: was /logo.png
-    logo.onload = () => { doc.addImage(logo, 'JPEG', 14, 10, 28, 28); buildPDF(); };
+    logo.src = '/newlogo.png';
+    logo.onload = () => {
+      // Neat, proportionate logo in its original top-left position
+      const maxBoxSize = 50;
+      const ratio = logo.naturalWidth && logo.naturalHeight ? logo.naturalWidth / logo.naturalHeight : 1;
+      let drawW = maxBoxSize;
+      let drawH = maxBoxSize / ratio;
+      if (drawH > maxBoxSize) {
+        drawH = maxBoxSize;
+        drawW = maxBoxSize * ratio;
+      }
+      doc.addImage(logo, 'PNG', 14, 10, drawW, drawH);
+      buildPDF();
+    };
     logo.onerror = () => buildPDF();
   };
 
