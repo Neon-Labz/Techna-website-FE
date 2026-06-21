@@ -1,5 +1,8 @@
 export interface Student {
+  _id?: string;       // MongoDB ObjectId from backend
   id: string;
+  batch?: string;     // e.g. "may 2026"
+  studentId?: string; // e.g. "STU084"
   status?: 'pending' | 'approved' | 'rejected';
   admissionNumber: string;
   serialNumber: string;
