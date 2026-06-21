@@ -12,7 +12,7 @@ export default function PublicHeader() {
 
   const navLinks = [
     { label: 'Home', path: '/' },
-    { label: 'Modules', path: '/modules' },
+    { label: 'Subjects', path: '/modules' },
     { label: 'Contact Us', path: '/contact' },
   ];
 
