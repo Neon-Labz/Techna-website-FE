@@ -5,12 +5,12 @@ import { ArrowRight, Cpu, FlaskConical, Leaf, Globe, Calculator, Dna, BookOpen }
 import { moduleApi, ModuleFromApi } from '@/api/module.api';
 
 const iconMap: Record<string, React.ElementType> = {
-  'Engineering Technology': Cpu,
-  'Science For Technology': FlaskConical,
-  'Bio Systems Technology': Dna,
-  'Agricultural Science': Leaf,
-  'Geography': Globe,
-  'Mathematics': Calculator,
+  'ENGINEERING TECHNOLOGY': Cpu,
+  'SCIENCE FOR TECHNOLOGY': FlaskConical,
+  'BIO SYSTEMS TECHNOLOGY': Dna,
+  'AGRICULTURAL SCIENCE': Leaf,
+  'GEOGRAPHY': Globe,
+  'MATHEMATICS': Calculator,
 };
 
 const getIcon = (name: string) => iconMap[name] ?? BookOpen;
