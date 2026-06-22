@@ -1,5 +1,11 @@
 @import "tailwindcss";
 
+@theme {
+  --color-brand: #0183CB;
+  --color-brand-light: #34BFF3;
+  --color-brand-dark: #016fad;
+}
+
 * {
   font-family: 'Inter', 'Poppins', system-ui, sans-serif;
 }

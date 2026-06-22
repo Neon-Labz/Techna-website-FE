@@ -3,14 +3,22 @@ import api from '@/lib/axios';
 export interface TeacherFromApi {
   _id: string;
   fullName: string;
+  firstName?: string;
+  lastName?: string;
   email: string;
   phone: string;
-  subject: string;
-  qualification: string;
+  subject: string | string[];
+  qualification?: string;
   experience: string;
   address: string;
   joinDate: string;
   status: 'active' | 'inactive';
+  degree?: string[];
+  specializations?: string[];
+  awards?: string[];
+  achievements?: string[];
+  biography?: string;
+  photoUrl?: string;
   createdAt?: string;
   updatedAt?: string;
 }

@@ -1,168 +1,212 @@
 'use client';
-import { useState } from 'react';
-import { Clock, Layers, Calendar, ArrowRight } from 'lucide-react';
-import { mockModules } from '../../data/mockData';
+
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import {
+  Clock,
+  Calendar,
+  ArrowRight,
+  Settings,
+  FlaskConical,
+  Calculator,
+  Globe,
+  Monitor,
+  Leaf,
+  BookOpen,
+  Microscope,
+  Loader2,
+  Home,
+  ChevronRight,
+  Layers,
+} from 'lucide-react';
+import api from '@/lib/axios';
 
-/* Display names in uppercase for card titles */
-const subjectDisplayNames: Record<string, string> = {
-  'ENGINEERING TECHNOLOGY': 'ENGINEERING TECHNOLOGY',
-  'BIO SYSTEMS TECHNOLOGY': 'BIO SYSTEMS TECHNOLOGY',
-  'SCIENCE FOR TECHNOLOGY': 'SCIENCE FOR TECHNOLOGY',
-  'INFORMATION COMMUNICATION TECHNOLOGY': 'COMPUTER APPLICATIONS',
-  'MATHEMATICS': 'MATHEMATICS',
-  'GEOGRAPHY': 'GEOGRAPHY',
-  'AGRICULTURAL SCIENCE': 'AGRICULTURAL SCIENCE',
-};
+interface ApiModule {
+  _id: string;
+  name: string;
+  description: string;
+  teacherId: string;
+  teacherName: string;
+  duration: string;
+  fee: number;
+  batch: string;
+  status: 'active' | 'inactive';
+}
 
-/* Subject-related emojis */
-const subjectEmojis: Record<string, string> = {
-  'ENGINEERING TECHNOLOGY': '⚙️',
-  'BIO SYSTEMS TECHNOLOGY': '🧬',
-  'SCIENCE FOR TECHNOLOGY': '🔬',
-  'INFORMATION COMMUNICATION TECHNOLOGY': '💻',
-  'MATHEMATICS': '📐',
-  'GEOGRAPHY': '🌍',
-  'AGRICULTURAL SCIENCE': '🌱',
-};
+interface PublicTeacher {
+  _id: string;
+  fullName: string;
+  subject: string | string[];
+  photoUrl?: string;
+}
 
-/* Subject card descriptions */
-const subjectDescriptions: Record<string, string> = {
-  'ENGINEERING TECHNOLOGY': 'Build a strong foundation in core engineering principles with hands-on learning.',
-  'BIO SYSTEMS TECHNOLOGY': 'Develop biodiversity and business skills for tomorrow\'s global challenges.',
-  'SCIENCE FOR TECHNOLOGY': 'Explore the world through discovery, research and innovation.',
-  'INFORMATION COMMUNICATION TECHNOLOGY': 'Innovate, code and transform ideas into digital solutions.',
-  'MATHEMATICS': 'Shape perspectives and create a better understanding of society and the universe.',
-  'GEOGRAPHY': 'Drive business growth with knowledge, analytics and practical skills.',
-  'AGRICULTURAL SCIENCE': 'Explore AI concepts and build intelligent systems for the future.',
-};
+function normalizeSubjects(raw: string | string[] | undefined): string[] {
+  if (!raw) return [];
+  if (Array.isArray(raw)) return raw.map(s => s.trim()).filter(Boolean);
+  return raw.split(',').map(s => s.trim()).filter(Boolean);
+}
+
+function getIcon(name: string) {
+  const lower = name.toLowerCase();
+  if (lower.includes('engineering')) return Settings;
+  if (lower.includes('science')) return FlaskConical;
+  if (lower.includes('mathematics') || lower.includes('math')) return Calculator;
+  if (lower.includes('geography')) return Globe;
+  if (lower.includes('computer') || lower.includes('ict') || lower.includes('information')) return Monitor;
+  if (lower.includes('agriculture') || lower.includes('agricultural')) return Leaf;
+  if (lower.includes('biology') || lower.includes('bio')) return Microscope;
+  if (lower.includes('commerce') || lower.includes('business')) return Layers;
+  return BookOpen;
+}
 
 const categories = ['All', 'Engineering Technology', 'Bio Systems Technology', 'Science For Technology', 'Information Communication Technology', 'Mathematics', 'Geography', 'Agricultural Science'];
 
 export default function ModulesSection() {
-  const subjects = mockModules;
-  const [filter, setFilter] = useState('All');
+  const [modules, setModules] = useState<ApiModule[]>([]);
+  const [teacherBySubject, setTeacherBySubject] = useState<Record<string, PublicTeacher>>({});
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  const filtered = filter === 'All'
-    ? subjects
-    : subjects.filter(s => s.name === filter);
+  useEffect(() => {
+    Promise.all([
+      api.get('/modules') as unknown as Promise<ApiModule[]>,
+      api.get('/public/teachers') as unknown as Promise<PublicTeacher[]>,
+    ])
+      .then(([modulesData, teachersData]) => {
+        setModules(modulesData.filter(m => m.status === 'active'));
+
+        const map: Record<string, PublicTeacher> = {};
+        teachersData.forEach(teacher => {
+          normalizeSubjects(teacher.subject).forEach(subj => {
+            map[subj.toLowerCase()] = teacher;
+          });
+        });
+        setTeacherBySubject(map);
+      })
+      .catch(() => setError('Failed to load subjects'))
+      .finally(() => setLoading(false));
+  }, []);
 
   return (
-    <div className="min-h-screen bg-white">
-      {/* Hero Section */}
+    <div className="min-h-screen bg-gray-50">
+      {/* Page Header */}
       <div
-        className="relative overflow-hidden h-[323px] bg-cover bg-center bg-no-repeat"
-        style={{
-          backgroundImage: "url('/contact_hero.png')",
-          backgroundColor: '#0183CB',
-        }}
+        className="py-16 relative overflow-hidden"
+        style={{ background: 'linear-gradient(90deg, #0183CB, #34BFF3)' }}
       >
-        <div className="absolute left-1/2 -translate-x-1/2 top-[64px] w-full max-w-[1280px] px-6">
-          {/* Breadcrumb */}
-          <nav className="flex items-center justify-center gap-1 opacity-90 mb-4">
-            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" className="mr-1">
-              <path d="M2 6L8 1.5L14 6V13.5C14 13.8978 13.842 14.2794 13.5607 14.5607C13.2794 14.842 12.8978 15 12.5 15H3.5C3.10218 15 2.72064 14.842 2.43934 14.5607C2.15804 14.2794 2 13.8978 2 13.5V6Z" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-            </svg>
-            <span className="text-white text-sm font-normal">Home</span>
-            <span className="text-white text-sm mx-1">/</span>
-            <span className="text-white text-sm font-normal">Academics</span>
-            <span className="text-white text-sm mx-1">/</span>
-            <span className="text-white text-sm font-bold">Our Subject</span>
+        <div className="absolute inset-0 opacity-10 pointer-events-none">
+          <div className="absolute top-8 left-1/4 w-32 h-32 rounded-full border-4 border-white" />
+          <div className="absolute bottom-4 right-1/3 w-48 h-48 rounded-full border-4 border-white" />
+        </div>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative">
+          <nav className="flex items-center justify-center gap-1.5 text-white/80 text-sm mb-6">
+            <Home className="w-3.5 h-3.5" />
+            <Link href="/" className="hover:text-white transition-colors">Home</Link>
+            <ChevronRight className="w-3.5 h-3.5" />
+            <span className="text-white font-medium">Our Subject</span>
           </nav>
-
-          {/* Heading */}
-          <h1 className="text-center text-[48px] font-extrabold text-white leading-[48px] mt-2 font-['Hanken_Grotesk']">
-            Our Subject
-          </h1>
-
-          {/* Decorative bar */}
-          <div className="w-16 h-1 bg-white opacity-60 mx-auto mt-4"></div>
-
-          {/* Subtitle */}
-          <p className="text-center text-lg text-white opacity-90 leading-[29px] mt-5 max-w-[672px] mx-auto font-['Hanken_Grotesk']">
-            Explore our wide range of industry-relevant Subject designed to build skills, knowledge and shape your future.
+          <h1 className="text-4xl md:text-5xl font-bold text-white">Our Subject</h1>
+          <p className="text-white/80 mt-3 max-w-2xl mx-auto text-base leading-relaxed">
+            Explore our wide range of industry-relevant subjects designed to build skills,
+            knowledge and shape your future.
           </p>
         </div>
       </div>
 
-      {/* Main Content Area */}
-      <div className="relative bg-[#f0f8ff]">
-        <div className="max-w-[1280px] mx-auto px-10 py-16">
-          {/* Section Header */}
-          <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-10">
-            <div>
-              <p className="text-sm font-semibold uppercase tracking-[1.5px] text-[#34BFF3] font-['Inter'] mb-2">
-                Academic Programs
-              </p>
-              <h2 className="text-[28px] sm:text-[32px] font-bold text-[#1B1C1C] leading-tight font-['Montserrat']">
-                Explore Our Subjects
-              </h2>
-              <div className="w-16 h-1 bg-[#0183CB] rounded-full mt-3"></div>
-            </div>
-            <div className="inline-flex items-center gap-2 self-start sm:self-auto bg-white border border-[#C1C6D7] rounded-full px-4 py-2 shadow-sm">
-              <span className="w-2 h-2 rounded-full bg-[#0183CB]"></span>
-              <span className="text-sm font-semibold text-[#414754] font-['Inter']">
-                {subjects.length} Subjects Available
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        {loading && (
+          <div className="flex items-center justify-center py-24">
+            <Loader2 className="w-10 h-10 animate-spin text-[#0183CB]" />
+          </div>
+        )}
+
+        {error && (
+          <div className="text-center py-24 text-gray-500">
+            <p>{error}</p>
+          </div>
+        )}
+
+        {!loading && !error && (
+          <>
+            <div className="flex justify-end mb-8">
+              <span className="text-[#0183CB] font-semibold text-base">
+                {modules.length} Subject{modules.length !== 1 ? 's' : ''} found
               </span>
             </div>
-          </div>
 
-          {/* Subject Cards Grid - 3 columns */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {filtered.map((subject) => (
-              <div
-                key={subject.id}
-                className="group bg-white border border-[#C1C6D7] rounded-xl p-8 flex flex-col justify-between hover:shadow-xl hover:border-[#0183CB] hover:-translate-y-1 transition-all duration-300"
-              >
-                {/* Subject-related Emoji */}
-                <div className="mb-6">
-                  <div className="w-14 h-14 flex items-center justify-center rounded-xl bg-[#0183CB]/8 group-hover:bg-[#0183CB]/15 transition-colors">
-                    <span className="text-[30px] leading-none" role="img" aria-label={subject.name}>
-                      {subjectEmojis[subject.name] || '📚'}
-                    </span>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {modules.map(module => {
+                const Icon = getIcon(module.name);
+
+                const matchedTeacher = teacherBySubject[module.name.toLowerCase()];
+                const teacherId = matchedTeacher?._id ?? (module.teacherId || null);
+
+                return (
+                  <div
+                    key={module._id}
+                    className="bg-white rounded-xl border border-[#C1C6D7] shadow-sm hover:shadow-md transition-shadow flex flex-col"
+                  >
+                    <div className="p-6 flex flex-col flex-1">
+                      <div className="w-14 h-14 rounded-xl bg-[#0183CB]/10 flex items-center justify-center mb-5">
+                        <Icon className="w-7 h-7 text-[#0183CB]" />
+                      </div>
+
+                      <h3 className="text-2xl font-bold text-[#1B1C1C] mb-2">{module.name}</h3>
+
+                      {module.description ? (
+                        <p className="text-base text-[#414754] leading-relaxed flex-1 mb-5">
+                          {module.description}
+                        </p>
+                      ) : (
+                        <div className="flex-1 mb-5" />
+                      )}
+
+                      <div className="border-t border-[#E5E7EB] mb-4" />
+
+                      <div className="flex items-center gap-5 text-sm text-[#6B7280] mb-5">
+                        {module.duration && (
+                          <span className="flex items-center gap-1.5">
+                            <Clock className="w-4 h-4 text-[#0183CB]" />
+                            {module.duration}
+                          </span>
+                        )}
+                        {module.batch && (
+                          <span className="flex items-center gap-1.5">
+                            <Calendar className="w-4 h-4 text-[#0183CB]" />
+                            Batch: {module.batch}
+                          </span>
+                        )}
+                      </div>
+
+                      {teacherId ? (
+                        <Link
+                          href={`/teachers/${teacherId}?subject=${encodeURIComponent(module.name)}`}
+                          className="flex items-center justify-center gap-2 w-full py-3 rounded-lg font-bold text-sm text-white transition-colors"
+                          style={{ background: '#0183CB' }}
+                          onMouseEnter={e => (e.currentTarget.style.background = '#016fad')}
+                          onMouseLeave={e => (e.currentTarget.style.background = '#0183CB')}
+                        >
+                          Visit Teacher <ArrowRight className="w-4 h-4" />
+                        </Link>
+                      ) : (
+                        <div className="flex items-center justify-center gap-2 w-full py-3 bg-gray-100 text-gray-400 text-sm font-bold rounded-lg cursor-not-allowed">
+                          No Teacher Assigned
+                        </div>
+                      )}
+                    </div>
                   </div>
-                </div>
+                );
+              })}
+            </div>
 
-                {/* Title - Proper Capitalization */}
-                <h3 className="text-[24px] font-bold text-[#1B1C1C] leading-8 font-['Montserrat'] mb-2 group-hover:text-[#0183CB] transition-colors">
-                  {subjectDisplayNames[subject.name] || subject.name}
-                </h3>
-
-                {/* Description */}
-                <p className="text-base text-[#414754] leading-[26px] font-['Inter'] mb-6">
-                  {subjectDescriptions[subject.name] || subject.description}
-                </p>
-
-                {/* Divider + Meta */}
-                <div className="border-t border-[#EFEDED] pt-4 mb-6">
-                  <div className="flex items-center gap-5 flex-wrap">
-                    <div className="flex items-center gap-1.5">
-                      <Clock className="w-[15px] h-[15px] text-[#0183CB]" />
-                      <span className="text-sm text-[#414754] font-['Inter']">2 Years</span>
-                    </div>
-                    <div className="flex items-center gap-1.5">
-                      <Layers className="w-[15px] h-[15px] text-[#0183CB]" />
-                      <span className="text-sm text-[#414754] font-['Inter']">12 Modules</span>
-                    </div>
-                    <div className="flex items-center gap-1.5">
-                      <Calendar className="w-[13.5px] h-[15px] text-[#0183CB]" />
-                      <span className="text-sm text-[#414754] font-['Inter']">Term: 6</span>
-                    </div>
-                  </div>
-                </div>
-
-                {/* CTA Button */}
-                <Link
-                  href="#"
-                  className="w-full flex items-center justify-center gap-2 bg-[#0183CB] text-white font-bold text-base py-3 rounded-lg shadow-[0px_1px_2px_rgba(0,0,0,0.05)] hover:bg-[#016ba5] transition-colors font-['Inter']"
-                >
-                  Visit Teacher
-                  <ArrowRight className="w-[19px] h-[9px]" strokeWidth={3} />
-                </Link>
+            {modules.length === 0 && (
+              <div className="text-center py-24 text-gray-400">
+                <BookOpen className="w-12 h-12 mx-auto mb-3 opacity-30" />
+                <p>No subjects available</p>
               </div>
-            ))}
-          </div>
-        </div>
+            )}
+          </>
+        )}
       </div>
     </div>
   );

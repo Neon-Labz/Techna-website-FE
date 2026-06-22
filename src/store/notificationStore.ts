@@ -56,11 +56,11 @@ export const useNotificationStore = create<NotificationState>((set, get) => ({
       get().addNotification(notification);
     });
 
-    socket.on('disconnect', (reason) => {
+    socket.on('disconnect', (reason: string) => {
       console.log('[Notifications] WebSocket disconnected:', reason);
     });
 
-    socket.on('connect_error', (err) => {
+    socket.on('connect_error', (err: Error) => {
       console.warn('[Notifications] WebSocket connection error:', err.message);
     });
 
