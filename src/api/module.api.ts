@@ -28,9 +28,21 @@ export interface ModuleFromApi {
   updatedAt?: string;
 }
 
+// Unwrap backend envelope: { success, message, data: [...] } or plain array
+function unwrapList(res: unknown): ModuleFromApi[] {
+  if (Array.isArray(res)) return res;
+  if (res && typeof res === 'object') {
+    const r = res as Record<string, unknown>;
+    if (Array.isArray(r['data'])) return r['data'] as ModuleFromApi[];
+    if (Array.isArray(r['modules'])) return r['modules'] as ModuleFromApi[];
+    if (Array.isArray(r['result'])) return r['result'] as ModuleFromApi[];
+  }
+  return [];
+}
+
 export const moduleApi = {
   getAll(): Promise<ModuleFromApi[]> {
-    return api.get('/modules').then((res) => res.data);
+    return api.get('/modules').then((res) => unwrapList(res.data ?? res));
   },
 
   getById(id: string): Promise<ModuleFromApi> {

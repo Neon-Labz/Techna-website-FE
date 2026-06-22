@@ -43,9 +43,24 @@ export const getSession = async (
     headers: token ? { Authorization: `Bearer ${token}` } : undefined,
   });
 
-
   return response.data as unknown as AuthApiResult;
+};
 
-  return response as unknown as AuthApiResult;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const changePassword = async (
+  currentPassword: string,
+  newPassword: string
+): Promise<any> => {
+  const response = await apiClient.post('/auth/change-password', {
+    currentPassword,
+    newPassword,
+  });
 
+  return response;
+};
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const logoutApi = async (): Promise<any> => {
+  const response = await apiClient.post('/auth/logout');
+  return response;
 };

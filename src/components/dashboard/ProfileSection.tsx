@@ -17,6 +17,7 @@ import {
 import { useAuthStore } from '../../store/authStore';
 import { updateStudentProfile } from '../../api/students.api';
 import { DISTRICTS, RACE_OPTIONS, RELIGION_OPTIONS } from '../website/RegisterSection';
+import { changePassword } from '../../api/auth.api';
 
 const getApiErrorMessage = (error: unknown, fallback: string) => {
   const axiosError = error as {
@@ -86,6 +87,8 @@ export default function ProfileSection() {
   const [showConfirm, setShowConfirm] = useState(false);
   const [pwForm, setPwForm] = useState({ old: '', newPw: '', confirm: '' });
   const [pwMsg, setPwMsg] = useState('');
+  const [pwError, setPwError] = useState('');
+  const [pwSaving, setPwSaving] = useState(false);
   const [editForm, setEditForm] = useState<any>({ ...studentData });
 
   const profileImage =
@@ -167,22 +170,34 @@ export default function ProfileSection() {
     }
   };
 
-  const handlePasswordChange = () => {
+  const handlePasswordChange = async () => {
+    setPwMsg('');
+    setPwError('');
+
     if (!pwForm.old || !pwForm.newPw || !pwForm.confirm) {
-      setPwMsg('Please fill all fields.');
+      setPwError('Please fill all fields.');
       return;
     }
     if (pwForm.newPw !== pwForm.confirm) {
-      setPwMsg('New passwords do not match.');
+      setPwError('New passwords do not match.');
       return;
     }
     if (pwForm.newPw.length < 6) {
-      setPwMsg('Password must be at least 6 characters.');
+      setPwError('Password must be at least 6 characters.');
       return;
     }
-    setPwMsg('Password updated successfully!');
-    setPwForm({ old: '', newPw: '', confirm: '' });
-    setTimeout(() => setPwMsg(''), 3000);
+
+    setPwSaving(true);
+    try {
+      const result = await changePassword(pwForm.old, pwForm.newPw);
+      setPwMsg(result?.message || 'Password changed successfully!');
+      setPwForm({ old: '', newPw: '', confirm: '' });
+      setTimeout(() => setPwMsg(''), 4000);
+    } catch (error) {
+      setPwError(getApiErrorMessage(error, 'Failed to change password. Please try again.'));
+    } finally {
+      setPwSaving(false);
+    }
   };
 
   const tabs = [
@@ -196,7 +211,7 @@ export default function ProfileSection() {
       <div className="bg-gradient-to-r from-[#0183CB] to-[#34BFF3] rounded-3xl p-6 md:p-8 text-white">
         <div className="flex flex-col md:flex-row items-center md:items-start gap-6">
           <div className="relative">
-            <div className="w-24 h-24 rounded-2xl overflow-hidden bg-yellow-400 shadow-xl">
+            <div className="w-24 h-24 rounded-2xl overflow-hidden bg-white shadow-xl">
               {profileImage ? (
                 <img
                   src={profileImage}
@@ -205,7 +220,7 @@ export default function ProfileSection() {
                 />
               ) : (
                 <div className="w-full h-full flex items-center justify-center">
-                  <User className="w-12 h-12 text-blue-900" />
+                  <User className="w-12 h-12 text-[#34BFF3]" />
                 </div>
               )}
             </div>
@@ -213,13 +228,13 @@ export default function ProfileSection() {
 
           <div className="text-center md:text-left flex-1">
             <h1 className="text-2xl font-bold">{studentData?.fullNameEnglish}</h1>
-            <p className="text-blue-300 text-sm mt-1">{studentData?.fullNameTamil}</p>
+            <p className="text-[#8EC5FF] text-sm mt-1">{studentData?.fullNameTamil}</p>
 
             <div className="flex flex-wrap justify-center md:justify-start gap-3 mt-3">
               <span className="px-3 py-1 bg-white/10 rounded-full text-xs font-medium">
                 {studentData?.studentId || studentData?.admissionNumber || studentData?.id}
               </span>
-              <span className="px-3 py-1 bg-white border border-white text-[#34BFF3] rounded-full text-xs font-medium">
+              <span className="px-3 py-1 bg-white border border-[#34BFF3] text-[#34BFF3] rounded-full text-xs font-medium">
                 Active Student
               </span>
               <span className="px-3 py-1 bg-white/10 rounded-full text-xs font-medium">
@@ -246,7 +261,7 @@ export default function ProfileSection() {
               className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium transition-all ${
                 activeTab === tab.id
                   ? 'bg-[#34BFF3] text-white shadow-md'
-                  : 'bg-white text-gray-600 border border-gray-200 hover:border-gray-800/20'
+                  : 'bg-white text-[#4A5565] border border-[#E5E7EB] hover:border-[#34BFF3]'
               }`}
             >
               <Icon className="w-4 h-4" /> {tab.label}
@@ -409,37 +424,52 @@ export default function ProfileSection() {
       )}
 
       {activeTab === 'password' && (
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
-          <h2 className="font-bold text-gray-900 text-lg mb-6">Change Password</h2>
+        <div className="bg-white rounded-2xl shadow-sm border border-[#F3F4F6] p-6 max-w-[448px]">
+          <h2 className="font-bold text-[#101828] text-lg">Change Password</h2>
+          <p className="text-sm text-[#6A7282] mt-1 mb-0">
+            Choose a strong password to keep your account secure.
+          </p>
 
-          {[
-            { key: 'old', label: 'Old Password', show: showOld, setShow: setShowOld },
-            { key: 'newPw', label: 'New Password', show: showNew, setShow: setShowNew },
-            { key: 'confirm', label: 'Confirm Password', show: showConfirm, setShow: setShowConfirm },
-          ].map(item => (
-            <div key={item.key} className="mb-4">
-              <label className="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1.5">
-                {item.label}
-              </label>
-              <div className="relative">
-                <input
-                  type={item.show ? 'text' : 'password'}
-                  value={(pwForm as any)[item.key]}
-                  onChange={e => setPwForm(f => ({ ...f, [item.key]: e.target.value }))}
-                  className={inputCls(false) + ' pr-10'}
-                />
-                <button type="button" onClick={() => item.setShow(v => !v)} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400">
-                  {item.show ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                </button>
+          <div className="flex flex-col gap-4 pt-4">
+            {[
+              { key: 'old', label: 'Current Password', placeholder: 'Enter current password', show: showOld, setShow: setShowOld },
+              { key: 'newPw', label: 'New Password', placeholder: 'Enter new password', show: showNew, setShow: setShowNew },
+              { key: 'confirm', label: 'Confirm New Password', placeholder: 'Confirm new password', show: showConfirm, setShow: setShowConfirm },
+            ].map(item => (
+              <div key={item.key} className="flex flex-col gap-1.5">
+                <label className="block text-sm font-medium text-[#364153]">
+                  {item.label}
+                </label>
+                <div className="relative">
+                  <input
+                    type={item.show ? 'text' : 'password'}
+                    value={(pwForm as any)[item.key]}
+                    onChange={e => setPwForm(f => ({ ...f, [item.key]: e.target.value }))}
+                    placeholder={item.placeholder}
+                    className="w-full px-3 py-3 bg-[#F9FAFB] border border-[#E5E7EB] rounded-xl text-sm text-gray-900 placeholder:text-black/50 focus:outline-none focus:ring-2 focus:ring-[#34BFF3] pr-10"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => item.setShow(v => !v)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-[#99A1AF]"
+                  >
+                    {item.show ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  </button>
+                </div>
               </div>
-            </div>
-          ))}
+            ))}
 
-          {pwMsg && <p className="mb-4 text-sm text-blue-700">{pwMsg}</p>}
+            {pwMsg && <p className="text-sm text-green-700 bg-green-50 border border-green-100 rounded-xl px-4 py-3">{pwMsg}</p>}
+            {pwError && <p className="text-sm text-red-700 bg-red-50 border border-red-100 rounded-xl px-4 py-3">{pwError}</p>}
 
-          <button onClick={handlePasswordChange} className="px-5 py-2.5 bg-blue-900 text-white rounded-xl text-sm font-medium hover:bg-blue-800">
-            Update Password
-          </button>
+            <button
+              onClick={handlePasswordChange}
+              disabled={pwSaving}
+              className="w-full py-3 bg-gradient-to-r from-[#0183CB] to-[#34BFF3] text-white rounded-xl text-sm font-semibold shadow-md hover:opacity-90 disabled:opacity-60 transition-all"
+            >
+              {pwSaving ? 'Updating...' : 'Update Password'}
+            </button>
+          </div>
         </div>
       )}
     </div>

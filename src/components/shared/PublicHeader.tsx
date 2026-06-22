@@ -2,7 +2,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { Menu, X, GraduationCap } from 'lucide-react';
+import { Menu, X } from 'lucide-react';
 import Image from 'next/image';
 
 export default function PublicHeader() {
@@ -21,29 +21,29 @@ export default function PublicHeader() {
   return (
     <header className="bg-white shadow-md sticky top-0 z-40">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-  <div className="flex items-center justify-between h-18 py-3">
-    {/* Logo - sized per Figma spec: 208x208px, lifted -86px, offset 94px */}
-    <Link
-      href="/"
-      className="relative flex items-center z-50"
-      style={{ width: '208px', height: '208px', marginBottom: '-20px', marginLeft: '-95px' }}
-    >
-      <Image
-        src="/newlogo.png"
-        alt="Techna Logo"
-        fill
-        className="object-contain"
-        priority
-      />
-    </Link>
+        <div className="flex items-center justify-between h-18 py-3">
+          {/* Logo - sized per Figma spec: 208x208px, lifted -86px, offset 94px */}
+          <Link
+            href="/"
+            className="relative flex items-center z-50"
+            style={{ width: '208px', height: '208px', marginBottom: '-20px', marginLeft: '-95px' }}
+          >
+            <Image
+              src="/newlogo.png"
+              alt="Techna Logo"
+              fill
+              className="object-contain"
+              priority
+            />
+          </Link>
 
           {/* Desktop Nav */}
-          <nav className="hidden md:flex items-center gap-1">
+          <nav className="hidden md:flex items-center gap-0">
             {navLinks.map(link => (
               <Link
                 key={link.path}
                 href={link.path}
-                className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
+                className={`px-8 py-2 rounded-md text-base font-medium transition-all duration-200 ${
                   isActive(link.path)
                     ? 'bg-[#0183CB] text-white'
                     : 'text-gray-700 hover:bg-blue-50 hover:text-[#0183CB]'
@@ -55,13 +55,14 @@ export default function PublicHeader() {
           </nav>
 
           {/* Auth Buttons */}
-          <div className="hidden md:flex items-center gap-3">
+          <div className="hidden md:flex items-center gap-4">
             <button
               onClick={() => router.push('/login')}
               className="px-5 py-2 text-sm font-semibold text-[#0183CB] border-2 border-[#0183CB] rounded-lg hover:bg-blue-50 transition-all duration-200"
             >
               Login
             </button>
+
             <button
               onClick={() => router.push('/register')}
               className="px-5 py-2 text-sm font-semibold text-white bg-[#0183CB] rounded-lg hover:bg-[#0170ad] transition-all duration-200 shadow-md"
@@ -74,6 +75,7 @@ export default function PublicHeader() {
           <button
             className="md:hidden p-2 rounded-lg text-gray-700 hover:bg-gray-100"
             onClick={() => setMenuOpen(!menuOpen)}
+            aria-label="Toggle menu"
           >
             {menuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
           </button>
@@ -97,6 +99,7 @@ export default function PublicHeader() {
                   {link.label}
                 </Link>
               ))}
+
               <div className="flex gap-2 mt-3 pt-3 border-t border-gray-100">
                 <button
                   onClick={() => { router.push('/login'); setMenuOpen(false); }}
@@ -104,6 +107,7 @@ export default function PublicHeader() {
                 >
                   Login
                 </button>
+
                 <button
                   onClick={() => { router.push('/register'); setMenuOpen(false); }}
                   className="flex-1 py-2 text-sm font-semibold text-white bg-[#0183CB] rounded-lg hover:bg-[#0170ad]"

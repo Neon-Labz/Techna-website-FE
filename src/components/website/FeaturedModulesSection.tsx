@@ -22,13 +22,7 @@ export default function FeaturedModulesSection() {
 
   useEffect(() => {
     moduleApi.getAll()
-      .then((res: unknown) => {
-        let data: ModuleFromApi[] = [];
-        if (Array.isArray(res)) {
-          data = res;
-        } else if (res && typeof res === 'object' && Array.isArray((res as any).data)) {
-          data = (res as any).data;
-        }
+      .then((data) => {
         setModules(data.slice(0, 6));
       })
       .catch((err: unknown) => console.error('Failed to fetch modules:', err))
