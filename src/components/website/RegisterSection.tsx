@@ -97,10 +97,13 @@ export default function RegisterSection() {
       try {
         const result = await apiClient.get('/modules');
 
-        const modules = Array.isArray(result.data)
-          ? result.data
-          : Array.isArray(result.data?.data)
-            ? result.data.data
+        // The axios response interceptor already unwraps the
+        // `{ success, message, data }` envelope, so `result` is either the
+        // modules array directly or an object containing it.
+        const modules = Array.isArray(result)
+          ? result
+          : Array.isArray((result as { data?: unknown })?.data)
+            ? (result as { data: ModuleOption[] }).data
             : [];
 
         const options = modules
@@ -169,6 +172,39 @@ export default function RegisterSection() {
     setLoading(true);
     setSubmitError('');
 
+    const olResults = olRows
+      .filter(row => row.year && row.indexNumber)
+      .map(row => ({
+        year: row.year,
+        indexNumber: row.indexNumber,
+        english: row.english || undefined,
+        mathematics: row.mathematics || undefined,
+        science: row.science || undefined,
+        sinhala: row.sinhala || undefined,
+        tamil: row.tamil || undefined,
+      }));
+
+    // O/L results are optional. Only include the section if the user filled
+    // in at least one O/L field, otherwise omit it entirely so the backend
+    // does not reject the registration.
+    const hasOlData = Boolean(
+      form.olYear ||
+        form.olIndexNumber ||
+        form.olNameUsed ||
+        olResults.length,
+    );
+
+    const olRecords = hasOlData
+      ? {
+          olCategory: form.olCategory || undefined,
+          olYear: form.olYear || undefined,
+          olIndexNumber: form.olIndexNumber || undefined,
+          olNameUsed: form.olNameUsed || undefined,
+          olAccept: form.olAccept || undefined,
+          olResults,
+        }
+      : undefined;
+
     const payload = {
       account: {
         email: form.email,
@@ -199,24 +235,7 @@ export default function RegisterSection() {
         guardianFixedTel: form.guardianFixedTel,
         guardianMobile: form.guardianMobile,
       },
-      olRecords: {
-        olCategory: form.olCategory || undefined,
-        olYear: form.olYear,
-        olIndexNumber: form.olIndexNumber,
-        olNameUsed: form.olNameUsed,
-        olAccept: form.olAccept || undefined,
-        olResults: olRows
-          .filter(row => row.year && row.indexNumber)
-          .map(row => ({
-            year: row.year,
-            indexNumber: row.indexNumber,
-            english: row.english || undefined,
-            mathematics: row.mathematics || undefined,
-            science: row.science || undefined,
-            sinhala: row.sinhala || undefined,
-            tamil: row.tamil || undefined,
-          })),
-      },
+      olRecords,
       subjectSelection: {
         subjects: form.subjects,
         //modules: form.subjects,
