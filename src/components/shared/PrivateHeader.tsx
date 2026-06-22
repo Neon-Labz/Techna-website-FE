@@ -53,9 +53,9 @@ export default function PrivateHeader() {
     }
 
     logout();
-    router.push('/');
     setDropdownOpen(false);
     setMenuOpen(false);
+    router.replace('/login');
   };
 
   useEffect(() => {
@@ -162,9 +162,7 @@ export default function PrivateHeader() {
                     <p className="truncate text-xs text-gray-500">
                       {studentId}
                     </p>
-                    <p className="truncate text-xs text-gray-500">
-                      {email}
-                    </p>
+                    <p className="truncate text-xs text-gray-500">{email}</p>
                   </div>
 
                   <Link

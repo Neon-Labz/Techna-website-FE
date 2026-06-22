@@ -220,6 +220,13 @@ export const authApi = {
     }
   },
 
+  async changePassword(currentPassword: string, newPassword: string) {
+    return api.post('/auth/change-password', {
+      currentPassword,
+      newPassword,
+    });
+  },
+
   async logout() {
     return api.post('/auth/logout');
   },
@@ -228,3 +235,5 @@ export const authApi = {
 export const registerStudent = authApi.registerStudent;
 export const studentLogin = authApi.loginStudent;
 export const getSession = authApi.getSession;
+export const changePassword = authApi.changePassword;
+export const logoutApi = authApi.logout;

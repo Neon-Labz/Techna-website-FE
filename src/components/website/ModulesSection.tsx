@@ -1,216 +1,152 @@
 'use client';
 
 import { useState } from 'react';
-import {
-  Clock,
-  Play,
-  ChevronDown,
-  ChevronUp,
-  BookOpen,
-  Layers,
-  Calendar,
-} from 'lucide-react';
+import Link from 'next/link';
+import { ArrowRight, Calendar, Clock, Layers } from 'lucide-react';
 import { mockModules } from '../../data/mockData';
 
-const moduleColors = [
-  'from-blue-600 to-blue-800',
-  'from-purple-600 to-purple-800',
-  'from-emerald-600 to-emerald-800',
-  'from-orange-600 to-orange-800',
-  'from-rose-600 to-rose-800',
-  'from-teal-600 to-teal-800',
-  'from-indigo-600 to-indigo-800',
-];
+const subjectDisplayNames: Record<string, string> = {
+  'Engineering Technology': 'Engineering Technology',
+  'Bio Systems Technology': 'Bio Systems Technology',
+  'Science For Technology': 'Science For Technology',
+  'Information Communication Technology': 'Computer Applications',
+  Mathematics: 'Mathematics',
+  Geography: 'Geography',
+  'Agricultural Science': 'Agricultural Science',
+};
 
-const formatDate = (date?: string) => {
-  if (!date) return '-';
+const subjectEmojis: Record<string, string> = {
+  'Engineering Technology': '⚙️',
+  'Bio Systems Technology': '🧬',
+  'Science For Technology': '🔬',
+  'Information Communication Technology': '💻',
+  Mathematics: '📐',
+  Geography: '🌍',
+  'Agricultural Science': '🌱',
+};
 
-  const parsedDate = new Date(date);
-  if (Number.isNaN(parsedDate.getTime())) return '-';
-
-  return parsedDate.toLocaleDateString('en-GB');
+const subjectDescriptions: Record<string, string> = {
+  'Engineering Technology':
+    'Build a strong foundation in core engineering principles with hands-on learning.',
+  'Bio Systems Technology':
+    "Develop biodiversity and business skills for tomorrow's global challenges.",
+  'Science For Technology':
+    'Explore the world through discovery, research and innovation.',
+  'Information Communication Technology':
+    'Innovate, code and transform ideas into digital solutions.',
+  Mathematics:
+    'Shape perspectives and create a better understanding of society and the universe.',
+  Geography:
+    'Drive business growth with knowledge, analytics and practical skills.',
+  'Agricultural Science':
+    'Explore AI concepts and build intelligent systems for the future.',
 };
 
 export default function ModulesSection() {
-  const [expanded, setExpanded] = useState<string | null>(null);
   const [filter, setFilter] = useState('All');
-
   const categories = ['All', 'Core', 'Elective'];
-
-  const filtered =
+  const subjects =
     filter === 'All'
       ? mockModules
-      : mockModules.filter((m) => m.category === filter);
+      : mockModules.filter((module) => module.category === filter);
 
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="bg-gradient-to-br from-blue-950 to-blue-900 py-16">
-        <div className="max-w-7xl mx-auto px-4 text-center sm:px-6 lg:px-8">
-          <span className="text-yellow-400 font-semibold text-sm uppercase tracking-wider">
+        <div className="mx-auto max-w-7xl px-4 text-center sm:px-6 lg:px-8">
+          <span className="text-sm font-semibold uppercase tracking-wider text-yellow-400">
             A/L Technology Stream
           </span>
-          <h1 className="text-4xl md:text-5xl font-bold text-white mt-2">
-            Our Modules
+          <h1 className="mt-2 text-4xl font-bold text-white md:text-5xl">
+            Our Subjects
           </h1>
-          <p className="text-blue-300 mt-3 max-w-xl mx-auto">
+          <p className="mx-auto mt-3 max-w-xl text-blue-300">
             Explore all subjects and courses offered at Techna Technical
             Institute for the A/L Technology Stream.
           </p>
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 py-12 sm:px-6 lg:px-8">
-        <div className="flex items-center gap-2 mb-8 flex-wrap">
-          <span className="text-sm text-gray-500 font-medium">Filter by:</span>
-
-          {categories.map((cat) => (
+      <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
+        <div className="mb-8 flex flex-wrap items-center gap-2">
+          <span className="text-sm font-medium text-gray-500">Filter by:</span>
+          {categories.map((category) => (
             <button
-              key={cat}
-              onClick={() => setFilter(cat)}
-              className={`px-4 py-1.5 rounded-full text-sm font-medium transition-all ${
-                filter === cat
+              key={category}
+              type="button"
+              onClick={() => setFilter(category)}
+              className={`rounded-full px-4 py-1.5 text-sm font-medium transition-all ${
+                filter === category
                   ? 'bg-blue-900 text-white shadow-md'
-                  : 'bg-white text-gray-600 border border-gray-200 hover:border-blue-300'
+                  : 'border border-gray-200 bg-white text-gray-600 hover:border-blue-300'
               }`}
             >
-              {cat}
+              {category}
             </button>
           ))}
-
           <span className="ml-auto text-sm text-gray-400">
-            {filtered.length} modules found
+            {subjects.length} subjects found
           </span>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {filtered.map((module, i) => {
-            const videos = module.videos ?? [];
-            const isOpen = expanded === module.id;
+        <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
+          {subjects.map((subject) => (
+            <div
+              key={subject.id}
+              className="group flex flex-col justify-between rounded-xl border border-[#C1C6D7] bg-white p-8 transition-all duration-300 hover:-translate-y-1 hover:border-[#0183CB] hover:shadow-xl"
+            >
+              <div className="mb-6">
+                <div className="flex h-14 w-14 items-center justify-center rounded-xl bg-[#0183CB]/8 transition-colors group-hover:bg-[#0183CB]/15">
+                  <span
+                    className="text-[30px] leading-none"
+                    role="img"
+                    aria-label={subject.name}
+                  >
+                    {subjectEmojis[subject.name] || '📚'}
+                  </span>
+                </div>
+              </div>
 
-            return (
-              <div
-                key={module.id}
-                className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition-all"
-              >
-                <div
-                  className={`bg-gradient-to-r ${
-                    moduleColors[i % moduleColors.length]
-                  } p-5`}
-                >
-                  <div className="flex items-start justify-between">
-                    <div>
-                      <span className="text-white/60 text-xs font-medium uppercase tracking-wider">
-                        {module.code || '-'}
-                      </span>
-                      <h3 className="text-white font-bold text-xl mt-0.5">
-                        {module.name}
-                      </h3>
-                    </div>
+              <h3 className="mb-2 font-['Montserrat'] text-[24px] font-bold leading-8 text-[#1B1C1C] transition-colors group-hover:text-[#0183CB]">
+                {subjectDisplayNames[subject.name] || subject.name}
+              </h3>
 
-                    <span className="px-2.5 py-1 bg-white/20 text-white text-xs font-semibold rounded-full">
-                      {module.category || '-'}
+              <p className="mb-6 font-['Inter'] text-base leading-[26px] text-[#414754]">
+                {subjectDescriptions[subject.name] || subject.description}
+              </p>
+
+              <div className="mb-6 border-t border-[#EFEDED] pt-4">
+                <div className="flex flex-wrap items-center gap-5">
+                  <div className="flex items-center gap-1.5">
+                    <Clock className="h-[15px] w-[15px] text-[#0183CB]" />
+                    <span className="font-['Inter'] text-sm text-[#414754]">
+                      2 Years
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    <Layers className="h-[15px] w-[15px] text-[#0183CB]" />
+                    <span className="font-['Inter'] text-sm text-[#414754]">
+                      12 Modules
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    <Calendar className="h-[15px] w-[13.5px] text-[#0183CB]" />
+                    <span className="font-['Inter'] text-sm text-[#414754]">
+                      Term: 6
                     </span>
                   </div>
                 </div>
-
-                <div className="p-5">
-                  <p className="text-gray-500 text-sm leading-relaxed mb-4">
-                    {module.description || '-'}
-                  </p>
-
-                  <div className="grid grid-cols-2 gap-3 mb-4">
-                    <div className="flex items-center gap-2 text-sm text-gray-600">
-                      {module.instructorPhotoUrl ? (
-                        <img
-                          src={module.instructorPhotoUrl}
-                          alt={module.instructor || 'Instructor'}
-                          className="w-6 h-6 rounded-full object-cover shrink-0"
-                        />
-                      ) : (
-                        <div className="w-6 h-6 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 text-xs font-bold shrink-0">
-                          {(module.instructor || '-').charAt(0)}
-                        </div>
-                      )}
-                      <span className="truncate">
-                        {module.instructor || '-'}
-                      </span>
-                    </div>
-
-                    <div className="flex items-center gap-2 text-sm text-gray-600">
-                      <Clock className="w-4 h-4 text-blue-500" />
-                      {module.duration || '-'}
-                    </div>
-
-                    <div className="flex items-center gap-2 text-sm text-gray-600">
-                      <Calendar className="w-4 h-4 text-blue-500" />
-                      <span className="truncate">
-                        {module.schedule || '-'}
-                      </span>
-                    </div>
-
-                    <div className="flex items-center gap-2 text-sm text-gray-600">
-                      <Layers className="w-4 h-4 text-blue-500" />
-                      {module.credits ?? 0} Credits
-                    </div>
-                  </div>
-
-                  {videos.length > 0 && (
-                    <>
-                      <button
-                        type="button"
-                        onClick={() => setExpanded(isOpen ? null : module.id)}
-                        className="flex items-center justify-between w-full px-4 py-2.5 bg-blue-50 hover:bg-blue-100 text-blue-800 rounded-xl text-sm font-medium transition-all"
-                      >
-                        <span className="flex items-center gap-2">
-                          <Play className="w-4 h-4" /> {videos.length} Lecture
-                          Recording{videos.length !== 1 ? 's' : ''}
-                        </span>
-
-                        {isOpen ? (
-                          <ChevronUp className="w-4 h-4" />
-                        ) : (
-                          <ChevronDown className="w-4 h-4" />
-                        )}
-                      </button>
-
-                      {isOpen && (
-                        <div className="mt-3 space-y-2">
-                          {videos.map((video) => (
-                            <div
-                              key={video.id}
-                              className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl hover:bg-gray-100 transition-all cursor-pointer group"
-                            >
-                              <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-blue-800 rounded-lg flex items-center justify-center shrink-0">
-                                <Play className="w-4 h-4 text-white fill-white" />
-                              </div>
-
-                              <div className="flex-1 min-w-0">
-                                <p className="text-sm font-medium text-gray-800 truncate group-hover:text-blue-700">
-                                  {video.title}
-                                </p>
-                                <p className="text-xs text-gray-400">
-                                  {video.duration || '-'} ·{' '}
-                                  {formatDate(video.uploadedAt)}
-                                </p>
-                              </div>
-
-                              <BookOpen className="w-4 h-4 text-gray-400 shrink-0" />
-                            </div>
-                          ))}
-
-                          <div className="text-center pt-2">
-                            <p className="text-xs text-gray-400">
-                              Login to access all lecture recordings →
-                            </p>
-                          </div>
-                        </div>
-                      )}
-                    </>
-                  )}
-                </div>
               </div>
-            );
-          })}
+
+              <Link
+                href="#"
+                className="flex w-full items-center justify-center gap-2 rounded-lg bg-[#0183CB] py-3 font-['Inter'] text-base font-bold text-white shadow-[0px_1px_2px_rgba(0,0,0,0.05)] transition-colors hover:bg-[#016ba5]"
+              >
+                Visit Teacher
+                <ArrowRight className="h-[9px] w-[19px]" strokeWidth={3} />
+              </Link>
+            </div>
+          ))}
         </div>
       </div>
     </div>

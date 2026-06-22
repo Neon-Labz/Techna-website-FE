@@ -2,7 +2,16 @@ import axios from 'axios';
 
 const AUTH_STORAGE_KEYS = ['techna-auth', 'edu-auth'];
 
-const PUBLIC_PATHS = ['/', '/about', '/contact', '/modules', '/programs'];
+const PUBLIC_PATHS = [
+  '/',
+  '/about',
+  '/contact',
+  '/modules',
+  '/programs',
+  '/login',
+  '/register',
+  '/pending',
+];
 
 const api = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api',
@@ -12,7 +21,7 @@ const api = axios.create({
   timeout: 15000,
 });
 
-const readStoredToken = () => {
+const readStoredToken = (): string | null => {
   if (typeof window === 'undefined') return null;
 
   const storages = [window.localStorage, window.sessionStorage];
