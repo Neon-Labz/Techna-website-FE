@@ -1,141 +1,214 @@
 'use client';
-import { useState } from 'react';
-import { Clock, Play, ChevronDown, ChevronUp, BookOpen, Layers, Calendar } from 'lucide-react';
-import { mockModules } from '../../data/mockData';
+import { useState, useEffect } from 'react';
+import Link from 'next/link';
+import {
+  Clock,
+  Calendar,
+  ArrowRight,
+  Settings,
+  FlaskConical,
+  Calculator,
+  Globe,
+  Monitor,
+  Leaf,
+  BookOpen,
+  Microscope,
+  Loader2,
+  Home,
+  ChevronRight,
+  Layers,
+} from 'lucide-react';
+import api from '@/lib/axios';
 
-const moduleColors = [
-  'from-blue-600 to-blue-800',
-  'from-purple-600 to-purple-800',
-  'from-emerald-600 to-emerald-800',
-  'from-orange-600 to-orange-800',
-  'from-rose-600 to-rose-800',
-  'from-teal-600 to-teal-800',
-  'from-indigo-600 to-indigo-800',
-];
+interface ApiModule {
+  _id: string;
+  name: string;
+  description: string;
+  teacherId: string;
+  teacherName: string;
+  duration: string;
+  fee: number;
+  batch: string;
+  status: 'active' | 'inactive';
+}
+
+interface PublicTeacher {
+  _id: string;
+  fullName: string;
+  subject: string | string[];
+  photoUrl?: string;
+}
+
+function normalizeSubjects(raw: string | string[] | undefined): string[] {
+  if (!raw) return [];
+  if (Array.isArray(raw)) return raw.map(s => s.trim()).filter(Boolean);
+  return raw.split(',').map(s => s.trim()).filter(Boolean);
+}
+
+function getIcon(name: string) {
+  const lower = name.toLowerCase();
+  if (lower.includes('engineering')) return Settings;
+  if (lower.includes('science')) return FlaskConical;
+  if (lower.includes('mathematics') || lower.includes('math')) return Calculator;
+  if (lower.includes('geography')) return Globe;
+  if (lower.includes('computer') || lower.includes('ict') || lower.includes('information')) return Monitor;
+  if (lower.includes('agriculture') || lower.includes('agricultural')) return Leaf;
+  if (lower.includes('biology') || lower.includes('bio')) return Microscope;
+  if (lower.includes('commerce') || lower.includes('business')) return Layers;
+  return BookOpen;
+}
 
 export default function ModulesSection() {
-  const [expanded, setExpanded] = useState<string | null>(null);
-  const [filter, setFilter] = useState('All');
+  const [modules, setModules] = useState<ApiModule[]>([]);
+  const [teacherBySubject, setTeacherBySubject] = useState<Record<string, PublicTeacher>>({});
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  const categories = ['All', 'Core', 'Elective'];
-  const filtered = filter === 'All' ? mockModules : mockModules.filter(m => m.category === filter);
+  useEffect(() => {
+    Promise.all([
+      api.get('/modules') as unknown as Promise<ApiModule[]>,
+      api.get('/public/teachers') as unknown as Promise<PublicTeacher[]>,
+    ])
+      .then(([modulesData, teachersData]) => {
+        // Only active modules
+        setModules(modulesData.filter(m => m.status === 'active'));
+
+        // Build subject (lowercased) → teacher map
+        // Each teacher lists their subjects in teacher.subject[] (e.g. ["Mathematics", "Physics"])
+        const map: Record<string, PublicTeacher> = {};
+        teachersData.forEach(teacher => {
+          normalizeSubjects(teacher.subject).forEach(subj => {
+            map[subj.toLowerCase()] = teacher;
+          });
+        });
+        setTeacherBySubject(map);
+      })
+      .catch(() => setError('Failed to load subjects'))
+      .finally(() => setLoading(false));
+  }, []);
 
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Page Header */}
-      <div className="bg-gradient-to-br from-blue-950 to-blue-900 py-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <span className="text-yellow-400 font-semibold text-sm uppercase tracking-wider">A/L Technology Stream</span>
-          <h1 className="text-4xl md:text-5xl font-bold text-white mt-2">Our Modules</h1>
-          <p className="text-blue-300 mt-3 max-w-xl mx-auto">Explore all subjects and courses offered at Techna Technical Institute for the A/L Technology Stream.</p>
+      <div
+        className="py-16 relative overflow-hidden"
+        style={{ background: 'linear-gradient(90deg, #0183CB, #34BFF3)' }}
+      >
+        <div className="absolute inset-0 opacity-10 pointer-events-none">
+          <div className="absolute top-8 left-1/4 w-32 h-32 rounded-full border-4 border-white" />
+          <div className="absolute bottom-4 right-1/3 w-48 h-48 rounded-full border-4 border-white" />
+        </div>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative">
+          <nav className="flex items-center justify-center gap-1.5 text-white/80 text-sm mb-6">
+            <Home className="w-3.5 h-3.5" />
+            <Link href="/" className="hover:text-white transition-colors">Home</Link>
+            <ChevronRight className="w-3.5 h-3.5" />
+            <span className="text-white font-medium">Our Subject</span>
+          </nav>
+          <h1 className="text-4xl md:text-5xl font-bold text-white">Our Subject</h1>
+          <p className="text-white/80 mt-3 max-w-2xl mx-auto text-base leading-relaxed">
+            Explore our wide range of industry-relevant subjects designed to build skills,
+            knowledge and shape your future.
+          </p>
         </div>
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        {/* Filter */}
-        <div className="flex items-center gap-2 mb-8 flex-wrap">
-          <span className="text-sm text-gray-500 font-medium">Filter by:</span>
-          {categories.map(cat => (
-            <button
-              key={cat}
-              onClick={() => setFilter(cat)}
-              className={`px-4 py-1.5 rounded-full text-sm font-medium transition-all ${filter === cat ? 'bg-blue-900 text-white shadow-md' : 'bg-white text-gray-600 border border-gray-200 hover:border-blue-300'}`}
-            >
-              {cat}
-            </button>
-          ))}
-          <span className="ml-auto text-sm text-gray-400">{filtered.length} modules found</span>
-        </div>
+        {loading && (
+          <div className="flex items-center justify-center py-24">
+            <Loader2 className="w-10 h-10 animate-spin text-[#0183CB]" />
+          </div>
+        )}
 
-        {/* Modules Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {filtered.map((module, i) => {
-            const isOpen = expanded === module.id;
-            return (
-              <div key={module.id} className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition-all">
-                {/* Header */}
-                <div className={`bg-gradient-to-r ${moduleColors[i % moduleColors.length]} p-5`}>
-                  <div className="flex items-start justify-between">
-                    <div>
-                      <span className="text-white/60 text-xs font-medium uppercase tracking-wider">{module.code}</span>
-                      <h3 className="text-white font-bold text-xl mt-0.5">{module.name}</h3>
-                    </div>
-                    <span className="px-2.5 py-1 bg-white/20 text-white text-xs font-semibold rounded-full">{module.category}</span>
-                  </div>
-                </div>
+        {error && (
+          <div className="text-center py-24 text-gray-500">
+            <p>{error}</p>
+          </div>
+        )}
 
-                {/* Body */}
-                <div className="p-5">
-                  <p className="text-gray-500 text-sm leading-relaxed mb-4">{module.description}</p>
+        {!loading && !error && (
+          <>
+            <div className="flex justify-end mb-8">
+              <span className="text-[#0183CB] font-semibold text-base">
+                {modules.length} Subject{modules.length !== 1 ? 's' : ''} found
+              </span>
+            </div>
 
-                  <div className="grid grid-cols-2 gap-3 mb-4">
-                    <div className="flex items-center gap-2 text-sm text-gray-600">
-                      {module.instructorPhotoUrl ? (
-                        <img
-                          src={module.instructorPhotoUrl}
-                          alt={module.instructor}
-                          className="w-6 h-6 rounded-full object-cover shrink-0"
-                        />
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {modules.map(module => {
+                const Icon = getIcon(module.name);
+
+                // Primary: look up teacher by module name in teacher.subject[] (case-insensitive)
+                // Fallback: use module.teacherId (static field set when module was created)
+                const matchedTeacher = teacherBySubject[module.name.toLowerCase()];
+                const teacherId = matchedTeacher?._id ?? (module.teacherId || null);
+
+                return (
+                  <div
+                    key={module._id}
+                    className="bg-white rounded-xl border border-[#C1C6D7] shadow-sm hover:shadow-md transition-shadow flex flex-col"
+                  >
+                    <div className="p-6 flex flex-col flex-1">
+                      <div className="w-14 h-14 rounded-xl bg-[#0183CB]/10 flex items-center justify-center mb-5">
+                        <Icon className="w-7 h-7 text-[#0183CB]" />
+                      </div>
+
+                      <h3 className="text-2xl font-bold text-[#1B1C1C] mb-2">{module.name}</h3>
+
+                      {module.description ? (
+                        <p className="text-base text-[#414754] leading-relaxed flex-1 mb-5">
+                          {module.description}
+                        </p>
                       ) : (
-                        <div className="w-6 h-6 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 text-xs font-bold shrink-0">
-                          {module.instructor.charAt(0)}
+                        <div className="flex-1 mb-5" />
+                      )}
+
+                      <div className="border-t border-[#E5E7EB] mb-4" />
+
+                      <div className="flex items-center gap-5 text-sm text-[#6B7280] mb-5">
+                        {module.duration && (
+                          <span className="flex items-center gap-1.5">
+                            <Clock className="w-4 h-4 text-[#0183CB]" />
+                            {module.duration}
+                          </span>
+                        )}
+                        {module.batch && (
+                          <span className="flex items-center gap-1.5">
+                            <Calendar className="w-4 h-4 text-[#0183CB]" />
+                            Batch: {module.batch}
+                          </span>
+                        )}
+                      </div>
+
+                      {teacherId ? (
+                        <Link
+                          href={`/teachers/${teacherId}?subject=${encodeURIComponent(module.name)}`}
+                          className="flex items-center justify-center gap-2 w-full py-3 rounded-lg font-bold text-sm text-white transition-colors"
+                          style={{ background: '#0183CB' }}
+                          onMouseEnter={e => (e.currentTarget.style.background = '#016fad')}
+                          onMouseLeave={e => (e.currentTarget.style.background = '#0183CB')}
+                        >
+                          Visit Teacher <ArrowRight className="w-4 h-4" />
+                        </Link>
+                      ) : (
+                        <div className="flex items-center justify-center gap-2 w-full py-3 bg-gray-100 text-gray-400 text-sm font-bold rounded-lg cursor-not-allowed">
+                          No Teacher Assigned
                         </div>
                       )}
-                      <span className="truncate">{module.instructor}</span>
-                    </div>
-                    <div className="flex items-center gap-2 text-sm text-gray-600">
-                      <Clock className="w-4 h-4 text-blue-500" />
-                      {module.duration}
-                    </div>
-                    <div className="flex items-center gap-2 text-sm text-gray-600">
-                      <Calendar className="w-4 h-4 text-blue-500" />
-                      <span className="truncate">{module.schedule}</span>
-                    </div>
-                    <div className="flex items-center gap-2 text-sm text-gray-600">
-                      <Layers className="w-4 h-4 text-blue-500" />
-                      {module.credits} Credits
                     </div>
                   </div>
+                );
+              })}
+            </div>
 
-                  {/* Toggle Videos */}
-                  {module.videos.length > 0 && (
-                    <>
-                      <button
-                        onClick={() => setExpanded(isOpen ? null : module.id)}
-                        className="flex items-center justify-between w-full px-4 py-2.5 bg-blue-50 hover:bg-blue-100 text-blue-800 rounded-xl text-sm font-medium transition-all"
-                      >
-                        <span className="flex items-center gap-2">
-                          <Play className="w-4 h-4" /> {module.videos.length} Lecture Recording{module.videos.length !== 1 ? 's' : ''}
-                        </span>
-                        {isOpen ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
-                      </button>
-
-                      {isOpen && (
-                        <div className="mt-3 space-y-2">
-                          {module.videos.map(video => (
-                            <div key={video.id} className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl hover:bg-gray-100 transition-all cursor-pointer group">
-                              <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-blue-800 rounded-lg flex items-center justify-center shrink-0">
-                                <Play className="w-4 h-4 text-white fill-white" />
-                              </div>
-                              <div className="flex-1 min-w-0">
-                                <p className="text-sm font-medium text-gray-800 truncate group-hover:text-blue-700">{video.title}</p>
-                                <p className="text-xs text-gray-400">{video.duration} · {new Date(video.uploadedAt).toLocaleDateString('en-GB')}</p>
-                              </div>
-                              <BookOpen className="w-4 h-4 text-gray-400 shrink-0" />
-                            </div>
-                          ))}
-                          <div className="text-center pt-2">
-                            <p className="text-xs text-gray-400">Login to access all lecture recordings →</p>
-                          </div>
-                        </div>
-                      )}
-                    </>
-                  )}
-                </div>
+            {modules.length === 0 && (
+              <div className="text-center py-24 text-gray-400">
+                <BookOpen className="w-12 h-12 mx-auto mb-3 opacity-30" />
+                <p>No subjects available</p>
               </div>
-            );
-          })}
-        </div>
+            )}
+          </>
+        )}
       </div>
     </div>
   );

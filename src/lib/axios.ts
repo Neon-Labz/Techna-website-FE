@@ -2,7 +2,7 @@ import axios from 'axios';
 
 const AUTH_STORAGE_KEY = 'edu-auth';
 
-const PUBLIC_PATHS = ['/', '/about', '/contact', '/modules', '/programs'];
+const PUBLIC_PATHS = ['/', '/about', '/contact', '/modules', '/programs', '/teachers'];
 
 const api = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:4000/api',
