@@ -1,24 +1,43 @@
 'use client';
-import { useState } from 'react';
-import { Clock, Play, ChevronDown, ChevronUp, BookOpen, Layers, Calendar } from 'lucide-react';
+import { Clock, Layers, Calendar, ArrowRight } from 'lucide-react';
 import { mockModules } from '../../data/mockData';
+import Link from 'next/link';
 
-const moduleColors = [
-  'from-blue-600 to-blue-800',
-  'from-purple-600 to-purple-800',
-  'from-emerald-600 to-emerald-800',
-  'from-orange-600 to-orange-800',
-  'from-rose-600 to-rose-800',
-  'from-teal-600 to-teal-800',
-  'from-indigo-600 to-indigo-800',
-];
+/* Proper capitalized subject display names */
+const subjectDisplayNames: Record<string, string> = {
+  'Engineering Technology': 'Engineering Technology',
+  'Bio Systems Technology': 'Bio Systems Technology',
+  'Science For Technology': 'Science For Technology',
+  'Information Communication Technology': 'Computer Applications',
+  'Mathematics': 'Mathematics',
+  'Geography': 'Geography',
+  'Agricultural Science': 'Agricultural Science',
+};
+
+/* Subject-related emojis - each emoji represents the subject */
+const subjectEmojis: Record<string, string> = {
+  'Engineering Technology': '⚙️',
+  'Bio Systems Technology': '🧬',
+  'Science For Technology': '🔬',
+  'Information Communication Technology': '💻',
+  'Mathematics': '📐',
+  'Geography': '🌍',
+  'Agricultural Science': '🌱',
+};
+
+/* Subject card descriptions */
+const subjectDescriptions: Record<string, string> = {
+  'Engineering Technology': 'Build a strong foundation in core engineering principles with hands-on learning.',
+  'Bio Systems Technology': 'Develop biodiversity and business skills for tomorrow\'s global challenges.',
+  'Science For Technology': 'Explore the world through discovery, research and innovation.',
+  'Information Communication Technology': 'Innovate, code and transform ideas into digital solutions.',
+  'Mathematics': 'Shape perspectives and create a better understanding of society and the universe.',
+  'Geography': 'Drive business growth with knowledge, analytics and practical skills.',
+  'Agricultural Science': 'Explore AI concepts and build intelligent systems for the future.',
+};
 
 export default function ModulesSection() {
-  const [expanded, setExpanded] = useState<string | null>(null);
-  const [filter, setFilter] = useState('All');
-
-  const categories = ['All', 'Core', 'Elective'];
-  const filtered = filter === 'All' ? mockModules : mockModules.filter(m => m.category === filter);
+  const subjects = mockModules;
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -47,94 +66,64 @@ export default function ModulesSection() {
           <span className="ml-auto text-sm text-gray-400">{filtered.length} subjects found</span>
         </div>
 
-        {/* Modules Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {filtered.map((module, i) => {
-            const isOpen = expanded === module.id;
-            return (
-              <div key={module.id} className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition-all">
-                {/* Header */}
-                <div className={`bg-gradient-to-r ${moduleColors[i % moduleColors.length]} p-5`}>
-                  <div className="flex items-start justify-between">
-                    <div>
-                      <span className="text-white/60 text-xs font-medium uppercase tracking-wider">{module.code}</span>
-                      <h3 className="text-white font-bold text-xl mt-0.5">{module.name}</h3>
-                    </div>
-                    <span className="px-2.5 py-1 bg-white/20 text-white text-xs font-semibold rounded-full">{module.category}</span>
+          {/* Subject Cards Grid - 3 columns */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {subjects.map((subject) => (
+              <div
+                key={subject.id}
+                className="group bg-white border border-[#C1C6D7] rounded-xl p-8 flex flex-col justify-between hover:shadow-xl hover:border-[#0183CB] hover:-translate-y-1 transition-all duration-300"
+              >
+                {/* Subject-related Emoji */}
+                <div className="mb-6">
+                  <div className="w-14 h-14 flex items-center justify-center rounded-xl bg-[#0183CB]/8 group-hover:bg-[#0183CB]/15 transition-colors">
+                    <span className="text-[30px] leading-none" role="img" aria-label={subject.name}>
+                      {subjectEmojis[subject.name] || '📚'}
+                    </span>
                   </div>
                 </div>
 
-                {/* Body */}
-                <div className="p-5">
-                  <p className="text-gray-500 text-sm leading-relaxed mb-4">{module.description}</p>
+                {/* Title - Proper Capitalization */}
+                <h3 className="text-[24px] font-bold text-[#1B1C1C] leading-8 font-['Montserrat'] mb-2 group-hover:text-[#0183CB] transition-colors">
+                  {subjectDisplayNames[subject.name] || subject.name}
+                </h3>
 
-                  <div className="grid grid-cols-2 gap-3 mb-4">
-                    <div className="flex items-center gap-2 text-sm text-gray-600">
-                      {module.instructorPhotoUrl ? (
-                        <img
-                          src={module.instructorPhotoUrl}
-                          alt={module.instructor}
-                          className="w-6 h-6 rounded-full object-cover shrink-0"
-                        />
-                      ) : (
-                        <div className="w-6 h-6 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 text-xs font-bold shrink-0">
-                          {module.instructor.charAt(0)}
-                        </div>
-                      )}
-                      <span className="truncate">{module.instructor}</span>
+                {/* Description */}
+                <p className="text-base text-[#414754] leading-[26px] font-['Inter'] mb-6">
+                  {subjectDescriptions[subject.name] || subject.description}
+                </p>
+
+                {/* Divider + Meta */}
+                <div className="border-t border-[#EFEDED] pt-4 mb-6">
+                  <div className="flex items-center gap-5 flex-wrap">
+                    {/* Duration - displayed as "2 Years" */}
+                    <div className="flex items-center gap-1.5">
+                      <Clock className="w-[15px] h-[15px] text-[#0183CB]" />
+                      <span className="text-sm text-[#414754] font-['Inter']">2 Years</span>
                     </div>
-                    <div className="flex items-center gap-2 text-sm text-gray-600">
-                      <Clock className="w-4 h-4 text-blue-500" />
-                      {module.duration}
+                    {/* Modules / Units */}
+                    <div className="flex items-center gap-1.5">
+                      <Layers className="w-[15px] h-[15px] text-[#0183CB]" />
+                      <span className="text-sm text-[#414754] font-['Inter']">12 Modules</span>
                     </div>
-                    <div className="flex items-center gap-2 text-sm text-gray-600">
-                      <Calendar className="w-4 h-4 text-blue-500" />
-                      <span className="truncate">{module.schedule}</span>
-                    </div>
-                    <div className="flex items-center gap-2 text-sm text-gray-600">
-                      <Layers className="w-4 h-4 text-blue-500" />
-                      {module.credits} Credits
+                    {/* Terms */}
+                    <div className="flex items-center gap-1.5">
+                      <Calendar className="w-[13.5px] h-[15px] text-[#0183CB]" />
+                      <span className="text-sm text-[#414754] font-['Inter']">Term: 6</span>
                     </div>
                   </div>
-
-                  {/* Toggle Videos */}
-                  {module.videos.length > 0 && (
-                    <>
-                      <button
-                        onClick={() => setExpanded(isOpen ? null : module.id)}
-                        className="flex items-center justify-between w-full px-4 py-2.5 bg-blue-50 hover:bg-blue-100 text-blue-800 rounded-xl text-sm font-medium transition-all"
-                      >
-                        <span className="flex items-center gap-2">
-                          <Play className="w-4 h-4" /> {module.videos.length} Lecture Recording{module.videos.length !== 1 ? 's' : ''}
-                        </span>
-                        {isOpen ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
-                      </button>
-
-                      {isOpen && (
-                        <div className="mt-3 space-y-2">
-                          {module.videos.map(video => (
-                            <div key={video.id} className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl hover:bg-gray-100 transition-all cursor-pointer group">
-                              <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-blue-800 rounded-lg flex items-center justify-center shrink-0">
-                                <Play className="w-4 h-4 text-white fill-white" />
-                              </div>
-                              <div className="flex-1 min-w-0">
-                                <p className="text-sm font-medium text-gray-800 truncate group-hover:text-blue-700">{video.title}</p>
-                                <p className="text-xs text-gray-400">{video.duration} · {new Date(video.uploadedAt).toLocaleDateString('en-GB')}</p>
-                              </div>
-                              <BookOpen className="w-4 h-4 text-gray-400 shrink-0" />
-                            </div>
-                          ))}
-                          <div className="text-center pt-2">
-                            <p className="text-xs text-gray-400">Login to access all lecture recordings →</p>
-                          </div>
-                        </div>
-                      )}
-                    </>
-                  )}
                 </div>
+
+                {/* CTA Button */}
+                <Link
+                  href="#"
+                  className="w-full flex items-center justify-center gap-2 bg-[#0183CB] text-white font-bold text-base py-3 rounded-lg shadow-[0px_1px_2px_rgba(0,0,0,0.05)] hover:bg-[#016ba5] transition-colors font-['Inter']"
+                >
+                  Visit Teacher
+                  <ArrowRight className="w-[19px] h-[9px]" strokeWidth={3} />
+                </Link>
               </div>
-            );
-          })}
+            ))}
+          </div>
         </div>
       </div>
     </div>
