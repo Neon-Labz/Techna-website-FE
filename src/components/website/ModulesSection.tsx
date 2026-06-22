@@ -1,5 +1,6 @@
 'use client';
 import { Clock, Layers, Calendar, ArrowRight } from 'lucide-react';
+import { Clock, Layers, Calendar, ArrowRight } from 'lucide-react';
 import { mockModules } from '../../data/mockData';
 import Link from 'next/link';
 
@@ -37,6 +38,7 @@ const subjectDescriptions: Record<string, string> = {
 };
 
 export default function ModulesSection() {
+  const subjects = mockModules;
   const subjects = mockModules;
 
   return (
@@ -150,6 +152,8 @@ export default function ModulesSection() {
                   <ArrowRight className="w-4 h-4" strokeWidth={2.5} />
                 </Link>
               </div>
+            ))}
+          </div>
             ))}
           </div>
         </div>
