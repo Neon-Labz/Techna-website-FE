@@ -29,10 +29,15 @@ type Result = {
 
 export default function DashboardHeroSection() {
   const { student, token } = useAuthStore();
-  const studentKey = student?._id || student?.id || student?.studentId || student?.email || '';
+
+  const studentKey =
+    student?._id || student?.id || student?.studentId || student?.email || '';
+
   const studentResultId = student?.studentId || student?._id || student?.id || '';
+
   const studentFullName =
     student?.fullNameEnglish?.trim() || student?.name?.trim() || 'Student';
+
   const studentFirstName = studentFullName?.split(' ')?.[0] || 'Student';
   const admissionNo = student?.studentId?.trim() || '-';
 
@@ -47,15 +52,15 @@ export default function DashboardHeroSection() {
       setResults([]);
 
       try {
-        const [notices, modules, results] = await Promise.all([
-            dashboardApi.getNotices(),
-            dashboardApi.getModules(),
-            dashboardApi.getResults(studentResultId, token || undefined),
-          ]);
+        const [noticeData, moduleData, resultData] = await Promise.all([
+          dashboardApi.getNotices(),
+          dashboardApi.getModules(),
+          dashboardApi.getResults(studentResultId, token || undefined),
+        ]);
 
-          setNotices(notices);
-          setModules(modules);
-          setResults(results);
+        setNotices(noticeData);
+        setModules(moduleData);
+        setResults(resultData);
       } catch (error) {
         console.error('Dashboard data fetch error:', error);
       }
@@ -71,28 +76,6 @@ export default function DashboardHeroSection() {
     return 'Good Evening';
   };
 
-  const avgScore = useMemo(() => {
-    if (results.length === 0) return 0;
-
-    const validResults = results.filter(
-      (r) =>
-        r.hasResult !== false &&
-        r.marks !== null &&
-        r.marks !== undefined &&
-        Number(r.marks) >= 0 &&
-        Number(r.maxMarks ?? 100) > 0
-    );
-
-    if (validResults.length === 0) return 0;
-
-    return Math.round(
-      validResults.reduce(
-        (acc, r) => acc + (Number(r.marks) / Number(r.maxMarks ?? 100)) * 100,
-        0
-      ) / validResults.length
-    );
-  }, [results]);
-
   const releasedResults = useMemo(
     () =>
       results.filter(
@@ -103,6 +86,23 @@ export default function DashboardHeroSection() {
       ),
     [results],
   );
+
+  const avgScore = useMemo(() => {
+    if (releasedResults.length === 0) return 0;
+
+    const validResults = releasedResults.filter(
+      (r) => Number(r.marks) >= 0 && Number(r.maxMarks ?? 100) > 0,
+    );
+
+    if (validResults.length === 0) return 0;
+
+    return Math.round(
+      validResults.reduce(
+        (acc, r) => acc + (Number(r.marks) / Number(r.maxMarks ?? 100)) * 100,
+        0,
+      ) / validResults.length,
+    );
+  }, [releasedResults]);
 
   const recentResults = releasedResults.slice(0, 3);
 
@@ -115,12 +115,14 @@ export default function DashboardHeroSection() {
       ...(student?.subjectSelection?.subjects ?? []),
       ...(student?.subjectSelection?.enrolledModules ?? []),
       ...(student?.enrolledModules ?? []),
+      ...modules.map((module) => module.name ?? ''),
     ]
       .map((module) => module?.trim())
       .filter((module): module is string => Boolean(module));
 
     return new Set(selectedModules).size;
   }, [
+    modules,
     student?.enrolledModules,
     student?.modules,
     student?.subjectSelection?.enrolledModules,
@@ -160,9 +162,9 @@ export default function DashboardHeroSection() {
   ];
 
   return (
-<section className="mx-auto w-full max-w-[1250px] px-4 py-6">
+    <section className="mx-auto w-full max-w-[1250px] px-4 py-6">
       <div className="space-y-6">
-      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-[#0183CB] to-[#34BFF3] px-5 py-6 text-white shadow-sm md:px-7 md:py-7">    
+        <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-[#0183CB] to-[#34BFF3] px-5 py-6 text-white shadow-sm md:px-7 md:py-7">
           <div className="absolute -right-10 -top-16 h-52 w-52 rounded-full bg-white/10" />
           <div className="absolute right-16 -bottom-16 h-28 w-28 rounded-full bg-white/10" />
 
@@ -170,8 +172,7 @@ export default function DashboardHeroSection() {
             <p className="text-xs font-medium text-white/80">{greeting()},</p>
 
             <h1 className="mt-1 text-2xl font-extrabold tracking-wide md:text-3xl">
-              {studentFirstName?.toUpperCase() || 'STUDENT'}
-              ! 👋
+              {studentFirstName?.toUpperCase() || 'STUDENT'}! 👋
             </h1>
 
             <p className="mt-1 text-xs text-white/85 md:text-sm">
@@ -187,9 +188,7 @@ export default function DashboardHeroSection() {
               </div>
 
               <div className="min-w-[78px] rounded-lg bg-white/20 px-4 py-2">
-                <p className="text-lg font-bold">
-                  {enrolledModuleCount}
-                </p>
+                <p className="text-lg font-bold">{enrolledModuleCount}</p>
                 <p className="text-[10px] text-white/75">Subjects</p>
               </div>
 
@@ -199,9 +198,7 @@ export default function DashboardHeroSection() {
               </div>
 
               <div className="min-w-[90px] rounded-lg bg-white/20 px-4 py-2">
-                <p className="text-lg font-bold">
-                  {admissionNo}
-                </p>
+                <p className="text-lg font-bold">{admissionNo}</p>
                 <p className="text-[10px] text-white/75">Admission No.</p>
               </div>
             </div>
@@ -223,9 +220,7 @@ export default function DashboardHeroSection() {
                   <Icon className="h-4 w-4" />
                 </div>
 
-                <p className="text-xl font-bold text-gray-900">
-                  {item.value}
-                </p>
+                <p className="text-xl font-bold text-gray-900">{item.value}</p>
                 <p className="mt-1 text-xs font-medium text-gray-500">
                   {item.label}
                 </p>

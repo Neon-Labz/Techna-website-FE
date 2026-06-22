@@ -570,8 +570,19 @@ export default function ProfileSection() {
               disabled
               inputCls={inputCls}
             />
+            <Input
+              label="Batch"
+              value={
+                studentData?.batch ||
+                studentData?.batchName ||
+                studentData?.enrolledBatch ||
+                studentData?.currentBatch ||
+                '-'
+              }
+              disabled
+              inputCls={inputCls}
+            />
           </div>
-
           <div className="mb-6">
             <h3 className="font-semibold text-gray-800 mb-3 text-sm">
               Enrolled Subjects
@@ -646,6 +657,7 @@ export default function ProfileSection() {
               </div>
             </div>
           </div>
+         
         </div>
       )}
 

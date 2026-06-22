@@ -25,12 +25,14 @@ type SessionResponse =
       student?: Student;
       user?: Student;
       profile?: Student;
-      data?: Student | {
-        student?: Student;
-        user?: Student;
-        profile?: Student;
-        data?: Student;
-      };
+      data?:
+        | Student
+        | {
+            student?: Student;
+            user?: Student;
+            profile?: Student;
+            data?: Student;
+          };
       result?: Student;
     };
 
@@ -166,13 +168,12 @@ const getSessionStudent = (
 
 export const authApi = {
   async loginStudent(email: string, password: string) {
-    const res = await api.post<LoginResponse>(
+    const loginData = (await api.post<LoginResponse>(
       '/auth/student/login',
       { email, password },
       { headers: { 'X-Skip-Auth': 'true' } },
-    );
+    )) as unknown as LoginResponse;
 
-    const loginData = res.data;
     const token = getLoginToken(loginData);
 
     if (!token) {
@@ -182,11 +183,11 @@ export const authApi = {
     let student = getLoginStudent(loginData);
 
     if (!student) {
-      const sessionRes = await api.get<SessionResponse>('/auth/session', {
+      const sessionData = (await api.get<SessionResponse>('/auth/session', {
         headers: { Authorization: `Bearer ${token}` },
-      });
+      })) as unknown as SessionResponse;
 
-      student = getSessionStudent(sessionRes.data);
+      student = getSessionStudent(sessionData);
     }
 
     if (!student) {
@@ -197,22 +198,22 @@ export const authApi = {
   },
 
   async registerStudent(payload: RegisterStudentPayload | FormData) {
-    const res = await api.post<RegisterStudentResponse>(
+    const data = (await api.post<RegisterStudentResponse>(
       '/students/register',
       payload,
       { headers: { 'X-Skip-Auth': 'true' } },
-    );
+    )) as unknown as RegisterStudentResponse;
 
-    return res.data;
+    return data;
   },
 
   async getSession(token?: string) {
     try {
-      const res = await api.get<SessionResponse>('/auth/session', {
+      const data = (await api.get<SessionResponse>('/auth/session', {
         headers: token ? { Authorization: `Bearer ${token}` } : undefined,
-      });
+      })) as unknown as SessionResponse;
 
-      return getSessionStudent(res.data);
+      return getSessionStudent(data);
     } catch (error) {
       console.warn('Failed to refresh student session:', error);
       return null;

@@ -1,16 +1,16 @@
 export interface Student {
-  id: string;
   _id?: string;
+  id?: string;
   studentId?: string;
   name?: string;
   role?: string;
+  batch?: string;
   modules?: string[];
   enrolledModules?: string[];
   subjectSelection?: {
     subjects?: string[];
     enrolledModules?: string[];
   };
-  batch?: string;
 
   status?: 'pending' | 'approved' | 'rejected';
   admissionNumber?: string;
@@ -24,7 +24,7 @@ export interface Student {
   school?: string;
   whatsappNo?: string;
   parentsNo?: string;
-  email: string;
+  email?: string;
   subjects?: string[];
 
   permanentAddress?: string;
@@ -81,6 +81,8 @@ export interface Module {
   videos?: LectureVideo[];
   notices?: Notice[];
   resources?: LectureVideo[];
+  recordings?: LectureVideo[];
+  lectureRecordings?: LectureVideo[];
   status?: string;
 }
 
@@ -96,6 +98,8 @@ export interface LectureVideo {
   thumbnail?: string;
   url?: string;
   fileUrl?: string;
+  videoUrl?: string;
+  link?: string;
   fileType?: string;
   description?: string;
   isPublished?: boolean | string;
@@ -114,7 +118,15 @@ export interface Notice {
   examDate?: string;
   moduleId?: string;
   moduleName?: string;
-  module?: string;
+  module?:
+    | string
+    | {
+        id?: string;
+        _id?: string;
+        name?: string;
+        moduleId?: string;
+        moduleName?: string;
+      };
   subject?: string;
   batch?: string;
   startTime?: string;
@@ -139,19 +151,28 @@ export interface ExamResult {
   grade?: string;
   date?: string;
   semester?: string;
+  result?: string;
+  hasResult?: boolean;
 }
 
 export interface Payment {
   id: string;
   _id?: string;
   studentId?: string;
+  studentName?: string;
+  moduleId?: string;
+  moduleName?: string;
   description?: string;
   amount: number;
   status: 'paid' | 'pending' | 'overdue';
   date?: string;
+  paidDate?: string;
   receiptNumber?: string;
-  method?: string;
+  receiptNo?: string;
+  method?: 'cash' | 'bank' | 'online' | string;
   semester?: string;
+  batch?: string;
+  notes?: string;
 }
 
 export interface AuthState {

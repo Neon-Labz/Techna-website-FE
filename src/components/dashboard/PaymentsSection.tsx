@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import {
   CreditCard,
   Download,
@@ -11,8 +11,9 @@ import {
   Receipt,
   DollarSign,
 } from 'lucide-react';
-import { getStudentPayments, type PaymentRecord } from '@/api/payment.api';
 import jsPDF from 'jspdf';
+import { paymentApi, type PaymentRecord } from '@/api/payment.api';
+import { useAuthStore } from '@/store/authStore';
 
 const statusConfig = {
   paid: {
@@ -50,60 +51,53 @@ interface StudentInfo {
 }
 
 export default function PaymentsSection() {
+  const { student } = useAuthStore();
+
   const [statusFilter, setStatusFilter] = useState('all');
   const [moduleFilter, setModuleFilter] = useState('all');
   const [payments, setPayments] = useState<PaymentRecord[]>([]);
   const [loading, setLoading] = useState(true);
-  const [student, setStudent] = useState<StudentInfo>({
-    name: 'N/A',
-    admissionNumber: 'N/A',
-    batch: 'N/A',
-    studentId: '',
-  });
+
+  const studentInfo: StudentInfo = useMemo(
+    () => ({
+      name:
+        student?.fullNameEnglish ??
+        student?.fullNameTamil ??
+        student?.name ??
+        student?.email ??
+        'N/A',
+      admissionNumber:
+        student?.admissionNumber ??
+        student?.studentId ??
+        'N/A',
+      batch: student?.batch ?? 'N/A',
+      studentId: student?._id ?? student?.id ?? student?.studentId ?? '',
+    }),
+    [student],
+  );
 
   useEffect(() => {
-    try {
-      const authData =
-        localStorage.getItem('techna-auth') || localStorage.getItem('edu-auth');
-
-      if (!authData) return;
-
-      const parsed = JSON.parse(authData);
-      const user = parsed?.state?.user || parsed?.state?.student;
-
-      if (user) {
-        setStudent({
-          name: user.fullNameEnglish ?? user.fullNameTamil ?? user.email ?? 'N/A',
-          admissionNumber: user.admissionNumber ?? user.studentId ?? 'N/A',
-          batch: user.batch ?? 'N/A',
-          studentId: user._id ?? user.id ?? user.studentId ?? '',
-        });
-      }
-    } catch (err) {
-      console.error('Failed to read student info:', err);
-    }
-  }, []);
-
-  useEffect(() => {
-    if (!student.studentId) {
-      setLoading(false);
-      return;
-    }
-
     const fetchPayments = async () => {
+      if (!studentInfo.studentId) {
+        setPayments([]);
+        setLoading(false);
+        return;
+      }
+
       try {
         setLoading(true);
-        const data = await getStudentPayments(student.studentId);
+        const data = await paymentApi.getByStudent(studentInfo.studentId);
         setPayments(data || []);
       } catch (err) {
         console.error('Failed to fetch payments:', err);
+        setPayments([]);
       } finally {
         setLoading(false);
       }
     };
 
     void fetchPayments();
-  }, [student.studentId]);
+  }, [studentInfo.studentId]);
 
   const modules = [...new Set(payments.map((p) => p.moduleName).filter(Boolean))];
 
@@ -151,14 +145,14 @@ export default function PaymentsSection() {
       y += 9;
     };
 
-    row('Student Name', student.name);
-    row('Admission No', student.admissionNumber);
-    row('Batch', student.batch);
+    row('Student Name', studentInfo.name);
+    row('Admission No', studentInfo.admissionNumber);
+    row('Batch', studentInfo.batch);
 
     y += 5;
 
     row('Receipt No', payment.receiptNo);
-    row('Module', payment.moduleName);
+    row('Subject', payment.moduleName);
     row('Amount', `LKR ${(payment.amount ?? 0).toLocaleString()}.00`);
     row('Method', payment.method);
     row('Date', formatDate(payment.paidDate));
@@ -275,13 +269,13 @@ export default function PaymentsSection() {
           </div>
 
           <div className="flex items-center gap-2">
-            <label className="text-xs text-gray-500">Module:</label>
+            <label className="text-xs text-gray-500">Subject:</label>
             <select
               value={moduleFilter}
               onChange={(e) => setModuleFilter(e.target.value)}
               className="rounded-xl border border-gray-200 bg-gray-50 px-3 py-2 text-sm text-gray-700 outline-none focus:ring-2 focus:ring-blue-500"
             >
-              <option value="all">All Modules</option>
+              <option value="all">All Subjects</option>
               {modules.map((m) => (
                 <option key={m} value={m}>
                   {m}
@@ -291,9 +285,7 @@ export default function PaymentsSection() {
           </div>
 
           <div className="ml-auto">
-            <span className="text-xs text-gray-400">
-              {filtered.length} records
-            </span>
+            <span className="text-xs text-gray-400">{filtered.length} records</span>
           </div>
         </div>
       </div>
@@ -366,7 +358,7 @@ export default function PaymentsSection() {
                   <tr>
                     {[
                       'Receipt No.',
-                      'Module',
+                      'Subject',
                       'Amount',
                       'Method',
                       'Date',
@@ -399,7 +391,7 @@ export default function PaymentsSection() {
 
                         <td className="px-5 py-4">
                           <div className="flex items-center gap-2">
-                            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-50">
+                            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-blue-50">
                               <DollarSign className="h-4 w-4 text-blue-700" />
                             </div>
                             <p className="text-sm font-medium text-gray-900">
@@ -428,9 +420,7 @@ export default function PaymentsSection() {
                           <span
                             className={`flex w-fit items-center gap-1.5 rounded-xl border px-2.5 py-1 text-xs font-semibold ${cfg.color}`}
                           >
-                            <span
-                              className={`h-1.5 w-1.5 rounded-full ${cfg.dot}`}
-                            />
+                            <span className={`h-1.5 w-1.5 rounded-full ${cfg.dot}`} />
                             {cfg.label}
                           </span>
                         </td>

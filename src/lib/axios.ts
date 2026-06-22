@@ -65,7 +65,7 @@ api.interceptors.request.use((config) => {
 });
 
 api.interceptors.response.use(
-(response) => response.data?.data ?? response.data,
+  (response) => response.data?.data ?? response.data,
   (error) => {
     if (error.response?.status === 401 && typeof window !== 'undefined') {
       const currentPath = window.location.pathname;
