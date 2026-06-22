@@ -2,7 +2,6 @@ import api from '@/lib/axios';
 
 export type Announcement = {
   _id?: string;
-  id?: string;
   title: string;
   date: string;
   audience: 'All Students';
