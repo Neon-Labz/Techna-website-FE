@@ -10,7 +10,7 @@ const STEPS = [
   { id: 1, label: 'Basic Info', icon: User, desc: 'Personal details' },
   { id: 2, label: 'Address & Contact', icon: MapPin, desc: 'Residence details' },
   { id: 3, label: 'Parent Details', icon: User, desc: 'Guardian info' },
-  { id: 4, label: 'O/L Results', icon: BookOpen, desc: 'Academic results' },
+  { id: 4, label: 'O/L Results', icon: BookOpen, desc: 'Academic results (Optional)' },
   { id: 5, label: 'Subjects & Confirm', icon: FileText, desc: 'Subject selection' },
 ];
 
@@ -27,6 +27,12 @@ export const RACE_OPTIONS = ['Sinhala', 'Tamil', 'Indian Tamil', 'Muslim', 'Burg
 export const RELIGION_OPTIONS = ['Buddhism', 'Hinduism', 'Islam', 'Christianity', 'Catholicism', 'Other'];
 interface OLRow { year: string; indexNumber: string; english: string; mathematics: string; science: string; sinhala: string; tamil: string; }
 const emptyOL: OLRow = { year: '', indexNumber: '', english: '', mathematics: '', science: '', sinhala: '', tamil: '' };
+
+// Display-only label overrides for subjects. The value sent to the backend stays the original module name.
+const SUBJECT_LABELS: Record<string, string> = {
+  'Information Communication Technology': 'ICT',
+};
+const subjectLabel = (name: string) => SUBJECT_LABELS[name] || name;
 
 type ModuleOption = {
   name?: string;
@@ -58,8 +64,8 @@ export default function RegisterSection() {
     fullNameTamil: '', fullNameEnglish: '', dateOfBirth: '',
     nicNo: '', address: '', school: '', whatsappNo: '', parentsNo: '', email: '', password: '', confirmPassword: '',
     // Address
-    permanentAddress: '', administrativeDistrict: '', fixedTelephone: '', residingSince: '',
-    race: '', religion: '', citizenByDescent: 'YES',
+    permanentAddress: '', administrativeDistrict: '', fixedTelephone: '',
+    race: '', religion: '',
     contactAddress: '', postalCode: '',
     // Parents
     fatherName: '', motherName: '', guardianName: '',
@@ -91,10 +97,13 @@ export default function RegisterSection() {
       try {
         const result = await apiClient.get('/modules');
 
-        const modules = Array.isArray(result.data)
-          ? result.data
-          : Array.isArray(result.data?.data)
-            ? result.data.data
+        // The axios response interceptor already unwraps the
+        // `{ success, message, data }` envelope, so `result` is either the
+        // modules array directly or an object containing it.
+        const modules = Array.isArray(result)
+          ? result
+          : Array.isArray((result as { data?: unknown })?.data)
+            ? (result as { data: ModuleOption[] }).data
             : [];
 
         const options = modules
@@ -163,6 +172,39 @@ export default function RegisterSection() {
     setLoading(true);
     setSubmitError('');
 
+    const olResults = olRows
+      .filter(row => row.year && row.indexNumber)
+      .map(row => ({
+        year: row.year,
+        indexNumber: row.indexNumber,
+        english: row.english || undefined,
+        mathematics: row.mathematics || undefined,
+        science: row.science || undefined,
+        sinhala: row.sinhala || undefined,
+        tamil: row.tamil || undefined,
+      }));
+
+    // O/L results are optional. Only include the section if the user filled
+    // in at least one O/L field, otherwise omit it entirely so the backend
+    // does not reject the registration.
+    const hasOlData = Boolean(
+      form.olYear ||
+        form.olIndexNumber ||
+        form.olNameUsed ||
+        olResults.length,
+    );
+
+    const olRecords = hasOlData
+      ? {
+          olCategory: form.olCategory || undefined,
+          olYear: form.olYear || undefined,
+          olIndexNumber: form.olIndexNumber || undefined,
+          olNameUsed: form.olNameUsed || undefined,
+          olAccept: form.olAccept || undefined,
+          olResults,
+        }
+      : undefined;
+
     const payload = {
       account: {
         email: form.email,
@@ -179,10 +221,8 @@ export default function RegisterSection() {
         permanentAddress: form.permanentAddress || form.address,
         administrativeDistrict: form.administrativeDistrict,
         fixedTelephone: form.fixedTelephone,
-        residingSince: form.residingSince,
         race: form.race || undefined,
         religion: form.religion || undefined,
-        citizenByDescent: form.citizenByDescent || undefined,
         contactAddress: form.contactAddress,
         postalCode: form.postalCode,
       },
@@ -195,24 +235,7 @@ export default function RegisterSection() {
         guardianFixedTel: form.guardianFixedTel,
         guardianMobile: form.guardianMobile,
       },
-      olRecords: {
-        olCategory: form.olCategory || undefined,
-        olYear: form.olYear,
-        olIndexNumber: form.olIndexNumber,
-        olNameUsed: form.olNameUsed,
-        olAccept: form.olAccept || undefined,
-        olResults: olRows
-          .filter(row => row.year && row.indexNumber)
-          .map(row => ({
-            year: row.year,
-            indexNumber: row.indexNumber,
-            english: row.english || undefined,
-            mathematics: row.mathematics || undefined,
-            science: row.science || undefined,
-            sinhala: row.sinhala || undefined,
-            tamil: row.tamil || undefined,
-          })),
-      },
+      olRecords,
       subjectSelection: {
         subjects: form.subjects,
         //modules: form.subjects,
@@ -304,7 +327,7 @@ export default function RegisterSection() {
       <div className="max-w-3xl mx-auto">
         {/* Header */}
         <div className="text-center mb-8">
-          {/* <Image src="/logo.png" alt="Techna Logo" width={120} height={50} className="mx-auto mb-4 rounded-full" /> */}
+          <Image src="/techna-logo.png" alt="Techna Logo" width={120} height={50} className="mx-auto mb-4 rounded-full" />
           <h1 className="text-2xl font-bold text-white">Techna Technical Institute</h1>
           <p className="text-blue-300 text-sm">A/L Technology Stream – Admission Form 2024</p>
         </div>
@@ -373,7 +396,7 @@ export default function RegisterSection() {
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">Full Name (English) <span className="text-red-500">*</span></label>
-                  <input value={form.fullNameEnglish} onChange={e => set('fullNameEnglish', e.target.value.toUpperCase())} placeholder="FULL NAME IN ENGLISH" className={inputCls(errors.fullNameEnglish)} />
+                  <input value={form.fullNameEnglish} onChange={e => set('fullNameEnglish', e.target.value.replace(/[^a-zA-Z\s]/g, '').toUpperCase())} placeholder="FULL NAME IN ENGLISH" className={inputCls(errors.fullNameEnglish)} />
                   {errors.fullNameEnglish && <p className="text-red-500 text-xs mt-1">{errors.fullNameEnglish}</p>}
                 </div>
               </div>
@@ -462,7 +485,7 @@ export default function RegisterSection() {
                 {errors.permanentAddress && <p className="text-red-500 text-xs mt-1">{errors.permanentAddress}</p>}
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">Administrative District <span className="text-red-500">*</span></label>
                   <select value={form.administrativeDistrict} onChange={e => set('administrativeDistrict', e.target.value)} className={inputCls(errors.administrativeDistrict)}>
@@ -475,13 +498,9 @@ export default function RegisterSection() {
                   <label className="block text-sm font-medium text-gray-700 mb-1">Fixed Telephone Number</label>
                   <input value={form.fixedTelephone} onChange={e => set('fixedTelephone', e.target.value)} placeholder="0XX-XXXXXXX" className={inputCls()} />
                 </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Residing Since</label>
-                  <input type="date" value={form.residingSince} onChange={e => set('residingSince', e.target.value)} className={inputCls()} />
-                </div>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">Race</label>
                   <select value={form.race} onChange={e => set('race', e.target.value)} className={inputCls()}>
@@ -494,14 +513,6 @@ export default function RegisterSection() {
                   <select value={form.religion} onChange={e => set('religion', e.target.value)} className={inputCls()}>
                     <option value="">Select Religion</option>
                     {RELIGION_OPTIONS.map(r => <option key={r} value={r}>{r}</option>)}
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Citizen by Descent</label>
-                  <select value={form.citizenByDescent} onChange={e => set('citizenByDescent', e.target.value)} className={inputCls()}>
-                    <option value="">Select</option>
-                    <option value="YES">YES</option>
-                    <option value="NO">NO</option>
                   </select>
                 </div>
               </div>
@@ -577,7 +588,7 @@ export default function RegisterSection() {
           {step === 4 && (
             <div className="space-y-5">
               <div className="bg-gray-50 rounded-2xl p-4 border border-gray-200">
-                <h3 className="font-semibold text-gray-800 mb-4 text-sm">G.C.E. (O/L) Results</h3>
+                <h3 className="font-semibold text-gray-800 mb-4 text-sm">G.C.E. (O/L) Results <span className="text-gray-400 font-normal">(Optional)</span></h3>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
                   <div>
                     <label className="block text-xs font-medium text-gray-600 mb-1">Category of G.C.E.(O/L)</label>
@@ -690,7 +701,7 @@ export default function RegisterSection() {
                           onChange={() => toggleSubject(sub)}
                           className="text-blue-600 rounded w-4 h-4"
                         />
-                        <span className={`text-sm font-medium ${selected ? 'text-blue-800' : 'text-gray-700'}`}>{sub}</span>
+                        <span className={`text-sm font-medium ${selected ? 'text-blue-800' : 'text-gray-700'}`}>{subjectLabel(sub)}</span>
                         {selected && <Check className="w-4 h-4 text-blue-600 ml-auto" />}
                       </label>
                     );
@@ -713,7 +724,7 @@ export default function RegisterSection() {
                   <div className="flex justify-between"><span className="text-gray-500">Email:</span><span className="font-medium">{form.email || '–'}</span></div>
                   <div className="flex justify-between"><span className="text-gray-500">District:</span><span className="font-medium">{form.administrativeDistrict || '–'}</span></div>
                   <div className="flex justify-between"><span className="text-gray-500">Batch:</span><span className="font-medium">{form.batch || '–'}</span></div>
-                  <div className="flex justify-between gap-4"><span className="text-gray-500">Subjects:</span><span className="font-medium text-right">{form.subjects.length > 0 ? form.subjects.join(', ') : '–'}</span></div>
+                  <div className="flex justify-between gap-4"><span className="text-gray-500">Subjects:</span><span className="font-medium text-right">{form.subjects.length > 0 ? form.subjects.map(subjectLabel).join(', ') : '–'}</span></div>
                 </div>
               </div>
 

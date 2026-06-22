@@ -2,12 +2,18 @@
 import { useRouter } from 'next/navigation';
 import { GraduationCap, Clock, LogOut } from 'lucide-react';
 import { useAuthStore } from '@/store/authStore';
+import { logoutApi } from '@/api/auth.api';
 
 export default function PendingApprovalPage() {
   const { student, logout } = useAuthStore();
   const router = useRouter();
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    try {
+      await logoutApi();
+    } catch {
+      // Ignore backend errors — still clear local session
+    }
     logout();
     router.replace('/login');
   };
