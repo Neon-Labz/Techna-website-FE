@@ -6,13 +6,11 @@ import { Bell, BookOpen, Award, TrendingUp } from 'lucide-react';
 import { dashboardApi } from '@/api/dashboard.api';
 
 type Notice = {
-  id?: string;
   _id?: string;
   type?: 'exam' | 'general' | 'assignment' | 'holiday';
 };
 
 type Module = {
-  id?: string;
   _id?: string;
   name?: string;
 };

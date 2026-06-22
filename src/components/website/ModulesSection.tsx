@@ -1,153 +1,227 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { ArrowRight, Calendar, Clock, Layers } from 'lucide-react';
-import { mockModules } from '../../data/mockData';
+import {
+  Clock,
+  Calendar,
+  ArrowRight,
+  Settings,
+  FlaskConical,
+  Calculator,
+  Globe,
+  Monitor,
+  Leaf,
+  BookOpen,
+  Microscope,
+  Loader2,
+  Home,
+  ChevronRight,
+  Layers,
+} from 'lucide-react';
+import api from '@/lib/axios';
 
-const subjectDisplayNames: Record<string, string> = {
-  'Engineering Technology': 'Engineering Technology',
-  'Bio Systems Technology': 'Bio Systems Technology',
-  'Science For Technology': 'Science For Technology',
-  'Information Communication Technology': 'Computer Applications',
-  Mathematics: 'Mathematics',
-  Geography: 'Geography',
-  'Agricultural Science': 'Agricultural Science',
-};
+interface ApiModule {
+  _id: string;
+  name: string;
+  description: string;
+  teacherId: string;
+  teacherName: string;
+  duration: string;
+  fee: number;
+  batch: string;
+  status: 'active' | 'inactive';
+}
 
-const subjectEmojis: Record<string, string> = {
-  'Engineering Technology': '⚙️',
-  'Bio Systems Technology': '🧬',
-  'Science For Technology': '🔬',
-  'Information Communication Technology': '💻',
-  Mathematics: '📐',
-  Geography: '🌍',
-  'Agricultural Science': '🌱',
-};
+interface PublicTeacher {
+  _id: string;
+  fullName: string;
+  subject: string | string[];
+  photoUrl?: string;
+}
 
-const subjectDescriptions: Record<string, string> = {
-  'Engineering Technology':
-    'Build a strong foundation in core engineering principles with hands-on learning.',
-  'Bio Systems Technology':
-    "Develop biodiversity and business skills for tomorrow's global challenges.",
-  'Science For Technology':
-    'Explore the world through discovery, research and innovation.',
-  'Information Communication Technology':
-    'Innovate, code and transform ideas into digital solutions.',
-  Mathematics:
-    'Shape perspectives and create a better understanding of society and the universe.',
-  Geography:
-    'Drive business growth with knowledge, analytics and practical skills.',
-  'Agricultural Science':
-    'Explore AI concepts and build intelligent systems for the future.',
-};
+function normalizeSubjects(raw: string | string[] | undefined): string[] {
+  if (!raw) return [];
+  if (Array.isArray(raw)) return raw.map((s) => s.trim()).filter(Boolean);
+  return raw.split(',').map((s) => s.trim()).filter(Boolean);
+}
+
+function getIcon(name: string) {
+  const lower = name.toLowerCase();
+  if (lower.includes('engineering')) return Settings;
+  if (lower.includes('science')) return FlaskConical;
+  if (lower.includes('mathematics') || lower.includes('math')) return Calculator;
+  if (lower.includes('geography')) return Globe;
+  if (
+    lower.includes('computer') ||
+    lower.includes('ict') ||
+    lower.includes('information')
+  ) {
+    return Monitor;
+  }
+  if (lower.includes('agriculture') || lower.includes('agricultural')) return Leaf;
+  if (lower.includes('biology') || lower.includes('bio')) return Microscope;
+  if (lower.includes('commerce') || lower.includes('business')) return Layers;
+  return BookOpen;
+}
 
 export default function ModulesSection() {
-  const [filter, setFilter] = useState('All');
-  const categories = ['All', 'Core', 'Elective'];
-  const subjects =
-    filter === 'All'
-      ? mockModules
-      : mockModules.filter((module) => module.category === filter);
+  const [modules, setModules] = useState<ApiModule[]>([]);
+  const [teacherBySubject, setTeacherBySubject] = useState<
+    Record<string, PublicTeacher>
+  >({});
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    Promise.all([
+      api.get('/modules') as unknown as Promise<ApiModule[]>,
+      api.get('/public/teachers') as unknown as Promise<PublicTeacher[]>,
+    ])
+      .then(([modulesData, teachersData]) => {
+        setModules(modulesData.filter((module) => module.status === 'active'));
+
+        const map: Record<string, PublicTeacher> = {};
+        teachersData.forEach((teacher) => {
+          normalizeSubjects(teacher.subject).forEach((subject) => {
+            map[subject.toLowerCase()] = teacher;
+          });
+        });
+
+        setTeacherBySubject(map);
+      })
+      .catch(() => setError('Failed to load subjects'))
+      .finally(() => setLoading(false));
+  }, []);
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <div className="bg-gradient-to-br from-blue-950 to-blue-900 py-16">
-        <div className="mx-auto max-w-7xl px-4 text-center sm:px-6 lg:px-8">
-          <span className="text-sm font-semibold uppercase tracking-wider text-yellow-400">
-            A/L Technology Stream
-          </span>
-          <h1 className="mt-2 text-4xl font-bold text-white md:text-5xl">
-            Our Subjects
+      <div
+        className="relative overflow-hidden py-16"
+        style={{ background: 'linear-gradient(90deg, #0183CB, #34BFF3)' }}
+      >
+        <div className="pointer-events-none absolute inset-0 opacity-10">
+          <div className="absolute left-1/4 top-8 h-32 w-32 rounded-full border-4 border-white" />
+          <div className="absolute bottom-4 right-1/3 h-48 w-48 rounded-full border-4 border-white" />
+        </div>
+
+        <div className="relative mx-auto max-w-7xl px-4 text-center sm:px-6 lg:px-8">
+          <nav className="mb-6 flex items-center justify-center gap-1.5 text-sm text-white/80">
+            <Home className="h-3.5 w-3.5" />
+            <Link href="/" className="transition-colors hover:text-white">
+              Home
+            </Link>
+            <ChevronRight className="h-3.5 w-3.5" />
+            <span className="font-medium text-white">Our Subject</span>
+          </nav>
+
+          <h1 className="text-4xl font-bold text-white md:text-5xl">
+            Our Subject
           </h1>
-          <p className="mx-auto mt-3 max-w-xl text-blue-300">
-            Explore all subjects and courses offered at Techna Technical
-            Institute for the A/L Technology Stream.
+
+          <p className="mx-auto mt-3 max-w-2xl text-base leading-relaxed text-white/80">
+            Explore our wide range of industry-relevant subjects designed to
+            build skills, knowledge and shape your future.
           </p>
         </div>
       </div>
 
       <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
-        <div className="mb-8 flex flex-wrap items-center gap-2">
-          <span className="text-sm font-medium text-gray-500">Filter by:</span>
-          {categories.map((category) => (
-            <button
-              key={category}
-              type="button"
-              onClick={() => setFilter(category)}
-              className={`rounded-full px-4 py-1.5 text-sm font-medium transition-all ${
-                filter === category
-                  ? 'bg-blue-900 text-white shadow-md'
-                  : 'border border-gray-200 bg-white text-gray-600 hover:border-blue-300'
-              }`}
-            >
-              {category}
-            </button>
-          ))}
-          <span className="ml-auto text-sm text-gray-400">
-            {subjects.length} subjects found
-          </span>
-        </div>
+        {loading && (
+          <div className="flex items-center justify-center py-24">
+            <Loader2 className="h-10 w-10 animate-spin text-[#0183CB]" />
+          </div>
+        )}
 
-        <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
-          {subjects.map((subject) => (
-            <div
-              key={subject.id}
-              className="group flex flex-col justify-between rounded-xl border border-[#C1C6D7] bg-white p-8 transition-all duration-300 hover:-translate-y-1 hover:border-[#0183CB] hover:shadow-xl"
-            >
-              <div className="mb-6">
-                <div className="flex h-14 w-14 items-center justify-center rounded-xl bg-[#0183CB]/8 transition-colors group-hover:bg-[#0183CB]/15">
-                  <span
-                    className="text-[30px] leading-none"
-                    role="img"
-                    aria-label={subject.name}
-                  >
-                    {subjectEmojis[subject.name] || '📚'}
-                  </span>
-                </div>
-              </div>
+        {error && (
+          <div className="py-24 text-center text-gray-500">
+            <p>{error}</p>
+          </div>
+        )}
 
-              <h3 className="mb-2 font-['Montserrat'] text-[24px] font-bold leading-8 text-[#1B1C1C] transition-colors group-hover:text-[#0183CB]">
-                {subjectDisplayNames[subject.name] || subject.name}
-              </h3>
-
-              <p className="mb-6 font-['Inter'] text-base leading-[26px] text-[#414754]">
-                {subjectDescriptions[subject.name] || subject.description}
-              </p>
-
-              <div className="mb-6 border-t border-[#EFEDED] pt-4">
-                <div className="flex flex-wrap items-center gap-5">
-                  <div className="flex items-center gap-1.5">
-                    <Clock className="h-[15px] w-[15px] text-[#0183CB]" />
-                    <span className="font-['Inter'] text-sm text-[#414754]">
-                      2 Years
-                    </span>
-                  </div>
-                  <div className="flex items-center gap-1.5">
-                    <Layers className="h-[15px] w-[15px] text-[#0183CB]" />
-                    <span className="font-['Inter'] text-sm text-[#414754]">
-                      12 Modules
-                    </span>
-                  </div>
-                  <div className="flex items-center gap-1.5">
-                    <Calendar className="h-[15px] w-[13.5px] text-[#0183CB]" />
-                    <span className="font-['Inter'] text-sm text-[#414754]">
-                      Term: 6
-                    </span>
-                  </div>
-                </div>
-              </div>
-
-              <Link
-                href="#"
-                className="flex w-full items-center justify-center gap-2 rounded-lg bg-[#0183CB] py-3 font-['Inter'] text-base font-bold text-white shadow-[0px_1px_2px_rgba(0,0,0,0.05)] transition-colors hover:bg-[#016ba5]"
-              >
-                Visit Teacher
-                <ArrowRight className="h-[9px] w-[19px]" strokeWidth={3} />
-              </Link>
+        {!loading && !error && (
+          <>
+            <div className="mb-8 flex justify-end">
+              <span className="text-base font-semibold text-[#0183CB]">
+                {modules.length} Subject{modules.length !== 1 ? 's' : ''} found
+              </span>
             </div>
-          ))}
-        </div>
+
+            <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+              {modules.map((module) => {
+                const Icon = getIcon(module.name);
+                const matchedTeacher =
+                  teacherBySubject[module.name.toLowerCase()];
+                const teacherId = matchedTeacher?._id ?? module.teacherId;
+
+                return (
+                  <div
+                    key={module._id}
+                    className="flex flex-col rounded-xl border border-[#C1C6D7] bg-white shadow-sm transition-shadow hover:shadow-md"
+                  >
+                    <div className="flex flex-1 flex-col p-6">
+                      <div className="mb-5 flex h-14 w-14 items-center justify-center rounded-xl bg-[#0183CB]/10">
+                        <Icon className="h-7 w-7 text-[#0183CB]" />
+                      </div>
+
+                      <h3 className="mb-2 text-2xl font-bold text-[#1B1C1C]">
+                        {module.name}
+                      </h3>
+
+                      {module.description ? (
+                        <p className="mb-5 flex-1 text-base leading-relaxed text-[#414754]">
+                          {module.description}
+                        </p>
+                      ) : (
+                        <div className="mb-5 flex-1" />
+                      )}
+
+                      <div className="mb-4 border-t border-[#E5E7EB]" />
+
+                      <div className="mb-5 flex items-center gap-5 text-sm text-[#6B7280]">
+                        {module.duration && (
+                          <span className="flex items-center gap-1.5">
+                            <Clock className="h-4 w-4 text-[#0183CB]" />
+                            {module.duration}
+                          </span>
+                        )}
+
+                        {module.batch && (
+                          <span className="flex items-center gap-1.5">
+                            <Calendar className="h-4 w-4 text-[#0183CB]" />
+                            Batch: {module.batch}
+                          </span>
+                        )}
+                      </div>
+
+                      {teacherId ? (
+                        <Link
+                          href={`/teachers/${teacherId}?subject=${encodeURIComponent(
+                            module.name,
+                          )}`}
+                          className="flex w-full items-center justify-center gap-2 rounded-lg bg-[#0183CB] py-3 text-sm font-bold text-white transition-colors hover:bg-[#016fad]"
+                        >
+                          Visit Teacher <ArrowRight className="h-4 w-4" />
+                        </Link>
+                      ) : (
+                        <div className="flex w-full cursor-not-allowed items-center justify-center gap-2 rounded-lg bg-gray-100 py-3 text-sm font-bold text-gray-400">
+                          No Teacher Assigned
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+
+            {modules.length === 0 && (
+              <div className="py-24 text-center text-gray-400">
+                <BookOpen className="mx-auto mb-3 h-12 w-12 opacity-30" />
+                <p>No subjects available</p>
+              </div>
+            )}
+          </>
+        )}
       </div>
     </div>
   );

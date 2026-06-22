@@ -3,10 +3,11 @@
 import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { Menu, X, LogOut, Bell, User } from 'lucide-react';
+import { Menu, X, LogOut, User } from 'lucide-react';
 import Image from 'next/image';
 import { useAuthStore } from '../../store/authStore';
 import { authApi } from '@/api/auth.api';
+import NotificationBell from './NotificationBell';
 
 export default function PrivateHeader() {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -39,6 +40,7 @@ export default function PrivateHeader() {
     { label: 'Profile', path: '/dashboard/profile' },
     { label: 'Results', path: '/dashboard/results' },
     { label: 'Payments', path: '/dashboard/payments' },
+    { label: 'Notifications', path: '/dashboard/notifications' },
   ];
 
   const isActive = (path: string) => pathname === path;
@@ -95,9 +97,7 @@ export default function PrivateHeader() {
             />
 
             <div className="leading-tight">
-              <h1 className="text-xl font-semibold text-[#0183CB]">
-                Techna
-              </h1>
+              <h1 className="text-xl font-semibold text-[#0183CB]">Techna</h1>
               <p className="text-sm font-medium text-[#0183CB]">
                 Student Portal
               </p>
@@ -121,14 +121,7 @@ export default function PrivateHeader() {
           </nav>
 
           <div className="hidden items-center gap-3 md:flex">
-            <button
-              type="button"
-              aria-label="Notifications"
-              className="relative rounded-full p-2 text-[#0183CB] hover:bg-gray-100 hover:text-sky-600"
-            >
-              <Bell className="h-4 w-4" />
-              <span className="absolute right-1.5 top-1.5 h-1.5 w-1.5 rounded-full bg-red-500" />
-            </button>
+            <NotificationBell />
 
             <div ref={dropdownRef} className="relative">
               <button
@@ -159,9 +152,7 @@ export default function PrivateHeader() {
                     <p className="truncate text-sm font-semibold text-gray-900">
                       {fullName}
                     </p>
-                    <p className="truncate text-xs text-gray-500">
-                      {studentId}
-                    </p>
+                    <p className="truncate text-xs text-gray-500">{studentId}</p>
                     <p className="truncate text-xs text-gray-500">{email}</p>
                   </div>
 
@@ -186,18 +177,21 @@ export default function PrivateHeader() {
             </div>
           </div>
 
-          <button
-            type="button"
-            aria-label="Toggle menu"
-            className="rounded-lg p-2 text-gray-600 hover:bg-gray-100 md:hidden"
-            onClick={() => setMenuOpen((prev) => !prev)}
-          >
-            {menuOpen ? (
-              <X className="h-5 w-5" />
-            ) : (
-              <Menu className="h-5 w-5" />
-            )}
-          </button>
+          <div className="flex items-center gap-2 md:hidden">
+            <NotificationBell />
+            <button
+              type="button"
+              aria-label="Toggle menu"
+              className="rounded-lg p-2 text-gray-600 hover:bg-gray-100"
+              onClick={() => setMenuOpen((prev) => !prev)}
+            >
+              {menuOpen ? (
+                <X className="h-5 w-5" />
+              ) : (
+                <Menu className="h-5 w-5" />
+              )}
+            </button>
+          </div>
         </div>
 
         {menuOpen && (

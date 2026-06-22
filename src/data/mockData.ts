@@ -1,13 +1,13 @@
 import type { Module, Notice, ExamResult, Payment, Student } from '../types';
 
 export const SUBJECTS = [
-  'Engineering Technology',
-  'Bio Systems Technology',
-  'Science For Technology',
-  'Information Communication Technology',
-  'Agricultural Science',
-  'Mathematics',
-  'Geography',
+  'ENGINEERING TECHNOLOGY',
+  'BIO SYSTEMS TECHNOLOGY',
+  'SCIENCE FOR TECHNOLOGY',
+  'INFORMATION COMMUNICATION TECHNOLOGY',
+  'AGRICULTURAL SCIENCE',
+  'MATHEMATICS',
+  'GEOGRAPHY',
 ];
 
 export const DISTRICTS = [
@@ -27,7 +27,7 @@ export const GRADES = ['A+', 'A', 'A-', 'B+', 'B', 'B-', 'C+', 'C', 'C-', 'S', '
 export const mockModules: Module[] = [
   {
     id: '1',
-    name: 'Engineering Technology',
+    name: 'ENGINEERING TECHNOLOGY',
     code: 'ET-101',
     description: 'Fundamentals of engineering technology including mechanics, electrical systems, and materials science.',
     duration: '2 Years',
@@ -36,15 +36,15 @@ export const mockModules: Module[] = [
     schedule: 'Mon, Wed, Fri – 8:00 AM',
     category: 'Core',
     videos: [
-      { id: 'v1', title: 'Introduction to Engineering Technology', moduleId: '1', moduleName: 'Engineering Technology', duration: '45:30', uploadedAt: '2024-01-15', thumbnail: 'https://img.youtube.com/vi/dQw4w9WgXcQ/0.jpg', url: '#', description: 'Overview of engineering fundamentals' },
-      { id: 'v2', title: 'Mechanics – Statics & Dynamics', moduleId: '1', moduleName: 'Engineering Technology', duration: '52:10', uploadedAt: '2024-01-22', thumbnail: 'https://img.youtube.com/vi/dQw4w9WgXcQ/0.jpg', url: '#', description: 'Force analysis and motion' },
-      { id: 'v3', title: 'Electrical Circuits Basics', moduleId: '1', moduleName: 'Engineering Technology', duration: '38:45', uploadedAt: '2024-02-01', thumbnail: 'https://img.youtube.com/vi/dQw4w9WgXcQ/0.jpg', url: '#', description: 'Ohm\'s law and circuit analysis' },
+      { id: 'v1', title: 'Introduction to Engineering Technology', moduleId: '1', moduleName: 'ENGINEERING TECHNOLOGY', duration: '45:30', uploadedAt: '2024-01-15', thumbnail: 'https://img.youtube.com/vi/dQw4w9WgXcQ/0.jpg', url: '#', description: 'Overview of engineering fundamentals' },
+      { id: 'v2', title: 'Mechanics – Statics & Dynamics', moduleId: '1', moduleName: 'ENGINEERING TECHNOLOGY', duration: '52:10', uploadedAt: '2024-01-22', thumbnail: 'https://img.youtube.com/vi/dQw4w9WgXcQ/0.jpg', url: '#', description: 'Force analysis and motion' },
+      { id: 'v3', title: 'Electrical Circuits Basics', moduleId: '1', moduleName: 'ENGINEERING TECHNOLOGY', duration: '38:45', uploadedAt: '2024-02-01', thumbnail: 'https://img.youtube.com/vi/dQw4w9WgXcQ/0.jpg', url: '#', description: 'Ohm\'s law and circuit analysis' },
     ],
     notices: [],
   },
   {
     id: '2',
-    name: 'Information Communication Technology',
+    name: 'INFORMATION COMMUNICATION TECHNOLOGY',
     code: 'ICT-102',
     description: 'Computing fundamentals, programming, networking, and digital systems for the modern world.',
     duration: '2 Years',
@@ -60,7 +60,7 @@ export const mockModules: Module[] = [
   },
   {
     id: '3',
-    name: 'Mathematics',
+    name: 'MATHEMATICS',
     code: 'MATH-103',
     description: 'Advanced mathematics covering calculus, algebra, statistics, and discrete mathematics.',
     duration: '2 Years',
@@ -69,14 +69,14 @@ export const mockModules: Module[] = [
     schedule: 'Mon, Wed – 10:00 AM',
     category: 'Core',
     videos: [
-      { id: 'v6', title: 'Calculus – Differentiation', moduleId: '3', moduleName: 'Mathematics', duration: '55:20', uploadedAt: '2024-01-20', thumbnail: 'https://img.youtube.com/vi/dQw4w9WgXcQ/0.jpg', url: '#', description: 'Derivatives and applications' },
-      { id: 'v7', title: 'Integration Techniques', moduleId: '3', moduleName: 'Mathematics', duration: '62:00', uploadedAt: '2024-02-10', thumbnail: 'https://img.youtube.com/vi/dQw4w9WgXcQ/0.jpg', url: '#', description: 'Definite and indefinite integrals' },
+      { id: 'v6', title: 'Calculus – Differentiation', moduleId: '3', moduleName: 'MATHEMATICS', duration: '55:20', uploadedAt: '2024-01-20', thumbnail: 'https://img.youtube.com/vi/dQw4w9WgXcQ/0.jpg', url: '#', description: 'Derivatives and applications' },
+      { id: 'v7', title: 'Integration Techniques', moduleId: '3', moduleName: 'MATHEMATICS', duration: '62:00', uploadedAt: '2024-02-10', thumbnail: 'https://img.youtube.com/vi/dQw4w9WgXcQ/0.jpg', url: '#', description: 'Definite and indefinite integrals' },
     ],
     notices: [],
   },
   {
     id: '4',
-    name: 'Bio Systems Technology',
+    name: 'BIO SYSTEMS TECHNOLOGY',
     code: 'BST-104',
     description: 'Study of biological systems, biotechnology, and their applications in modern industry.',
     duration: '2 Years',
@@ -85,13 +85,13 @@ export const mockModules: Module[] = [
     schedule: 'Tue, Fri – 11:00 AM',
     category: 'Core',
     videos: [
-      { id: 'v8', title: 'Introduction to Biosystems', moduleId: '4', moduleName: 'Bio Systems', duration: '42:30', uploadedAt: '2024-01-25', thumbnail: 'https://img.youtube.com/vi/dQw4w9WgXcQ/0.jpg', url: '#', description: 'Overview of biological systems' },
+      { id: 'v8', title: 'Introduction to Biosystems', moduleId: '4', moduleName: 'BIO SYSTEMS TECHNOLOGY', duration: '42:30', uploadedAt: '2024-01-25', thumbnail: 'https://img.youtube.com/vi/dQw4w9WgXcQ/0.jpg', url: '#', description: 'Overview of biological systems' },
     ],
     notices: [],
   },
   {
     id: '5',
-    name: 'Science For Technology',
+    name: 'SCIENCE FOR TECHNOLOGY',
     code: 'SFT-105',
     description: 'Applied science concepts including physics, chemistry, and biology for technological applications.',
     duration: '2 Years',
@@ -104,7 +104,7 @@ export const mockModules: Module[] = [
   },
   {
     id: '6',
-    name: 'Agricultural Science',
+    name: 'AGRICULTURAL SCIENCE',
     code: 'AGS-106',
     description: 'Modern agricultural practices, soil science, crop management, and agribusiness.',
     duration: '2 Years',
@@ -117,7 +117,7 @@ export const mockModules: Module[] = [
   },
   {
     id: '7',
-    name: 'Geography',
+    name: 'GEOGRAPHY',
     code: 'GEO-107',
     description: 'Physical and human geography, GIS, environmental studies, and spatial analysis.',
     duration: '2 Years',
@@ -180,16 +180,16 @@ export const mockNotices: Notice[] = [
 ];
 
 export const mockResults: ExamResult[] = [
-  { id: 'r1', studentId: 'STU001', moduleId: '1', moduleName: 'Engineering Technology', moduleCode: 'ET-101', examType: 'Mid-Term', marks: 78, maxMarks: 100, grade: 'B+', date: '2024-03-20', semester: 'Semester 1' },
-  { id: 'r2', studentId: 'STU001', moduleId: '2', moduleName: 'Information Communication Technology', moduleCode: 'ICT-102', examType: 'Mid-Term', marks: 92, maxMarks: 100, grade: 'A+', date: '2024-03-21', semester: 'Semester 1' },
-  { id: 'r3', studentId: 'STU001', moduleId: '3', moduleName: 'Mathematics', moduleCode: 'MATH-103', examType: 'Mid-Term', marks: 85, maxMarks: 100, grade: 'A', date: '2024-03-22', semester: 'Semester 1' },
-  { id: 'r4', studentId: 'STU001', moduleId: '4', moduleName: 'Bio Systems Technology', moduleCode: 'BST-104', examType: 'Mid-Term', marks: 71, maxMarks: 100, grade: 'B', date: '2024-03-23', semester: 'Semester 1' },
-  { id: 'r5', studentId: 'STU001', moduleId: '1', moduleName: 'Engineering Technology', moduleCode: 'ET-101', examType: 'Final', marks: 88, maxMarks: 100, grade: 'A', date: '2024-06-15', semester: 'Semester 1' },
-  { id: 'r6', studentId: 'STU001', moduleId: '2', moduleName: 'Information Communication Technology', moduleCode: 'ICT-102', examType: 'Final', marks: 95, maxMarks: 100, grade: 'A+', date: '2024-06-16', semester: 'Semester 1' },
-  { id: 'r7', studentId: 'STU001', moduleId: '3', moduleName: 'Mathematics', moduleCode: 'MATH-103', examType: 'Final', marks: 80, maxMarks: 100, grade: 'A-', date: '2024-06-17', semester: 'Semester 1' },
-  { id: 'r8', studentId: 'STU001', moduleId: '5', moduleName: 'Science For Technology', moduleCode: 'SFT-105', examType: 'Final', marks: 76, maxMarks: 100, grade: 'B+', date: '2024-06-18', semester: 'Semester 1' },
-  { id: 'r9', studentId: 'STU001', moduleId: '1', moduleName: 'Engineering Technology', moduleCode: 'ET-101', examType: 'Mid-Term', marks: 82, maxMarks: 100, grade: 'A-', date: '2024-09-20', semester: 'Semester 2' },
-  { id: 'r10', studentId: 'STU001', moduleId: '2', moduleName: 'Information Communication Technology', moduleCode: 'ICT-102', examType: 'Mid-Term', marks: 89, maxMarks: 100, grade: 'A', date: '2024-09-21', semester: 'Semester 2' },
+  { id: 'r1', studentId: 'STU001', moduleId: '1', moduleName: 'ENGINEERING TECHNOLOGY', moduleCode: 'ET-101', examType: 'Mid-Term', marks: 78, maxMarks: 100, grade: 'B+', date: '2024-03-20', semester: 'Semester 1' },
+  { id: 'r2', studentId: 'STU001', moduleId: '2', moduleName: 'INFORMATION COMMUNICATION TECHNOLOGY', moduleCode: 'ICT-102', examType: 'Mid-Term', marks: 92, maxMarks: 100, grade: 'A+', date: '2024-03-21', semester: 'Semester 1' },
+  { id: 'r3', studentId: 'STU001', moduleId: '3', moduleName: 'MATHEMATICS', moduleCode: 'MATH-103', examType: 'Mid-Term', marks: 85, maxMarks: 100, grade: 'A', date: '2024-03-22', semester: 'Semester 1' },
+  { id: 'r4', studentId: 'STU001', moduleId: '4', moduleName: 'BIO SYSTEMS TECHNOLOGY', moduleCode: 'BST-104', examType: 'Mid-Term', marks: 71, maxMarks: 100, grade: 'B', date: '2024-03-23', semester: 'Semester 1' },
+  { id: 'r5', studentId: 'STU001', moduleId: '1', moduleName: 'ENGINEERING TECHNOLOGY', moduleCode: 'ET-101', examType: 'Final', marks: 88, maxMarks: 100, grade: 'A', date: '2024-06-15', semester: 'Semester 1' },
+  { id: 'r6', studentId: 'STU001', moduleId: '2', moduleName: 'INFORMATION COMMUNICATION TECHNOLOGY', moduleCode: 'ICT-102', examType: 'Final', marks: 95, maxMarks: 100, grade: 'A+', date: '2024-06-16', semester: 'Semester 1' },
+  { id: 'r7', studentId: 'STU001', moduleId: '3', moduleName: 'MATHEMATICS', moduleCode: 'MATH-103', examType: 'Final', marks: 80, maxMarks: 100, grade: 'A-', date: '2024-06-17', semester: 'Semester 1' },
+  { id: 'r8', studentId: 'STU001', moduleId: '5', moduleName: 'SCIENCE FOR TECHNOLOGY', moduleCode: 'SFT-105', examType: 'Final', marks: 76, maxMarks: 100, grade: 'B+', date: '2024-06-18', semester: 'Semester 1' },
+  { id: 'r9', studentId: 'STU001', moduleId: '1', moduleName: 'ENGINEERING TECHNOLOGY', moduleCode: 'ET-101', examType: 'Mid-Term', marks: 82, maxMarks: 100, grade: 'A-', date: '2024-09-20', semester: 'Semester 2' },
+  { id: 'r10', studentId: 'STU001', moduleId: '2', moduleName: 'INFORMATION COMMUNICATION TECHNOLOGY', moduleCode: 'ICT-102', examType: 'Mid-Term', marks: 89, maxMarks: 100, grade: 'A', date: '2024-09-21', semester: 'Semester 2' },
 ];
 
 export const mockPayments: Payment[] = [
@@ -215,7 +215,7 @@ export const mockStudent: Student = {
   whatsappNo: '0771234567',
   parentsNo: '0214567890',
   email: 'ganesh@student.techna.lk',
-  subjects: ['Engineering Technology', 'Information Communication Technology', 'Mathematics'],
+  subjects: ['ENGINEERING TECHNOLOGY', 'INFORMATION COMMUNICATION TECHNOLOGY', 'MATHEMATICS'],
   permanentAddress: '25, Temple Road, Jaffna North, Jaffna.',
   administrativeDistrict: 'Jaffna',
   fixedTelephone: '021-2223344',
