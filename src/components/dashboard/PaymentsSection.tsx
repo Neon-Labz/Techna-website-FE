@@ -142,7 +142,7 @@ export default function PaymentsSection() {
       const paymentRows: [string, string][] = [
   ['Receipt No', payment.receiptNo ?? '-'],
   ['Date', payment.paidDate ? new Date(payment.paidDate).toLocaleDateString('en-GB') : '-'],
-  ['Module', payment.moduleName ?? '-'],
+  ['Subject', payment.moduleName ?? '-'],
   ['Amount', `LKR ${(payment.amount ?? 0).toLocaleString()}.00`],
   ['Method', payment.method ?? '-'],
   ['Status', (payment.status ?? '-').toUpperCase()],
@@ -234,10 +234,10 @@ export default function PaymentsSection() {
             </select>
           </div>
           <div className="flex items-center gap-2">
-            <label className="text-xs text-gray-500">Module:</label>
+            <label className="text-xs text-gray-500">Subject:</label>
             <select value={moduleFilter} onChange={e => setModuleFilter(e.target.value)}
               className="border border-gray-200 rounded-xl px-3 py-2 text-sm bg-gray-50 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
-              <option value="all">All Modules</option>
+              <option value="all">All Subjects</option>
               {modules.map(m => <option key={m} value={m}>{m}</option>)}
             </select>
           </div>
@@ -297,7 +297,7 @@ export default function PaymentsSection() {
               <table className="w-full">
                 <thead className="bg-gray-50 border-b border-gray-100">
                   <tr>
-                    {['Receipt No.', 'Module', 'Amount', 'Method', 'Date', 'Status', 'Action'].map(h => (
+                    {['Receipt No.', 'Subject', 'Amount', 'Method', 'Date', 'Status', 'Action'].map(h => (
                       <th key={h} className="text-left px-5 py-3.5 text-xs font-semibold text-gray-500 uppercase tracking-wider">{h}</th>
                     ))}
                   </tr>
