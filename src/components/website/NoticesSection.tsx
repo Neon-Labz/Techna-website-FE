@@ -125,15 +125,11 @@ export default function NoticesSection({
             )}
 
             {!loading &&
-              visibleAnnouncements.map((notice) => (
-                <div
-                  key={
-                    notice._id || notice.id || `${notice.title}-${notice.date}`
-                  }
-                  className="flex min-h-[220px] flex-col rounded-md border border-gray-200 bg-white p-5 shadow-sm ..."                >
-                  <h3 className="mb-3 text-[21px] font-bold leading-tight text-[#222222]">
-                    {notice.title}
-                  </h3>
+                visibleAnnouncements.map((notice) => (
+                  <div
+                    key={notice._id || `${notice.title}-${notice.date}`}
+                    className="flex min-h-[220px] flex-col rounded-md border border-gray-200 bg-white p-5 shadow-sm"
+                  >
 
                   <p className="mb-4 text-[11px] font-bold uppercase tracking-wider text-[#0069B4]">
                     {formatDateUpper(notice.date)}

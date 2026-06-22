@@ -1,123 +1,164 @@
 "use client";
 import { useRouter } from "next/navigation";
-import { ArrowRight, BookOpen, Users, Award, Star } from "lucide-react";
+import { ArrowRight, Building2, BookOpen, Users, Star } from "lucide-react";
 
 const stats = [
-  { icon: Users, value: "2,400+", label: "Students Enrolled" },
-  { icon: BookOpen, value: "7", label: "Core Subjects" },
-  { icon: Award, value: "98%", label: "Pass Rate" },
-  { icon: Star, value: "15+", label: "Years of Excellence" },
+  { icon: Building2, value: "6+", label: "Years of Excellence" },
+  { icon: BookOpen, value: "9", label: "Core Subjects" },
+  { icon: Users, value: "1,500+", label: "Students Enrolled" },
+  { icon: Star, value: "98%", label: "Pass Rate" },
 ];
 
 export default function HeroSection() {
   const router = useRouter();
 
   return (
-    <section className="relative h-[620px] flex flex-col justify-center overflow-hidden bg-[#0a0a0f] pt-14">
+    <section className="relative w-full h-[640px] flex items-center overflow-hidden bg-[#0a0a0f]">
       {/* Background image */}
       <div
-        className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-30"
-        style={{ backgroundImage: "url('/hero-bg.jpg')" }}
+        className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+        style={{
+          backgroundImage: "url('/hero-bg.jpg')",
+          opacity: 0.32,
+        }}
       />
+
+      {/* Dark overlay gradient - left side darker for text readability */}
+      <div className="absolute inset-0 [background:linear-gradient(90deg,rgba(10,10,15,0.75)_0%,rgba(10,10,15,0.35)_55%,rgba(10,10,15,0.1)_100%)]" />
+
       {/* Grid texture */}
       <div className="absolute inset-0 pointer-events-none [background-image:linear-gradient(rgba(244,241,235,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(244,241,235,0.03)_1px,transparent_1px)] [background-size:64px_44px]" />
 
       {/* Top accent bar */}
-      <div className="absolute top-0 left-0 right-0 h-[3px] opacity-70 [background:linear-gradient(90deg,transparent,#D9D9D9,transparent)]" />
+      <div className="absolute top-0 left-0 right-0 h-[3px] [background:linear-gradient(90deg,transparent,rgba(217,217,217,0.7),transparent)]" />
 
       {/* Glow blobs */}
-      <div className="absolute rounded-full pointer-events-none -left-[8%] top-[5%] w-[420px] h-[420px] bg-[rgba(232,184,75,0.07)] blur-[90px]" />
-      <div className="absolute rounded-full pointer-events-none right-[18%] bottom-[8%] w-[280px] h-[280px] bg-[rgba(42,93,224,0.07)] blur-[90px]" />
+      <div className="absolute rounded-full pointer-events-none -left-[6%] top-[8%] w-[380px] h-[380px] bg-[rgba(232,184,75,0.06)] blur-[100px]" />
+      <div className="absolute rounded-full pointer-events-none right-[20%] bottom-[10%] w-[240px] h-[240px] bg-[rgba(42,93,224,0.06)] blur-[90px]" />
 
       {/* Background word */}
       <div
-        className="absolute top-1/2 -translate-y-1/2 -right-[2%] select-none pointer-events-none leading-none whitespace-nowrap text-transparent"
+        className="absolute top-1/2 -translate-y-1/2 right-[-1%] select-none pointer-events-none leading-none whitespace-nowrap"
         style={{
           fontFamily: "'Bebas Neue', sans-serif",
-          fontSize: "clamp(180px,28vw,320px)",
-          WebkitTextStroke: "1px rgba(232,184,75,0.07)",
+          fontSize: "clamp(130px, 20vw, 240px)",
+          color: "transparent",
+          WebkitTextStroke: "1px rgba(232,184,75,0.055)",
         }}
       >
         TECHNA
       </div>
 
       {/* Corner marks */}
-      <div className="absolute top-5 right-5 w-9 h-9 border-t-[1.5px] border-r-[1.5px] border-[rgba(232,184,75,0.4)] opacity-50" />
-      <div className="absolute bottom-5 left-5 w-9 h-9 border-b-[1.5px] border-l-[1.5px] border-[rgba(232,184,75,0.4)] opacity-50" />
+      <div className="absolute top-4 right-4 w-7 h-7 border-t-[1.5px] border-r-[1.5px] border-[rgba(232,184,75,0.35)] opacity-60" />
+      <div className="absolute bottom-4 left-4 w-7 h-7 border-b-[1.5px] border-l-[1.5px] border-[rgba(232,184,75,0.35)] opacity-60" />
 
-      {/* Content */}
-      <div className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-[48px] pb-[56px]">
-        {/* Headline */}
-        <h1
-          className="leading-[0.88] tracking-[-0.01em] mb-4"
-          style={{
-            fontFamily: "'Bebas Neue', sans-serif",
-            fontSize: "clamp(72px,10vw,110px)",
-          }}
-        >
-          <span className="text-[#34BFF3]">Shape</span>
-          <br />
-          <span className="text-transparent" style={{ WebkitTextStroke: "2px #34BFF3" }}>
-            Your
-          </span>
-          <br />
-          <span className="text-[#34BFF3]">Future</span>
-        </h1>
+      {/* ── MAIN CONTENT ── */}
+      <div className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex flex-col max-w-[520px] -ml-16">
 
-        {/* Description */}
-        <p className="max-w-[460px] text-[17px] leading-[28px] text-white font-medium mb-6">
-          Empowering minds. Shaping leaders.<br />
-          Join a community that inspires<br />
-          innovation and excellence.
-        </p>
+          {/* Headline */}
+          <h1
+            className="mb-5 leading-[0.92]"
+            style={{
+              fontFamily: "'Bebas Neue', sans-serif",
+              fontSize: "clamp(58px, 6.8vw, 84px)",
+              letterSpacing: "-0.01em",
+            }}
+          >
+            <span className="block text-[#34BFF3]">Build</span>
+            <span
+              className="block"
+              style={{
+                color: "transparent",
+                WebkitTextStroke: "2px #34BFF3",
+              }}
+            >
+              Your
+            </span>
+            <span className="block text-[#34BFF3]">Dreams with</span>
+            <span className="block text-[#34BFF3]">Technology</span>
+          </h1>
 
-        {/* CTA */}
-        <button
-          onClick={() => router.push("/register")}
-          className="inline-flex items-center gap-2.5 text-white text-[13px] font-bold tracking-[0.05em] uppercase rounded-xl border-none cursor-pointer transition-all duration-200 hover:-translate-y-0.5 hover:opacity-90"
-          style={{
-            background: "linear-gradient(90deg, #1a9fd4 0%, #34BFF3 50%, #6dd5f7 100%)",
-            width: "205px",
-            height: "48px",
-            paddingLeft: "32px",
-            paddingRight: "32px",
-          }}
-        >
-          Discover More <ArrowRight className="w-4 h-4" />
-        </button>
+          {/* Description */}
+          <p
+            className="text-white font-medium mb-7 leading-relaxed"
+            style={{ fontSize: "14.5px", maxWidth: "360px" }}
+          >
+            Empowering minds. Shaping leaders.
+            <br />
+            Join a community that inspires
+            <br />
+            innovation and excellence.
+          </p>
 
-        {/* Stats */}
-        <div className="w-full max-w-[850px] h-[50px] bg-white border border-[#F9FAFB] rounded-[11px] flex items-center px-6 mt-6">
-          {stats.map(({ icon: Icon, value, label }, index) => (
-            <div key={label} className="flex items-center flex-1">
-              {index !== 0 && (
-                <div className="w-px h-8 border-l border-dashed border-[#34BFF3] mr-6 ml-6" />
-              )}
-              <div className="flex items-center gap-3">
-                <Icon className="w-[26px] h-[26px] text-[#34BFF3] shrink-0" />
-                <div>
-                  <p className="text-[#0a0a0f] leading-none mb-0.5 text-[19px] font-bold">
-                    {value}
-                  </p>
-                  <p className="text-[10px] tracking-[0.08em] uppercase text-[#6b7280] font-medium">
-                    {label}
-                  </p>
+          {/* CTA Button */}
+          <div className="mb-6">
+            <button
+              onClick={() => router.push("/register")}
+              className="inline-flex items-center gap-2 text-white font-bold uppercase tracking-[0.07em] rounded-xl border-none cursor-pointer transition-all duration-200 hover:-translate-y-[2px] hover:brightness-110 active:scale-[0.98]"
+              style={{
+                background: "linear-gradient(90deg,#1a9fd4 0%,#34BFF3 50%,#6dd5f7 100%)",
+                fontSize: "11.5px",
+                height: "42px",
+                paddingLeft: "26px",
+                paddingRight: "26px",
+              }}
+            >
+              Discover More <ArrowRight className="w-[13px] h-[13px]" />
+            </button>
+          </div>
+
+          {/* Stats Bar */}
+          <div
+            className="inline-flex items-center bg-white rounded-[12px] h-[72px] px-20 gap-0"
+            style={{
+              border: "1px solid #EFEFEF",
+              width: "fit-content",
+              boxShadow: "0 8px 24px rgba(0,0,0,0.08)",
+            }}
+          >
+            {stats.map(({ icon: Icon, value, label }, index) => (
+              <div key={label} className="flex items-center">
+                {index !== 0 && (
+                  <div className="mx-10 h-9 w-px border-l border-dashed border-[#34BFF3]" />
+                )}
+                <div className="flex items-center gap-3">
+                  <Icon
+                    className="text-[#34BFF3] shrink-0"
+                    style={{ width: "26px", height: "26px" }}
+                  />
+                  <div className="flex flex-col leading-none">
+                    <span
+                      className="text-[#0a0a0f] font-bold"
+                      style={{ fontSize: "19px", lineHeight: "1.2" }}
+                    >
+                      {value}
+                    </span>
+                    <span
+                      className="uppercase text-[#6b7280] font-medium tracking-[0.07em]"
+                      style={{ fontSize: "9.5px", marginTop: "3px" }}
+                    >
+                      {label}
+                    </span>
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
+            ))}
+          </div>
+
         </div>
       </div>
 
       {/* Side accent */}
-      <div className="absolute right-12 bottom-14 flex flex-col items-center gap-2 z-10">
+      <div className="absolute right-10 bottom-10 flex flex-col items-center gap-2 z-10">
         <span
-          className="text-[10px] tracking-[0.15em] uppercase text-[rgba(244,241,235,0.2)]"
-          style={{ writingMode: "vertical-rl" }}
+          className="uppercase text-[rgba(244,241,235,0.18)] tracking-[0.15em]"
+          style={{ fontSize: "8.5px", writingMode: "vertical-rl" }}
         >
           Techna Institute · 2024
         </span>
-        <div className="w-px h-14 [background:linear-gradient(180deg,transparent,rgba(232,184,75,0.45))]" />
+        <div className="w-px h-11 [background:linear-gradient(180deg,transparent,rgba(232,184,75,0.4))]" />
       </div>
     </section>
   );

@@ -1,13 +1,12 @@
 'use client';
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { Check, ChevronRight, ChevronLeft, User, MapPin, BookOpen, FileText, Plus, Trash2, Upload, GraduationCap } from 'lucide-react';
 import Image from 'next/image';
+import { Check, ChevronRight, ChevronLeft, User, MapPin, BookOpen, FileText, Plus, Trash2, Upload, GraduationCap } from 'lucide-react';
 import { authApi } from '@/api/auth.api';
 import { dashboardApi } from '@/api/dashboard.api';
 import type { RegisterStudentPayload } from '@/api/auth.api';
 import { SUBJECTS } from '@/data/mockData';
-
 
 const STEPS = [
   { id: 1, label: 'Basic Info', icon: User, desc: 'Personal details' },
@@ -323,12 +322,12 @@ export default function RegisterSection() {
   if (submitted) {
     return (
       <div
-  className="relative min-h-screen overflow-hidden flex items-center justify-center px-4 py-12"
-  style={{
-    background:
-      'radial-gradient(circle at center, #34BFF3 0%, #1EA6E6 50%, #0183CB 100%)',
-  }}
->
+        className="relative min-h-screen overflow-hidden flex items-center justify-center px-4 py-12"
+        style={{
+          background:
+            'radial-gradient(circle at center, #34BFF3 0%, #1EA6E6 50%, #0183CB 100%)',
+        }}
+      >
         <GraduationCap className="absolute -left-12 top-10 h-80 w-80 rotate-12 text-white/10 stroke-[1.5] sm:h-[30rem] sm:w-[30rem]" />
         <BookOpen className="absolute -right-16 bottom-6 h-72 w-72 -rotate-12 text-white/10 stroke-[1.5] sm:h-[26rem] sm:w-[26rem]" />
         <GraduationCap className="absolute bottom-24 right-16 h-24 w-24 rotate-12 text-white/10 stroke-[1.5] sm:h-36 sm:w-36" />
@@ -351,14 +350,13 @@ export default function RegisterSection() {
             </p>
           </div>
 
-          <div className="mb-6 border-t border-gray-200 pt-4">
-            <div className="rounded-xl bg-sky-100 px-4 py-5 text-sky-600">
-              <p className="text-sm font-bold">Application Reference:</p>
-              <p className="mt-2 break-words text-xl font-medium tracking-wide">{submissionReference || 'Pending'}</p>
-            </div>
+          <div className="mt-4 flex justify-center">
+            <button className="rounded-full bg-sky-400 px-10 py-3 text-base font-bold text-white shadow-md">
+              Review in Progress
+            </button>
           </div>
 
-          <p className="text-xs text-gray-400">
+          <p className="mt-4 text-xs text-gray-400">
             Need help? Contact our support team at support@techna.edu
           </p>
         </div>
@@ -370,12 +368,12 @@ export default function RegisterSection() {
 
   return (
     <div
-  className="min-h-screen py-10 px-4"
-  style={{
-    background:
-      'radial-gradient(circle at center, #34BFF3 0%, #1EA6E6 50%, #0183CB 100%)',
-  }}
->
+      className="min-h-screen py-10 px-4"
+      style={{
+        background:
+          'radial-gradient(circle at center, #34BFF3 0%, #1EA6E6 50%, #0183CB 100%)',
+      }}
+    >
       <div className="max-w-3xl mx-auto">
         {/* Header */}
         <div className="text-center mb-8">
@@ -384,52 +382,52 @@ export default function RegisterSection() {
           <p className="text-blue-300 text-sm">A/L Technology Stream – Admission Form 2024</p>
         </div>
 
-       {/* Stepper */}
-<div className="flex items-center justify-between mb-8 px-2">
-  {STEPS.map((s, i) => {
-    const Icon = s.icon;
-    const active = step === s.id;
-    const done = step > s.id;
+        {/* Stepper */}
+        <div className="flex items-center justify-between mb-8 px-2">
+          {STEPS.map((s, i) => {
+            const Icon = s.icon;
+            const active = step === s.id;
+            const done = step > s.id;
 
-    return (
-      <div key={s.id} className="flex items-center flex-1">
-        <div className="flex flex-col items-center">
-          <div
-            className={`w-10 h-10 rounded-full flex items-center justify-center transition-all ${
-              done
-                ? 'bg-[#1E40AF]'
-                : 'bg-white'
-            }`}
-          >
-            {done ? (
-              <Check className="w-5 h-5 text-white" />
-            ) : (
-              <Icon className="w-5 h-5 text-[#1E40AF]" />
-            )}
-          </div>
+            return (
+              <div key={s.id} className="flex items-center flex-1">
+                <div className="flex flex-col items-center">
+                  <div
+                    className={`w-10 h-10 rounded-full flex items-center justify-center transition-all ${
+                      done
+                        ? 'bg-[#1E40AF]'
+                        : 'bg-white'
+                    }`}
+                  >
+                    {done ? (
+                      <Check className="w-5 h-5 text-white" />
+                    ) : (
+                      <Icon className="w-5 h-5 text-[#1E40AF]" />
+                    )}
+                  </div>
 
-          <p
-            className={`text-xs mt-1.5 font-medium hidden sm:block ${
-              active || done
-                ? 'text-white'
-                : 'text-blue-100'
-            }`}
-          >
-            {s.label}
-          </p>
+                  <p
+                    className={`text-xs mt-1.5 font-medium hidden sm:block ${
+                      active || done
+                        ? 'text-white'
+                        : 'text-blue-100'
+                    }`}
+                  >
+                    {s.label}
+                  </p>
+                </div>
+
+                {i < STEPS.length - 1 && (
+                  <div
+                    className={`flex-1 h-0.5 mx-2 ${
+                      done ? 'bg-[#1E40AF]' : 'bg-white'
+                    }`}
+                  />
+                )}
+              </div>
+            );
+          })}
         </div>
-
-        {i < STEPS.length - 1 && (
-          <div
-            className={`flex-1 h-0.5 mx-2 ${
-              done ? 'bg-[#1E40AF]' : 'bg-white'
-            }`}
-          />
-        )}
-      </div>
-    );
-  })}
-</div>
 
         {/* Form Card */}
         <div className="bg-white rounded-3xl shadow-2xl p-6 md:p-8">
@@ -774,9 +772,9 @@ export default function RegisterSection() {
               <div className="bg-blue-50 rounded-2xl p-5 border border-blue-100">
                 <h4 className="font-semibold text-blue-900 mb-3 text-sm">Application Summary</h4>
                 <div className="space-y-1.5 text-sm text-gray-700">
-                  <div className="flex justify-between"><span className="text-gray-500">Race:</span><span className="font-medium">{form.race || 'â€“'}</span></div>
-                  <div className="flex justify-between"><span className="text-gray-500">Religion:</span><span className="font-medium">{form.religion || 'â€“'}</span></div>
-                  <div className="flex justify-between"><span className="text-gray-500">Name:</span><span className="font-medium">{form.fullNameEnglish || '–'}</span></div>
+                  <div className="flex justify-between"><span className="text-gray-500">Race:</span><span className="font-medium">{form.race || '–'}</span></div>
+                  <div className="flex justify-between"><span className="text-gray-500">Religion:</span><span className="font-medium">{form.religion || '–'}</span></div>
+                  <div className="flex justify-between"><span className="text-gray-500">Full Name:</span><span className="font-medium">{form.fullNameEnglish || '–'}</span></div>
                   <div className="flex justify-between"><span className="text-gray-500">NIC:</span><span className="font-medium">{form.nicNo || '–'}</span></div>
                   <div className="flex justify-between"><span className="text-gray-500">Email:</span><span className="font-medium">{form.email || '–'}</span></div>
                   <div className="flex justify-between"><span className="text-gray-500">District:</span><span className="font-medium">{form.administrativeDistrict || '–'}</span></div>
@@ -836,21 +834,21 @@ export default function RegisterSection() {
                   Next <ChevronRight className="w-4 h-4" />
                 </button>
               ) : (
-                              <button
-                onClick={handleSubmit}
-                disabled={loading}
-                className="flex items-center gap-2 px-6 py-2.5 text-white font-semibold rounded-xl transition-all text-sm shadow-md disabled:opacity-60"
-                style={{
-                  background: 'linear-gradient(135deg, #0183CB 0%, #34BFF3 100%)',
-                }}
-              >
-                {loading ? (
-                  <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                ) : (
-                  <Check className="w-4 h-4" />
-                )}
-                {loading ? 'Submitting...' : 'Submit Application'}
-              </button>
+                <button
+                  onClick={handleSubmit}
+                  disabled={loading}
+                  className="flex items-center gap-2 px-6 py-2.5 text-white font-semibold rounded-xl transition-all text-sm shadow-md disabled:opacity-60"
+                  style={{
+                    background: 'linear-gradient(135deg, #0183CB 0%, #34BFF3 100%)',
+                  }}
+                >
+                  {loading ? (
+                    <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                  ) : (
+                    <Check className="w-4 h-4" />
+                  )}
+                  {loading ? 'Submitting...' : 'Submit Application'}
+                </button>
               )}
             </div>
           </div>
