@@ -81,7 +81,7 @@ export default function DashboardHomeSection() {
         {[
           { icon: Award, label: 'Latest Grade', value: recentResults[0]?.grade || 'A+', sub: recentResults[0]?.moduleName || 'ICT', color: 'text-blue-600 bg-blue-50' },
           { icon: TrendingUp, label: 'Average Marks', value: `${avgScore}%`, sub: 'All subjects', color: 'text-green-600 bg-green-50' },
-          { icon: BookOpen, label: 'Modules', value: mockModules.length.toString(), sub: 'Enrolled', color: 'text-purple-600 bg-purple-50' },
+          { icon: BookOpen, label: 'Subjects', value: mockModules.length.toString(), sub: 'Enrolled', color: 'text-purple-600 bg-purple-50' },
           { icon: Bell, label: 'Notices', value: mockNotices.filter(n => n.type === 'exam').length.toString(), sub: 'Exam notices', color: 'text-red-600 bg-red-50' },
         ].map(item => {
           const Icon = item.icon;
@@ -157,7 +157,7 @@ export default function DashboardHomeSection() {
                   onChange={(e) => setActiveModule(e.target.value)}
                   className="text-xs border border-gray-200 rounded-lg px-2 py-1.5 text-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 >
-                  <option value="all">All Modules</option>
+                  <option value="all">All Subjects</option>
                   {studentModules.map((m) => (
                     <option key={m.id} value={m.id}>
                       {m.name}

@@ -26,7 +26,7 @@ export default function ModulesSection() {
       <div className="bg-gradient-to-br from-blue-950 to-blue-900 py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <span className="text-yellow-400 font-semibold text-sm uppercase tracking-wider">A/L Technology Stream</span>
-          <h1 className="text-4xl md:text-5xl font-bold text-white mt-2">Our Modules</h1>
+          <h1 className="text-4xl md:text-5xl font-bold text-white mt-2">Our Subjects</h1>
           <p className="text-blue-300 mt-3 max-w-xl mx-auto">Explore all subjects and courses offered at Techna Technical Institute for the A/L Technology Stream.</p>
         </div>
       </div>
@@ -44,7 +44,7 @@ export default function ModulesSection() {
               {cat}
             </button>
           ))}
-          <span className="ml-auto text-sm text-gray-400">{filtered.length} modules found</span>
+          <span className="ml-auto text-sm text-gray-400">{filtered.length} subjects found</span>
         </div>
 
         {/* Modules Grid */}
