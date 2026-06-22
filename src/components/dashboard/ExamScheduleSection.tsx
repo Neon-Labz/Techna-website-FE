@@ -153,13 +153,13 @@ export default function ExamScheduleSection() {
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
-            <label className="block text-xs text-gray-500 mb-1.5 font-medium">Module</label>
+            <label className="block text-xs text-gray-500 mb-1.5 font-medium">Subject</label>
             <select
               value={moduleFilter}
               onChange={e => setModuleFilter(e.target.value)}
               className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm bg-gray-50 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
-              <option value="all">All Modules</option>
+              <option value="all">All Subjects</option>
               {modules.map(m => <option key={m} value={m}>{m}</option>)}
             </select>
           </div>
