@@ -17,7 +17,9 @@ export type AuthApiResult = {
   [key: string]: unknown;
 };
 
-export const registerStudent = async (formData: FormData): Promise<AuthApiResult> => {
+export const registerStudent = async (
+  formData: FormData
+): Promise<AuthApiResult> => {
   const response = await apiClient.post('/students/register', formData);
   return response as unknown as AuthApiResult;
 };
@@ -34,7 +36,9 @@ export const studentLogin = async (
   return response as unknown as AuthApiResult;
 };
 
-export const getSession = async (token?: string): Promise<AuthApiResult> => {
+export const getSession = async (
+  token?: string
+): Promise<AuthApiResult> => {
   const response = await apiClient.get('/auth/session', {
     headers: token ? { Authorization: `Bearer ${token}` } : undefined,
   });

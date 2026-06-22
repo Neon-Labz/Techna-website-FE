@@ -72,7 +72,7 @@ export default function DashboardHeroSection() {
         {[
           { icon: Award, label: 'Latest Grade', value: recentResults[0]?.grade || 'A+', sub: recentResults[0]?.moduleName || 'ICT', color: 'text-blue-600 bg-blue-50' },
           { icon: TrendingUp, label: 'Average Marks', value: `${avgScore}%`, sub: 'All subjects', color: 'text-green-600 bg-green-50' },
-          { icon: BookOpen, label: 'Modules', value: mockModules.length.toString(), sub: 'Enrolled', color: 'text-purple-600 bg-purple-50' },
+          { icon: BookOpen, label: 'Subjects', value: mockModules.length.toString(), sub: 'Enrolled', color: 'text-purple-600 bg-purple-50' },
           { icon: Bell, label: 'Notices', value: mockNotices.filter(n => n.type === 'exam').length.toString(), sub: 'Exam notices', color: 'text-red-600 bg-red-50' },
         ].map(item => {
           const Icon = item.icon;
