@@ -10,7 +10,7 @@ const STEPS = [
   { id: 1, label: 'Basic Info', icon: User, desc: 'Personal details' },
   { id: 2, label: 'Address & Contact', icon: MapPin, desc: 'Residence details' },
   { id: 3, label: 'Parent Details', icon: User, desc: 'Guardian info' },
-  { id: 4, label: 'O/L Results', icon: BookOpen, desc: 'Academic results' },
+  { id: 4, label: 'O/L Results', icon: BookOpen, desc: 'Academic results (Optional)' },
   { id: 5, label: 'Subjects & Confirm', icon: FileText, desc: 'Subject selection' },
 ];
 
@@ -27,6 +27,12 @@ export const RACE_OPTIONS = ['Sinhala', 'Tamil', 'Indian Tamil', 'Muslim', 'Burg
 export const RELIGION_OPTIONS = ['Buddhism', 'Hinduism', 'Islam', 'Christianity', 'Catholicism', 'Other'];
 interface OLRow { year: string; indexNumber: string; english: string; mathematics: string; science: string; sinhala: string; tamil: string; }
 const emptyOL: OLRow = { year: '', indexNumber: '', english: '', mathematics: '', science: '', sinhala: '', tamil: '' };
+
+// Display-only label overrides for subjects. The value sent to the backend stays the original module name.
+const SUBJECT_LABELS: Record<string, string> = {
+  'Information Communication Technology': 'ICT',
+};
+const subjectLabel = (name: string) => SUBJECT_LABELS[name] || name;
 
 type ModuleOption = {
   name?: string;
@@ -58,8 +64,8 @@ export default function RegisterSection() {
     fullNameTamil: '', fullNameEnglish: '', dateOfBirth: '',
     nicNo: '', address: '', school: '', whatsappNo: '', parentsNo: '', email: '', password: '', confirmPassword: '',
     // Address
-    permanentAddress: '', administrativeDistrict: '', fixedTelephone: '', residingSince: '',
-    race: '', religion: '', citizenByDescent: 'YES',
+    permanentAddress: '', administrativeDistrict: '', fixedTelephone: '',
+    race: '', religion: '',
     contactAddress: '', postalCode: '',
     // Parents
     fatherName: '', motherName: '', guardianName: '',
@@ -91,10 +97,13 @@ export default function RegisterSection() {
       try {
         const result = await apiClient.get('/modules');
 
-        const modules = Array.isArray(result.data)
-          ? result.data
-          : Array.isArray(result.data?.data)
-            ? result.data.data
+        // The axios response interceptor already unwraps the
+        // `{ success, message, data }` envelope, so `result` is either the
+        // modules array directly or an object containing it.
+        const modules = Array.isArray(result)
+          ? result
+          : Array.isArray((result as { data?: unknown })?.data)
+            ? (result as { data: ModuleOption[] }).data
             : [];
 
         const options = modules
@@ -163,6 +172,39 @@ export default function RegisterSection() {
     setLoading(true);
     setSubmitError('');
 
+    const olResults = olRows
+      .filter(row => row.year && row.indexNumber)
+      .map(row => ({
+        year: row.year,
+        indexNumber: row.indexNumber,
+        english: row.english || undefined,
+        mathematics: row.mathematics || undefined,
+        science: row.science || undefined,
+        sinhala: row.sinhala || undefined,
+        tamil: row.tamil || undefined,
+      }));
+
+    // O/L results are optional. Only include the section if the user filled
+    // in at least one O/L field, otherwise omit it entirely so the backend
+    // does not reject the registration.
+    const hasOlData = Boolean(
+      form.olYear ||
+        form.olIndexNumber ||
+        form.olNameUsed ||
+        olResults.length,
+    );
+
+    const olRecords = hasOlData
+      ? {
+          olCategory: form.olCategory || undefined,
+          olYear: form.olYear || undefined,
+          olIndexNumber: form.olIndexNumber || undefined,
+          olNameUsed: form.olNameUsed || undefined,
+          olAccept: form.olAccept || undefined,
+          olResults,
+        }
+      : undefined;
+
     const payload = {
       account: {
         email: form.email,
@@ -179,10 +221,8 @@ export default function RegisterSection() {
         permanentAddress: form.permanentAddress || form.address,
         administrativeDistrict: form.administrativeDistrict,
         fixedTelephone: form.fixedTelephone,
-        residingSince: form.residingSince,
         race: form.race || undefined,
         religion: form.religion || undefined,
-        citizenByDescent: form.citizenByDescent || undefined,
         contactAddress: form.contactAddress,
         postalCode: form.postalCode,
       },
@@ -195,24 +235,7 @@ export default function RegisterSection() {
         guardianFixedTel: form.guardianFixedTel,
         guardianMobile: form.guardianMobile,
       },
-      olRecords: {
-        olCategory: form.olCategory || undefined,
-        olYear: form.olYear,
-        olIndexNumber: form.olIndexNumber,
-        olNameUsed: form.olNameUsed,
-        olAccept: form.olAccept || undefined,
-        olResults: olRows
-          .filter(row => row.year && row.indexNumber)
-          .map(row => ({
-            year: row.year,
-            indexNumber: row.indexNumber,
-            english: row.english || undefined,
-            mathematics: row.mathematics || undefined,
-            science: row.science || undefined,
-            sinhala: row.sinhala || undefined,
-            tamil: row.tamil || undefined,
-          })),
-      },
+      olRecords,
       subjectSelection: {
         subjects: form.subjects,
         //modules: form.subjects,
@@ -247,7 +270,13 @@ export default function RegisterSection() {
 
   if (submitted) {
     return (
-      <div className="relative min-h-screen overflow-hidden bg-gradient-to-br from-sky-500 via-cyan-400 to-sky-600 flex items-center justify-center px-4 py-12">
+      <div
+  className="relative min-h-screen overflow-hidden flex items-center justify-center px-4 py-12"
+  style={{
+    background:
+      'radial-gradient(circle at center, #34BFF3 0%, #1EA6E6 50%, #0183CB 100%)',
+  }}
+>
         <GraduationCap className="absolute -left-12 top-10 h-80 w-80 rotate-12 text-white/10 stroke-[1.5] sm:h-[30rem] sm:w-[30rem]" />
         <BookOpen className="absolute -right-16 bottom-6 h-72 w-72 -rotate-12 text-white/10 stroke-[1.5] sm:h-[26rem] sm:w-[26rem]" />
         <GraduationCap className="absolute bottom-24 right-16 h-24 w-24 rotate-12 text-white/10 stroke-[1.5] sm:h-36 sm:w-36" />
@@ -288,36 +317,67 @@ export default function RegisterSection() {
   const inputCls = (err?: string) => `w-full px-3 py-2.5 border ${err ? 'border-red-400 bg-red-50' : 'border-gray-200 bg-gray-50'} rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 placeholder-gray-400`;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-950 via-blue-900 to-blue-800 py-10 px-4">
+    <div
+  className="min-h-screen py-10 px-4"
+  style={{
+    background:
+      'radial-gradient(circle at center, #34BFF3 0%, #1EA6E6 50%, #0183CB 100%)',
+  }}
+>
       <div className="max-w-3xl mx-auto">
         {/* Header */}
         <div className="text-center mb-8">
-          <Image src="/logo.png" alt="Techna Logo" width={120} height={50} className="mx-auto mb-4 rounded-full" />
+          <Image src="/techna-logo.png" alt="Techna Logo" width={120} height={50} className="mx-auto mb-4 rounded-full" />
           <h1 className="text-2xl font-bold text-white">Techna Technical Institute</h1>
           <p className="text-blue-300 text-sm">A/L Technology Stream – Admission Form 2024</p>
         </div>
 
-        {/* Stepper */}
-        <div className="flex items-center justify-between mb-8 px-2">
-          {STEPS.map((s, i) => {
-            const Icon = s.icon;
-            const active = step === s.id;
-            const done = step > s.id;
-            return (
-              <div key={s.id} className="flex items-center flex-1">
-                <div className="flex flex-col items-center">
-                  <div className={`w-10 h-10 rounded-full flex items-center justify-center border-2 transition-all ${done ? 'bg-green-500 border-green-500' : active ? 'bg-yellow-400 border-yellow-400' : 'bg-white/10 border-white/30'}`}>
-                    {done ? <Check className="w-5 h-5 text-white" /> : <Icon className={`w-5 h-5 ${active ? 'text-blue-900' : 'text-blue-300'}`} />}
-                  </div>
-                  <p className={`text-xs mt-1.5 font-medium hidden sm:block ${active ? 'text-yellow-400' : done ? 'text-green-400' : 'text-blue-400'}`}>{s.label}</p>
-                </div>
-                {i < STEPS.length - 1 && (
-                  <div className={`flex-1 h-0.5 mx-2 ${done ? 'bg-green-500' : 'bg-white/20'}`} />
-                )}
-              </div>
-            );
-          })}
+       {/* Stepper */}
+<div className="flex items-center justify-between mb-8 px-2">
+  {STEPS.map((s, i) => {
+    const Icon = s.icon;
+    const active = step === s.id;
+    const done = step > s.id;
+
+    return (
+      <div key={s.id} className="flex items-center flex-1">
+        <div className="flex flex-col items-center">
+          <div
+            className={`w-10 h-10 rounded-full flex items-center justify-center transition-all ${
+              done
+                ? 'bg-[#1E40AF]'
+                : 'bg-white'
+            }`}
+          >
+            {done ? (
+              <Check className="w-5 h-5 text-white" />
+            ) : (
+              <Icon className="w-5 h-5 text-[#1E40AF]" />
+            )}
+          </div>
+
+          <p
+            className={`text-xs mt-1.5 font-medium hidden sm:block ${
+              active || done
+                ? 'text-white'
+                : 'text-blue-100'
+            }`}
+          >
+            {s.label}
+          </p>
         </div>
+
+        {i < STEPS.length - 1 && (
+          <div
+            className={`flex-1 h-0.5 mx-2 ${
+              done ? 'bg-[#1E40AF]' : 'bg-white'
+            }`}
+          />
+        )}
+      </div>
+    );
+  })}
+</div>
 
         {/* Form Card */}
         <div className="bg-white rounded-3xl shadow-2xl p-6 md:p-8">
@@ -336,7 +396,7 @@ export default function RegisterSection() {
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">Full Name (English) <span className="text-red-500">*</span></label>
-                  <input value={form.fullNameEnglish} onChange={e => set('fullNameEnglish', e.target.value.toUpperCase())} placeholder="FULL NAME IN ENGLISH" className={inputCls(errors.fullNameEnglish)} />
+                  <input value={form.fullNameEnglish} onChange={e => set('fullNameEnglish', e.target.value.replace(/[^a-zA-Z\s]/g, '').toUpperCase())} placeholder="FULL NAME IN ENGLISH" className={inputCls(errors.fullNameEnglish)} />
                   {errors.fullNameEnglish && <p className="text-red-500 text-xs mt-1">{errors.fullNameEnglish}</p>}
                 </div>
               </div>
@@ -425,7 +485,7 @@ export default function RegisterSection() {
                 {errors.permanentAddress && <p className="text-red-500 text-xs mt-1">{errors.permanentAddress}</p>}
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">Administrative District <span className="text-red-500">*</span></label>
                   <select value={form.administrativeDistrict} onChange={e => set('administrativeDistrict', e.target.value)} className={inputCls(errors.administrativeDistrict)}>
@@ -438,13 +498,9 @@ export default function RegisterSection() {
                   <label className="block text-sm font-medium text-gray-700 mb-1">Fixed Telephone Number</label>
                   <input value={form.fixedTelephone} onChange={e => set('fixedTelephone', e.target.value)} placeholder="0XX-XXXXXXX" className={inputCls()} />
                 </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Residing Since</label>
-                  <input type="date" value={form.residingSince} onChange={e => set('residingSince', e.target.value)} className={inputCls()} />
-                </div>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">Race</label>
                   <select value={form.race} onChange={e => set('race', e.target.value)} className={inputCls()}>
@@ -457,14 +513,6 @@ export default function RegisterSection() {
                   <select value={form.religion} onChange={e => set('religion', e.target.value)} className={inputCls()}>
                     <option value="">Select Religion</option>
                     {RELIGION_OPTIONS.map(r => <option key={r} value={r}>{r}</option>)}
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Citizen by Descent</label>
-                  <select value={form.citizenByDescent} onChange={e => set('citizenByDescent', e.target.value)} className={inputCls()}>
-                    <option value="">Select</option>
-                    <option value="YES">YES</option>
-                    <option value="NO">NO</option>
                   </select>
                 </div>
               </div>
@@ -540,7 +588,7 @@ export default function RegisterSection() {
           {step === 4 && (
             <div className="space-y-5">
               <div className="bg-gray-50 rounded-2xl p-4 border border-gray-200">
-                <h3 className="font-semibold text-gray-800 mb-4 text-sm">G.C.E. (O/L) Results</h3>
+                <h3 className="font-semibold text-gray-800 mb-4 text-sm">G.C.E. (O/L) Results <span className="text-gray-400 font-normal">(Optional)</span></h3>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
                   <div>
                     <label className="block text-xs font-medium text-gray-600 mb-1">Category of G.C.E.(O/L)</label>
@@ -653,7 +701,7 @@ export default function RegisterSection() {
                           onChange={() => toggleSubject(sub)}
                           className="text-blue-600 rounded w-4 h-4"
                         />
-                        <span className={`text-sm font-medium ${selected ? 'text-blue-800' : 'text-gray-700'}`}>{sub}</span>
+                        <span className={`text-sm font-medium ${selected ? 'text-blue-800' : 'text-gray-700'}`}>{subjectLabel(sub)}</span>
                         {selected && <Check className="w-4 h-4 text-blue-600 ml-auto" />}
                       </label>
                     );
@@ -676,7 +724,7 @@ export default function RegisterSection() {
                   <div className="flex justify-between"><span className="text-gray-500">Email:</span><span className="font-medium">{form.email || '–'}</span></div>
                   <div className="flex justify-between"><span className="text-gray-500">District:</span><span className="font-medium">{form.administrativeDistrict || '–'}</span></div>
                   <div className="flex justify-between"><span className="text-gray-500">Batch:</span><span className="font-medium">{form.batch || '–'}</span></div>
-                  <div className="flex justify-between gap-4"><span className="text-gray-500">Subjects:</span><span className="font-medium text-right">{form.subjects.length > 0 ? form.subjects.join(', ') : '–'}</span></div>
+                  <div className="flex justify-between gap-4"><span className="text-gray-500">Subjects:</span><span className="font-medium text-right">{form.subjects.length > 0 ? form.subjects.map(subjectLabel).join(', ') : '–'}</span></div>
                 </div>
               </div>
 
@@ -725,18 +773,27 @@ export default function RegisterSection() {
             <div className="flex items-center gap-3">
               <span className="text-xs text-gray-400">Step {step} of {STEPS.length}</span>
               {step < 5 ? (
-                <button onClick={next} className="flex items-center gap-2 px-6 py-2.5 bg-blue-900 hover:bg-blue-800 text-white font-semibold rounded-xl transition-all text-sm shadow-md">
+                <button onClick={next} className="flex items-center gap-2 px-6 py-2.5 text-white font-semibold rounded-xl transition-all text-sm shadow-md" style={{
+                    background: 'linear-gradient(135deg, #0183CB 0%, #34BFF3 100%)'
+                  }}>
                   Next <ChevronRight className="w-4 h-4" />
                 </button>
               ) : (
-                <button
-                  onClick={handleSubmit}
-                  disabled={loading}
-                  className="flex items-center gap-2 px-6 py-2.5 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-xl transition-all text-sm shadow-md disabled:opacity-60"
-                >
-                  {loading ? <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" /> : <Check className="w-4 h-4" />}
-                  {loading ? 'Submitting...' : 'Submit Application'}
-                </button>
+                              <button
+                onClick={handleSubmit}
+                disabled={loading}
+                className="flex items-center gap-2 px-6 py-2.5 text-white font-semibold rounded-xl transition-all text-sm shadow-md disabled:opacity-60"
+                style={{
+                  background: 'linear-gradient(135deg, #0183CB 0%, #34BFF3 100%)',
+                }}
+              >
+                {loading ? (
+                  <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                ) : (
+                  <Check className="w-4 h-4" />
+                )}
+                {loading ? 'Submitting...' : 'Submit Application'}
+              </button>
               )}
             </div>
           </div>

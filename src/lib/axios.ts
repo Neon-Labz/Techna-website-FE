@@ -1,8 +1,42 @@
 import axios from 'axios';
 
-const AUTH_STORAGE_KEY = 'edu-auth';
+const AUTH_STORAGE_KEY = 'techna-auth';
 
-const PUBLIC_PATHS = ['/', '/about', '/contact', '/modules', '/programs', '/teachers'];
+const PUBLIC_PATHS = [
+  '/',
+  '/about',
+  '/contact',
+  '/modules',
+  '/programs',
+  '/login',
+  '/register',
+  '/pending',
+];
+
+const readStoredToken = (): string | null => {
+  if (typeof window === 'undefined') return null;
+
+  const storages = [window.localStorage, window.sessionStorage];
+
+  const directToken =
+    storages.find((storage) => storage.getItem('token'))?.getItem('token') ||
+    storages.find((storage) => storage.getItem('access_token'))?.getItem('access_token') ||
+    storages.find((storage) => storage.getItem('accessToken'))?.getItem('accessToken');
+
+  if (directToken) return directToken;
+
+  const persistedAuth =
+    window.localStorage.getItem(AUTH_STORAGE_KEY) ||
+    window.sessionStorage.getItem(AUTH_STORAGE_KEY);
+  if (!persistedAuth) return null;
+
+  try {
+    const parsed = JSON.parse(persistedAuth);
+    return parsed?.state?.token || parsed?.token || null;
+  } catch {
+    return null;
+  }
+};
 
 const api = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:4000/api',
@@ -14,18 +48,9 @@ const api = axios.create({
 
 // REQUEST interceptor — attach JWT token
 api.interceptors.request.use((config) => {
-  if (typeof window !== 'undefined') {
-    try {
-      const authData = localStorage.getItem(AUTH_STORAGE_KEY);
-      if (authData) {
-        const token = JSON.parse(authData)?.state?.token;
-        if (token) {
-          config.headers.Authorization = `Bearer ${token}`;
-        }
-      }
-    } catch (err) {
-      console.error('Failed to read auth token:', err);
-    }
+  const token = readStoredToken();
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
   }
   return config;
 });
@@ -38,13 +63,14 @@ api.interceptors.response.use(
       if (typeof window !== 'undefined') {
         const currentPath = window.location.pathname;
 
-        // Public pages-ல் 401 வந்தாலும் login-க்கு போகாதே
+        // Don't redirect to login on public pages
         const isPublicPath = PUBLIC_PATHS.some(
           (path) => currentPath === path || currentPath.startsWith(path + '/')
         );
 
         if (!isPublicPath) {
           localStorage.removeItem(AUTH_STORAGE_KEY);
+          sessionStorage.removeItem(AUTH_STORAGE_KEY);
           window.location.href = '/login';
         }
       }

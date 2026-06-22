@@ -1,4 +1,5 @@
 'use client';
+
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import {
@@ -70,11 +71,8 @@ export default function ModulesSection() {
       api.get('/public/teachers') as unknown as Promise<PublicTeacher[]>,
     ])
       .then(([modulesData, teachersData]) => {
-        // Only active modules
         setModules(modulesData.filter(m => m.status === 'active'));
 
-        // Build subject (lowercased) → teacher map
-        // Each teacher lists their subjects in teacher.subject[] (e.g. ["Mathematics", "Physics"])
         const map: Record<string, PublicTeacher> = {};
         teachersData.forEach(teacher => {
           normalizeSubjects(teacher.subject).forEach(subj => {
@@ -138,8 +136,6 @@ export default function ModulesSection() {
               {modules.map(module => {
                 const Icon = getIcon(module.name);
 
-                // Primary: look up teacher by module name in teacher.subject[] (case-insensitive)
-                // Fallback: use module.teacherId (static field set when module was created)
                 const matchedTeacher = teacherBySubject[module.name.toLowerCase()];
                 const teacherId = matchedTeacher?._id ?? (module.teacherId || null);
 

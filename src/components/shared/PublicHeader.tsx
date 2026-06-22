@@ -2,7 +2,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { Menu, X, GraduationCap } from 'lucide-react';
+import { Menu, X } from 'lucide-react';
 import Image from 'next/image';
 
 export default function PublicHeader() {
@@ -12,35 +12,35 @@ export default function PublicHeader() {
 
   const navLinks = [
     { label: 'Home', path: '/' },
-    { label: 'Modules', path: '/modules' },
+    { label: 'Subjects', path: '/modules' },
     { label: 'Contact Us', path: '/contact' },
   ];
 
   const isActive = (path: string) => pathname === path;
 
   return (
-    <header className="bg-white shadow-md sticky top-0 z-40">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-18 py-3">
+    <header className="bg-white border-b border-[#F3F4F6] sticky top-0 z-40">
+      <div className="max-w-[1376px] mx-auto px-8">
+        <div className="flex items-center justify-between h-20">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-0">
             <Image src="/logo copy.png" alt="Techna Logo" width={105} height={40} className="rounded-full" />
             <div>
-              <p className="text-lg font-bold text-blue-900 leading-tight font-poppins">Techna</p>
-              <p className="text-xs text-gray-500 leading-tight">Technical Institute</p>
+              <p className="text-lg font-bold text-[#1C398E] leading-tight">Techna</p>
+              <p className="text-xs text-[#6A7282] leading-tight">Technical Institute</p>
             </div>
           </Link>
 
           {/* Desktop Nav */}
-          <nav className="hidden md:flex items-center gap-1">
+          <nav className="hidden md:flex items-center gap-0">
             {navLinks.map(link => (
               <Link
                 key={link.path}
                 href={link.path}
-                className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
+                className={`px-8 py-2 rounded-md text-base font-medium transition-all duration-200 ${
                   isActive(link.path)
-                    ? 'bg-blue-900 text-white'
-                    : 'text-gray-700 hover:bg-blue-50 hover:text-blue-900'
+                    ? 'bg-[#0183CB] text-white'
+                    : 'text-[#0183CB] hover:bg-[#0183CB]/10'
                 }`}
               >
                 {link.label}
@@ -49,16 +49,16 @@ export default function PublicHeader() {
           </nav>
 
           {/* Auth Buttons */}
-          <div className="hidden md:flex items-center gap-3">
+          <div className="hidden md:flex items-center gap-4">
             <button
               onClick={() => router.push('/login')}
-              className="px-5 py-2 text-sm font-semibold text-blue-900 border-2 border-blue-900 rounded-lg hover:bg-blue-50 transition-all duration-200"
+              className="px-6 py-2.5 text-base font-medium text-[#0183CB] border-2 border-[#0183CB] rounded-md hover:bg-[#0183CB]/5 transition-all duration-200"
             >
               Login
             </button>
             <button
               onClick={() => router.push('/register')}
-              className="px-5 py-2 text-sm font-semibold text-white bg-gradient-to-r from-blue-900 to-blue-700 rounded-lg hover:from-blue-800 hover:to-blue-600 transition-all duration-200 shadow-md"
+              className="px-6 py-2.5 text-base font-medium text-white bg-[#0183CB] rounded-md hover:bg-[#016ba5] transition-all duration-200 shadow-[0px_4px_6px_-1px_rgba(0,0,0,0.1),0px_2px_4px_-2px_rgba(0,0,0,0.1)]"
             >
               Register
             </button>
@@ -68,6 +68,7 @@ export default function PublicHeader() {
           <button
             className="md:hidden p-2 rounded-lg text-gray-700 hover:bg-gray-100"
             onClick={() => setMenuOpen(!menuOpen)}
+            aria-label="Toggle menu"
           >
             {menuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
           </button>
@@ -84,8 +85,8 @@ export default function PublicHeader() {
                   onClick={() => setMenuOpen(false)}
                   className={`px-4 py-2.5 rounded-lg text-sm font-medium transition-all ${
                     isActive(link.path)
-                      ? 'bg-blue-900 text-white'
-                      : 'text-gray-700 hover:bg-blue-50'
+                      ? 'bg-[#0183CB] text-white'
+                      : 'text-[#0183CB] hover:bg-[#0183CB]/10'
                   }`}
                 >
                   {link.label}
@@ -94,13 +95,13 @@ export default function PublicHeader() {
               <div className="flex gap-2 mt-3 pt-3 border-t border-gray-100">
                 <button
                   onClick={() => { router.push('/login'); setMenuOpen(false); }}
-                  className="flex-1 py-2 text-sm font-semibold text-blue-900 border-2 border-blue-900 rounded-lg hover:bg-blue-50"
+                  className="flex-1 py-2 text-sm font-medium text-[#0183CB] border-2 border-[#0183CB] rounded-md hover:bg-[#0183CB]/5"
                 >
                   Login
                 </button>
                 <button
                   onClick={() => { router.push('/register'); setMenuOpen(false); }}
-                  className="flex-1 py-2 text-sm font-semibold text-white bg-blue-900 rounded-lg hover:bg-blue-800"
+                  className="flex-1 py-2 text-sm font-medium text-white bg-[#0183CB] rounded-md hover:bg-[#016ba5]"
                 >
                   Register
                 </button>

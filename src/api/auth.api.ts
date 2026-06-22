@@ -17,7 +17,9 @@ export type AuthApiResult = {
   [key: string]: unknown;
 };
 
-export const registerStudent = async (formData: FormData): Promise<AuthApiResult> => {
+export const registerStudent = async (
+  formData: FormData
+): Promise<AuthApiResult> => {
   const response = await apiClient.post('/students/register', formData);
   return response as unknown as AuthApiResult;
 };
@@ -34,10 +36,27 @@ export const studentLogin = async (
   return response as unknown as AuthApiResult;
 };
 
-export const getSession = async (token?: string): Promise<AuthApiResult> => {
+export const getSession = async (
+  token?: string
+): Promise<AuthApiResult> => {
   const response = await apiClient.get('/auth/session', {
     headers: token ? { Authorization: `Bearer ${token}` } : undefined,
   });
 
   return response as unknown as AuthApiResult;
+};
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const changePassword = async (currentPassword: string, newPassword: string): Promise<any> => {
+  const response = await apiClient.post('/auth/change-password', {
+    currentPassword,
+    newPassword,
+  });
+  return response;
+};
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const logoutApi = async (): Promise<any> => {
+  const response = await apiClient.post('/auth/logout');
+  return response;
 };
