@@ -59,6 +59,8 @@ function getIcon(name: string) {
   return BookOpen;
 }
 
+const categories = ['All', 'Engineering Technology', 'Bio Systems Technology', 'Science For Technology', 'Information Communication Technology', 'Mathematics', 'Geography', 'Agricultural Science'];
+
 export default function ModulesSection() {
   const [modules, setModules] = useState<ApiModule[]>([]);
   const [teacherBySubject, setTeacherBySubject] = useState<Record<string, PublicTeacher>>({});

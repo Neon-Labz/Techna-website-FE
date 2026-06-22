@@ -21,7 +21,7 @@ export const registerStudent = async (
   formData: FormData
 ): Promise<AuthApiResult> => {
   const response = await apiClient.post('/students/register', formData);
-  return response as unknown as AuthApiResult;
+  return response.data as unknown as AuthApiResult;
 };
 
 export const studentLogin = async (
@@ -33,7 +33,7 @@ export const studentLogin = async (
     password,
   });
 
-  return response as unknown as AuthApiResult;
+  return response.data as unknown as AuthApiResult;
 };
 
 export const getSession = async (
@@ -43,15 +43,19 @@ export const getSession = async (
     headers: token ? { Authorization: `Bearer ${token}` } : undefined,
   });
 
-  return response as unknown as AuthApiResult;
+  return response.data as unknown as AuthApiResult;
 };
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const changePassword = async (currentPassword: string, newPassword: string): Promise<any> => {
+export const changePassword = async (
+  currentPassword: string,
+  newPassword: string
+): Promise<any> => {
   const response = await apiClient.post('/auth/change-password', {
     currentPassword,
     newPassword,
   });
+
   return response;
 };
 
