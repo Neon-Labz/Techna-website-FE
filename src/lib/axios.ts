@@ -18,7 +18,6 @@ const readStoredToken = (): string | null => {
 
   const storages = [window.localStorage, window.sessionStorage];
 
-  // Direct token keys
   const directToken =
     storages.find((storage) => storage.getItem('token'))?.getItem('token') ||
     storages.find((storage) => storage.getItem('access_token'))?.getItem('access_token') ||
@@ -26,7 +25,6 @@ const readStoredToken = (): string | null => {
 
   if (directToken) return directToken;
 
-  // Persisted auth store
   const persistedAuth =
     window.localStorage.getItem(AUTH_STORAGE_KEY) ||
     window.sessionStorage.getItem(AUTH_STORAGE_KEY);
