@@ -2,7 +2,6 @@ import api from '@/lib/axios';
 
 export interface PaymentFromApi {
   _id: string;
-  id?: string;
   studentId: string;
   studentName: string;
   moduleId: string;

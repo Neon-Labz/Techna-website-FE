@@ -18,7 +18,6 @@ type Module = {
 };
 
 type Result = {
-  id?: string;
   _id?: string;
   marks?: number | null;
   maxMarks?: number | null;

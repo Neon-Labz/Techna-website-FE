@@ -94,7 +94,7 @@ export default function LoginSection() {
         <div className="bg-white rounded-3xl shadow-2xl p-8">
           <div className="text-center mb-8">
             <Image
-              src="/logo.png"
+              src="/new.png"
               alt="Techna Logo"
               width={150}
               height={80}
