@@ -26,7 +26,7 @@ export const GRADES = ['A+', 'A', 'A-', 'B+', 'B', 'B-', 'C+', 'C', 'C-', 'S', '
 
 export const mockModules: Module[] = [
   {
-    id: '1',
+    _id: '1',
     name: 'ENGINEERING TECHNOLOGY',
     code: 'ET-101',
     description: 'Fundamentals of engineering technology including mechanics, electrical systems, and materials science.',
@@ -36,14 +36,14 @@ export const mockModules: Module[] = [
     schedule: 'Mon, Wed, Fri – 8:00 AM',
     category: 'Core',
     videos: [
-      { id: 'v1', title: 'Introduction to Engineering Technology', moduleId: '1', moduleName: 'ENGINEERING TECHNOLOGY', duration: '45:30', uploadedAt: '2024-01-15', thumbnail: 'https://img.youtube.com/vi/dQw4w9WgXcQ/0.jpg', url: '#', description: 'Overview of engineering fundamentals' },
-      { id: 'v2', title: 'Mechanics – Statics & Dynamics', moduleId: '1', moduleName: 'ENGINEERING TECHNOLOGY', duration: '52:10', uploadedAt: '2024-01-22', thumbnail: 'https://img.youtube.com/vi/dQw4w9WgXcQ/0.jpg', url: '#', description: 'Force analysis and motion' },
-      { id: 'v3', title: 'Electrical Circuits Basics', moduleId: '1', moduleName: 'ENGINEERING TECHNOLOGY', duration: '38:45', uploadedAt: '2024-02-01', thumbnail: 'https://img.youtube.com/vi/dQw4w9WgXcQ/0.jpg', url: '#', description: 'Ohm\'s law and circuit analysis' },
+      { _id: 'v1', title: 'Introduction to Engineering Technology', moduleId: '1', moduleName: 'ENGINEERING TECHNOLOGY', duration: '45:30', uploadedAt: '2024-01-15', thumbnail: 'https://img.youtube.com/vi/dQw4w9WgXcQ/0.jpg', url: '#', description: 'Overview of engineering fundamentals' },
+      { _id: 'v2', title: 'Mechanics – Statics & Dynamics', moduleId: '1', moduleName: 'ENGINEERING TECHNOLOGY', duration: '52:10', uploadedAt: '2024-01-22', thumbnail: 'https://img.youtube.com/vi/dQw4w9WgXcQ/0.jpg', url: '#', description: 'Force analysis and motion' },
+      { _id: 'v3', title: 'Electrical Circuits Basics', moduleId: '1', moduleName: 'ENGINEERING TECHNOLOGY', duration: '38:45', uploadedAt: '2024-02-01', thumbnail: 'https://img.youtube.com/vi/dQw4w9WgXcQ/0.jpg', url: '#', description: 'Ohm\'s law and circuit analysis' },
     ],
     notices: [],
   },
   {
-    id: '2',
+    _id: '2',
     name: 'INFORMATION COMMUNICATION TECHNOLOGY',
     code: 'ICT-102',
     description: 'Computing fundamentals, programming, networking, and digital systems for the modern world.',
@@ -53,13 +53,13 @@ export const mockModules: Module[] = [
     schedule: 'Tue, Thu – 9:00 AM',
     category: 'Core',
     videos: [
-      { id: 'v4', title: 'Introduction to Programming', moduleId: '2', moduleName: 'ICT', duration: '60:00', uploadedAt: '2024-01-18', thumbnail: 'https://img.youtube.com/vi/dQw4w9WgXcQ/0.jpg', url: '#', description: 'Basics of programming using Python' },
-      { id: 'v5', title: 'Database Management Systems', moduleId: '2', moduleName: 'ICT', duration: '48:15', uploadedAt: '2024-02-05', thumbnail: 'https://img.youtube.com/vi/dQw4w9WgXcQ/0.jpg', url: '#', description: 'SQL and relational databases' },
+      { _id: 'v4', title: 'Introduction to Programming', moduleId: '2', moduleName: 'ICT', duration: '60:00', uploadedAt: '2024-01-18', thumbnail: 'https://img.youtube.com/vi/dQw4w9WgXcQ/0.jpg', url: '#', description: 'Basics of programming using Python' },
+      { _id: 'v5', title: 'Database Management Systems', moduleId: '2', moduleName: 'ICT', duration: '48:15', uploadedAt: '2024-02-05', thumbnail: 'https://img.youtube.com/vi/dQw4w9WgXcQ/0.jpg', url: '#', description: 'SQL and relational databases' },
     ],
     notices: [],
   },
   {
-    id: '3',
+    _id: '3',
     name: 'MATHEMATICS',
     code: 'MATH-103',
     description: 'Advanced mathematics covering calculus, algebra, statistics, and discrete mathematics.',
@@ -69,13 +69,13 @@ export const mockModules: Module[] = [
     schedule: 'Mon, Wed – 10:00 AM',
     category: 'Core',
     videos: [
-      { id: 'v6', title: 'Calculus – Differentiation', moduleId: '3', moduleName: 'MATHEMATICS', duration: '55:20', uploadedAt: '2024-01-20', thumbnail: 'https://img.youtube.com/vi/dQw4w9WgXcQ/0.jpg', url: '#', description: 'Derivatives and applications' },
-      { id: 'v7', title: 'Integration Techniques', moduleId: '3', moduleName: 'MATHEMATICS', duration: '62:00', uploadedAt: '2024-02-10', thumbnail: 'https://img.youtube.com/vi/dQw4w9WgXcQ/0.jpg', url: '#', description: 'Definite and indefinite integrals' },
+      { _id: 'v6', title: 'Calculus – Differentiation', moduleId: '3', moduleName: 'MATHEMATICS', duration: '55:20', uploadedAt: '2024-01-20', thumbnail: 'https://img.youtube.com/vi/dQw4w9WgXcQ/0.jpg', url: '#', description: 'Derivatives and applications' },
+      { _id: 'v7', title: 'Integration Techniques', moduleId: '3', moduleName: 'MATHEMATICS', duration: '62:00', uploadedAt: '2024-02-10', thumbnail: 'https://img.youtube.com/vi/dQw4w9WgXcQ/0.jpg', url: '#', description: 'Definite and indefinite integrals' },
     ],
     notices: [],
   },
   {
-    id: '4',
+    _id: '4',
     name: 'BIO SYSTEMS TECHNOLOGY',
     code: 'BST-104',
     description: 'Study of biological systems, biotechnology, and their applications in modern industry.',
@@ -85,12 +85,12 @@ export const mockModules: Module[] = [
     schedule: 'Tue, Fri – 11:00 AM',
     category: 'Core',
     videos: [
-      { id: 'v8', title: 'Introduction to Biosystems', moduleId: '4', moduleName: 'BIO SYSTEMS TECHNOLOGY', duration: '42:30', uploadedAt: '2024-01-25', thumbnail: 'https://img.youtube.com/vi/dQw4w9WgXcQ/0.jpg', url: '#', description: 'Overview of biological systems' },
+      { _id: 'v8', title: 'Introduction to Biosystems', moduleId: '4', moduleName: 'BIO SYSTEMS TECHNOLOGY', duration: '42:30', uploadedAt: '2024-01-25', thumbnail: 'https://img.youtube.com/vi/dQw4w9WgXcQ/0.jpg', url: '#', description: 'Overview of biological systems' },
     ],
     notices: [],
   },
   {
-    id: '5',
+    _id: '5',
     name: 'SCIENCE FOR TECHNOLOGY',
     code: 'SFT-105',
     description: 'Applied science concepts including physics, chemistry, and biology for technological applications.',
@@ -103,7 +103,7 @@ export const mockModules: Module[] = [
     notices: [],
   },
   {
-    id: '6',
+    _id: '6',
     name: 'AGRICULTURAL SCIENCE',
     code: 'AGS-106',
     description: 'Modern agricultural practices, soil science, crop management, and agribusiness.',
@@ -116,7 +116,7 @@ export const mockModules: Module[] = [
     notices: [],
   },
   {
-    id: '7',
+    _id: '7',
     name: 'GEOGRAPHY',
     code: 'GEO-107',
     description: 'Physical and human geography, GIS, environmental studies, and spatial analysis.',
@@ -132,7 +132,7 @@ export const mockModules: Module[] = [
 
 export const mockNotices: Notice[] = [
   {
-    id: 'n1',
+    _id: 'n1',
     title: 'Mid-Term Examination Schedule – 2024',
     content: 'Mid-term examinations will be held from March 15–22, 2024. Students must carry their admission cards. No electronic devices allowed in examination halls.',
     type: 'exam',
@@ -140,7 +140,7 @@ export const mockNotices: Notice[] = [
     moduleId: undefined,
   },
   {
-    id: 'n2',
+    _id: 'n2',
     title: 'ICT Lab Practical Exam – Batch 2024',
     content: 'ICT practical examinations scheduled for March 18, 2024. Report to Lab 1 by 8:30 AM. Formal dress code is mandatory.',
     type: 'exam',
@@ -148,14 +148,14 @@ export const mockNotices: Notice[] = [
     moduleId: '2',
   },
   {
-    id: 'n3',
+    _id: 'n3',
     title: 'Annual Sports Day – 2024',
     content: 'Annual Sports Day will be held on February 28, 2024. All students are encouraged to participate. Registration closes February 20.',
     type: 'general',
     date: '2024-02-15',
   },
   {
-    id: 'n4',
+    _id: 'n4',
     title: 'Engineering Technology Assignment Submission',
     content: 'Final assignment submissions for ET-101 due March 10, 2024. Submit via the portal or hand-deliver to the department office.',
     type: 'assignment',
@@ -163,14 +163,14 @@ export const mockNotices: Notice[] = [
     moduleId: '1',
   },
   {
-    id: 'n5',
+    _id: 'n5',
     title: 'Holiday Notice – National Day',
     content: 'The institute will remain closed on February 4, 2024 for National Independence Day. Regular classes resume February 5.',
     type: 'holiday',
     date: '2024-02-01',
   },
   {
-    id: 'n6',
+    _id: 'n6',
     title: 'Mathematics Remedial Classes',
     content: 'Additional remedial classes for Mathematics will be held every Saturday from 9:00 AM to 12:00 PM starting March 2, 2024.',
     type: 'general',
@@ -180,30 +180,30 @@ export const mockNotices: Notice[] = [
 ];
 
 export const mockResults: ExamResult[] = [
-  { id: 'r1', studentId: 'STU001', moduleId: '1', moduleName: 'ENGINEERING TECHNOLOGY', moduleCode: 'ET-101', examType: 'Mid-Term', marks: 78, maxMarks: 100, grade: 'B+', date: '2024-03-20', semester: 'Semester 1' },
-  { id: 'r2', studentId: 'STU001', moduleId: '2', moduleName: 'INFORMATION COMMUNICATION TECHNOLOGY', moduleCode: 'ICT-102', examType: 'Mid-Term', marks: 92, maxMarks: 100, grade: 'A+', date: '2024-03-21', semester: 'Semester 1' },
-  { id: 'r3', studentId: 'STU001', moduleId: '3', moduleName: 'MATHEMATICS', moduleCode: 'MATH-103', examType: 'Mid-Term', marks: 85, maxMarks: 100, grade: 'A', date: '2024-03-22', semester: 'Semester 1' },
-  { id: 'r4', studentId: 'STU001', moduleId: '4', moduleName: 'BIO SYSTEMS TECHNOLOGY', moduleCode: 'BST-104', examType: 'Mid-Term', marks: 71, maxMarks: 100, grade: 'B', date: '2024-03-23', semester: 'Semester 1' },
-  { id: 'r5', studentId: 'STU001', moduleId: '1', moduleName: 'ENGINEERING TECHNOLOGY', moduleCode: 'ET-101', examType: 'Final', marks: 88, maxMarks: 100, grade: 'A', date: '2024-06-15', semester: 'Semester 1' },
-  { id: 'r6', studentId: 'STU001', moduleId: '2', moduleName: 'INFORMATION COMMUNICATION TECHNOLOGY', moduleCode: 'ICT-102', examType: 'Final', marks: 95, maxMarks: 100, grade: 'A+', date: '2024-06-16', semester: 'Semester 1' },
-  { id: 'r7', studentId: 'STU001', moduleId: '3', moduleName: 'MATHEMATICS', moduleCode: 'MATH-103', examType: 'Final', marks: 80, maxMarks: 100, grade: 'A-', date: '2024-06-17', semester: 'Semester 1' },
-  { id: 'r8', studentId: 'STU001', moduleId: '5', moduleName: 'SCIENCE FOR TECHNOLOGY', moduleCode: 'SFT-105', examType: 'Final', marks: 76, maxMarks: 100, grade: 'B+', date: '2024-06-18', semester: 'Semester 1' },
-  { id: 'r9', studentId: 'STU001', moduleId: '1', moduleName: 'ENGINEERING TECHNOLOGY', moduleCode: 'ET-101', examType: 'Mid-Term', marks: 82, maxMarks: 100, grade: 'A-', date: '2024-09-20', semester: 'Semester 2' },
-  { id: 'r10', studentId: 'STU001', moduleId: '2', moduleName: 'INFORMATION COMMUNICATION TECHNOLOGY', moduleCode: 'ICT-102', examType: 'Mid-Term', marks: 89, maxMarks: 100, grade: 'A', date: '2024-09-21', semester: 'Semester 2' },
+  { _id: 'r1', studentId: 'STU001', moduleId: '1', moduleName: 'ENGINEERING TECHNOLOGY', moduleCode: 'ET-101', examType: 'Mid-Term', marks: 78, maxMarks: 100, grade: 'B+', date: '2024-03-20', semester: 'Semester 1' },
+  { _id: 'r2', studentId: 'STU001', moduleId: '2', moduleName: 'INFORMATION COMMUNICATION TECHNOLOGY', moduleCode: 'ICT-102', examType: 'Mid-Term', marks: 92, maxMarks: 100, grade: 'A+', date: '2024-03-21', semester: 'Semester 1' },
+  { _id: 'r3', studentId: 'STU001', moduleId: '3', moduleName: 'MATHEMATICS', moduleCode: 'MATH-103', examType: 'Mid-Term', marks: 85, maxMarks: 100, grade: 'A', date: '2024-03-22', semester: 'Semester 1' },
+  { _id: 'r4', studentId: 'STU001', moduleId: '4', moduleName: 'BIO SYSTEMS TECHNOLOGY', moduleCode: 'BST-104', examType: 'Mid-Term', marks: 71, maxMarks: 100, grade: 'B', date: '2024-03-23', semester: 'Semester 1' },
+  { _id: 'r5', studentId: 'STU001', moduleId: '1', moduleName: 'ENGINEERING TECHNOLOGY', moduleCode: 'ET-101', examType: 'Final', marks: 88, maxMarks: 100, grade: 'A', date: '2024-06-15', semester: 'Semester 1' },
+  { _id: 'r6', studentId: 'STU001', moduleId: '2', moduleName: 'INFORMATION COMMUNICATION TECHNOLOGY', moduleCode: 'ICT-102', examType: 'Final', marks: 95, maxMarks: 100, grade: 'A+', date: '2024-06-16', semester: 'Semester 1' },
+  { _id: 'r7', studentId: 'STU001', moduleId: '3', moduleName: 'MATHEMATICS', moduleCode: 'MATH-103', examType: 'Final', marks: 80, maxMarks: 100, grade: 'A-', date: '2024-06-17', semester: 'Semester 1' },
+  { _id: 'r8', studentId: 'STU001', moduleId: '5', moduleName: 'SCIENCE FOR TECHNOLOGY', moduleCode: 'SFT-105', examType: 'Final', marks: 76, maxMarks: 100, grade: 'B+', date: '2024-06-18', semester: 'Semester 1' },
+  { _id: 'r9', studentId: 'STU001', moduleId: '1', moduleName: 'ENGINEERING TECHNOLOGY', moduleCode: 'ET-101', examType: 'Mid-Term', marks: 82, maxMarks: 100, grade: 'A-', date: '2024-09-20', semester: 'Semester 2' },
+  { _id: 'r10', studentId: 'STU001', moduleId: '2', moduleName: 'INFORMATION COMMUNICATION TECHNOLOGY', moduleCode: 'ICT-102', examType: 'Mid-Term', marks: 89, maxMarks: 100, grade: 'A', date: '2024-09-21', semester: 'Semester 2' },
 ];
 
 export const mockPayments: Payment[] = [
-  { id: 'p1', studentId: 'STU001', description: 'Tuition Fee – Semester 1', amount: 25000, status: 'paid', date: '2024-01-10', receiptNumber: 'REC-2024-001', method: 'Bank Transfer', semester: 'Semester 1' },
-  { id: 'p2', studentId: 'STU001', description: 'Lab Fee – Semester 1', amount: 5000, status: 'paid', date: '2024-01-10', receiptNumber: 'REC-2024-002', method: 'Cash', semester: 'Semester 1' },
-  { id: 'p3', studentId: 'STU001', description: 'Examination Fee – Mid-Term', amount: 3000, status: 'paid', date: '2024-02-20', receiptNumber: 'REC-2024-003', method: 'Online', semester: 'Semester 1' },
-  { id: 'p4', studentId: 'STU001', description: 'Tuition Fee – Semester 2', amount: 25000, status: 'paid', date: '2024-07-05', receiptNumber: 'REC-2024-004', method: 'Bank Transfer', semester: 'Semester 2' },
-  { id: 'p5', studentId: 'STU001', description: 'Lab Fee – Semester 2', amount: 5000, status: 'pending', date: '2024-07-05', receiptNumber: 'REC-2024-005', method: 'Pending', semester: 'Semester 2' },
-  { id: 'p6', studentId: 'STU001', description: 'Examination Fee – Final', amount: 4500, status: 'overdue', date: '2024-05-15', receiptNumber: 'REC-2024-006', method: 'Overdue', semester: 'Semester 1' },
-  { id: 'p7', studentId: 'STU001', description: 'Library Fee – Annual', amount: 2000, status: 'paid', date: '2024-01-15', receiptNumber: 'REC-2024-007', method: 'Cash', semester: 'Annual' },
+  { _id: 'p1', studentId: 'STU001', description: 'Tuition Fee – Semester 1', amount: 25000, status: 'paid', date: '2024-01-10', receiptNumber: 'REC-2024-001', method: 'Bank Transfer', semester: 'Semester 1' },
+  { _id: 'p2', studentId: 'STU001', description: 'Lab Fee – Semester 1', amount: 5000, status: 'paid', date: '2024-01-10', receiptNumber: 'REC-2024-002', method: 'Cash', semester: 'Semester 1' },
+  { _id: 'p3', studentId: 'STU001', description: 'Examination Fee – Mid-Term', amount: 3000, status: 'paid', date: '2024-02-20', receiptNumber: 'REC-2024-003', method: 'Online', semester: 'Semester 1' },
+  { _id: 'p4', studentId: 'STU001', description: 'Tuition Fee – Semester 2', amount: 25000, status: 'paid', date: '2024-07-05', receiptNumber: 'REC-2024-004', method: 'Bank Transfer', semester: 'Semester 2' },
+  { _id: 'p5', studentId: 'STU001', description: 'Lab Fee – Semester 2', amount: 5000, status: 'pending', date: '2024-07-05', receiptNumber: 'REC-2024-005', method: 'Pending', semester: 'Semester 2' },
+  { _id: 'p6', studentId: 'STU001', description: 'Examination Fee – Final', amount: 4500, status: 'overdue', date: '2024-05-15', receiptNumber: 'REC-2024-006', method: 'Overdue', semester: 'Semester 1' },
+  { _id: 'p7', studentId: 'STU001', description: 'Library Fee – Annual', amount: 2000, status: 'paid', date: '2024-01-15', receiptNumber: 'REC-2024-007', method: 'Cash', semester: 'Annual' },
 ];
 
 export const mockStudent: Student = {
-  id: 'STU001',
+  _id: 'STU001',
   admissionNumber: 'ADM-2024-0042',
   serialNumber: 'SN-2024-0042',
   fullNameTamil: 'ரவீந்திரன் கணேஷ்',

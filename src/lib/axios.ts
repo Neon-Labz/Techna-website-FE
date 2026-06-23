@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const AUTH_STORAGE_KEY = 'techna-auth';
+const AUTH_STORAGE_KEYS = ['techna-auth', 'edu-auth'];
 
 const PUBLIC_PATHS = [
   '/',
@@ -13,70 +13,91 @@ const PUBLIC_PATHS = [
   '/pending',
 ];
 
-const readStoredToken = (): string | null => {
-  if (typeof window === 'undefined') return null;
-
-  const storages = [window.localStorage, window.sessionStorage];
-
-  const directToken =
-    storages.find((storage) => storage.getItem('token'))?.getItem('token') ||
-    storages.find((storage) => storage.getItem('access_token'))?.getItem('access_token') ||
-    storages.find((storage) => storage.getItem('accessToken'))?.getItem('accessToken');
-
-  if (directToken) return directToken;
-
-  const persistedAuth =
-    window.localStorage.getItem(AUTH_STORAGE_KEY) ||
-    window.sessionStorage.getItem(AUTH_STORAGE_KEY);
-  if (!persistedAuth) return null;
-
-  try {
-    const parsed = JSON.parse(persistedAuth);
-    return parsed?.state?.token || parsed?.token || null;
-  } catch {
-    return null;
-  }
-};
-
 const api = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:4000/api',
+  baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api',
   headers: {
     'Content-Type': 'application/json',
   },
   timeout: 15000,
 });
 
-// REQUEST interceptor — attach JWT token
+const readStoredToken = (): string | null => {
+  if (typeof window === 'undefined') return null;
+
+  const storages = [window.localStorage, window.sessionStorage];
+
+  for (const storage of storages) {
+    const directToken =
+      storage.getItem('token') ||
+      storage.getItem('access_token') ||
+      storage.getItem('accessToken');
+
+    if (directToken) return directToken;
+  }
+
+  for (const key of AUTH_STORAGE_KEYS) {
+    const stored =
+      window.localStorage.getItem(key) || window.sessionStorage.getItem(key);
+
+    if (!stored) continue;
+
+    try {
+      const parsed = JSON.parse(stored);
+      const token = parsed?.state?.token || parsed?.token;
+
+      if (token) return token;
+    } catch {
+      // ignore invalid storage json
+    }
+  }
+
+  return null;
+};
+
 api.interceptors.request.use((config) => {
+  if (config.headers?.['X-Skip-Auth']) {
+    delete config.headers['X-Skip-Auth'];
+    return config;
+  }
+
+  if (config.headers?.Authorization) {
+    return config;
+  }
+
   const token = readStoredToken();
+
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }
+
   return config;
 });
 
-// RESPONSE interceptor — unwrap { success, message, data } envelope
 api.interceptors.response.use(
   (response) => response.data?.data ?? response.data,
   (error) => {
-    if (error.response?.status === 401) {
-      if (typeof window !== 'undefined') {
-        const currentPath = window.location.pathname;
+    if (error.response?.status === 401 && typeof window !== 'undefined') {
+      const currentPath = window.location.pathname;
 
-        // Don't redirect to login on public pages
-        const isPublicPath = PUBLIC_PATHS.some(
-          (path) => currentPath === path || currentPath.startsWith(path + '/')
-        );
+      const isPublicPath = PUBLIC_PATHS.some(
+        (path) => currentPath === path || currentPath.startsWith(path + '/'),
+      );
 
-        if (!isPublicPath) {
-          localStorage.removeItem(AUTH_STORAGE_KEY);
-          sessionStorage.removeItem(AUTH_STORAGE_KEY);
-          window.location.href = '/login';
-        }
+      const isLoginPath =
+        currentPath === '/login' || currentPath.includes('/login');
+
+      if (!isPublicPath && !isLoginPath) {
+        AUTH_STORAGE_KEYS.forEach((key) => {
+          localStorage.removeItem(key);
+          sessionStorage.removeItem(key);
+        });
+
+        window.location.href = '/login';
       }
     }
+
     return Promise.reject(error);
-  }
+  },
 );
 
 export default api;

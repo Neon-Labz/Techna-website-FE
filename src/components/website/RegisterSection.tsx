@@ -3,8 +3,10 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Check, ChevronRight, ChevronLeft, User, MapPin, BookOpen, FileText, Plus, Trash2, Upload, GraduationCap } from 'lucide-react';
-import { registerStudent } from '../../api/auth.api';
-import apiClient from '../../lib/axios';
+import { authApi } from '@/api/auth.api';
+import { dashboardApi } from '@/api/dashboard.api';
+import type { RegisterStudentPayload } from '@/api/auth.api';
+import { SUBJECTS } from '@/data/mockData';
 
 const STEPS = [
   { id: 1, label: 'Basic Info', icon: User, desc: 'Personal details' },
@@ -28,22 +30,156 @@ export const RELIGION_OPTIONS = ['Buddhism', 'Hinduism', 'Islam', 'Christianity'
 interface OLRow { year: string; indexNumber: string; english: string; mathematics: string; science: string; sinhala: string; tamil: string; }
 const emptyOL: OLRow = { year: '', indexNumber: '', english: '', mathematics: '', science: '', sinhala: '', tamil: '' };
 
-// Display-only label overrides for subjects. The value sent to the backend stays the original module name.
+// Display-only labels; the original module name is still sent to the backend.
 const SUBJECT_LABELS: Record<string, string> = {
   'Information Communication Technology': 'ICT',
 };
 const subjectLabel = (name: string) => SUBJECT_LABELS[name] || name;
 
-type ModuleOption = {
+type RegistrationModule = {
+  _id?: string;
   name?: string;
+  status?: string;
+};
+
+const clean = (value: string) => value.trim();
+
+const optional = (value: string) => {
+  const trimmed = clean(value);
+  return trimmed || undefined;
+};
+
+const cleanPhone = (value: string) => clean(value).replace(/[\s-]/g, '');
+
+const createInitialForm = () => ({
+  fullNameTamil: '', fullNameEnglish: '', dateOfBirth: '',
+  nicNo: '', address: '', school: '', whatsappNo: '', parentsNo: '', email: '', password: '', confirmPassword: '',
+  permanentAddress: '', administrativeDistrict: '', fixedTelephone: '', residingSince: '',
+  race: '', religion: '', citizenByDescent: 'YES',
+  contactAddress: '', postalCode: '',
+  fatherName: '', motherName: '', guardianName: '',
+  contactPerson: 'Mother' as 'Father' | 'Mother' | 'Guardian',
+  guardianAddress: '', guardianFixedTel: '', guardianMobile: '',
+  olCategory: 'Local O/L', olYear: '', olIndexNumber: '', olNameUsed: '',
+  olAccept: 'Accept' as 'Accept' | 'Change',
+  batch: '',
+  subjects: [] as string[],
+  declarationRules: false,
+  declarationAccuracy: false,
+});
+
+const buildRegisterPayload = (
+  form: ReturnType<typeof createInitialForm>,
+  olRows: OLRow[]
+): RegisterStudentPayload => {
+  const olResults = olRows
+    .filter((row) => clean(row.year) && clean(row.indexNumber))
+    .map((row) => ({
+      year: clean(row.year),
+      indexNumber: clean(row.indexNumber),
+      ...(optional(row.english) ? { english: clean(row.english) } : {}),
+      ...(optional(row.mathematics) ? { mathematics: clean(row.mathematics) } : {}),
+      ...(optional(row.science) ? { science: clean(row.science) } : {}),
+      ...(optional(row.sinhala) ? { sinhala: clean(row.sinhala) } : {}),
+      ...(optional(row.tamil) ? { tamil: clean(row.tamil) } : {}),
+    }));
+
+  return {
+    account: {
+      email: clean(form.email).toLowerCase(),
+      password: form.password,
+    },
+    personal: {
+      fullNameTamil: optional(form.fullNameTamil),
+      fullNameEnglish: clean(form.fullNameEnglish),
+      dateOfBirth: clean(form.dateOfBirth),
+      nicNo: clean(form.nicNo),
+      school: optional(form.school),
+      whatsappNo: cleanPhone(form.whatsappNo),
+      parentsNo: optional(cleanPhone(form.parentsNo)),
+      permanentAddress: clean(form.permanentAddress),
+      administrativeDistrict: form.administrativeDistrict,
+      fixedTelephone: optional(cleanPhone(form.fixedTelephone)),
+      residingSince: optional(form.residingSince),
+      race: optional(form.race),
+      religion: optional(form.religion),
+      citizenByDescent: form.citizenByDescent,
+      contactAddress: optional(form.contactAddress),
+      postalCode: optional(form.postalCode),
+    },
+    parent: {
+      fatherName: optional(form.fatherName),
+      motherName: optional(form.motherName),
+      guardianName: optional(form.guardianName),
+      contactPerson: form.contactPerson,
+      guardianAddress: optional(form.guardianAddress),
+      guardianFixedTel: optional(cleanPhone(form.guardianFixedTel)),
+      guardianMobile: optional(cleanPhone(form.guardianMobile)),
+    },
+    olRecords: {
+      olCategory: form.olCategory,
+      olYear: optional(form.olYear),
+      olIndexNumber: optional(form.olIndexNumber),
+      olNameUsed: optional(form.olNameUsed),
+      olAccept: form.olAccept,
+      olResults,
+    },
+    subjectSelection: {
+      subjects: form.subjects,
+      agreed: form.declarationRules && form.declarationAccuracy,
+    },
+    batch: clean(form.batch),
+  };
+};
+
+type ApiValidationDetail = {
+  field?: string;
+  property?: string;
+  message?: unknown;
+  constraints?: Record<string, string>;
+  children?: ApiValidationDetail[];
+};
+
+const stringifyApiMessage = (message: unknown): string => {
+  if (!message) return '';
+  if (typeof message === 'string') return message;
+  if (Array.isArray(message)) {
+    return message.map(stringifyApiMessage).filter(Boolean).join(', ');
+  }
+  if (typeof message === 'object') {
+    const detail = message as ApiValidationDetail;
+    const constraintMessage = stringifyApiMessage(
+      detail.constraints ? Object.values(detail.constraints) : undefined
+    );
+    const childMessage = stringifyApiMessage(detail.children);
+    const body = constraintMessage || childMessage || stringifyApiMessage(detail.message);
+    const field = detail.field || detail.property;
+
+    return field && body ? `${field}: ${body}` : body;
+  }
+
+  return String(message);
 };
 
 const getApiErrorMessage = (error: unknown, fallback: string) => {
-  const responseData = (error as { response?: { data?: { message?: string | string[] } } })?.response?.data;
+  const responseData = (error as {
+    response?: {
+      data?: {
+        message?: unknown;
+        error?: { details?: ApiValidationDetail[] };
+      };
+    };
+  })?.response?.data;
+  const details = responseData?.error?.details;
   const message = responseData?.message;
 
-  if (Array.isArray(message)) return message.join(', ');
-  if (message) return message;
+  if (Array.isArray(details) && details.length > 0) {
+    const detailMessage = stringifyApiMessage(details);
+    if (detailMessage) return detailMessage;
+  }
+
+  const apiMessage = stringifyApiMessage(message);
+  if (apiMessage) return apiMessage;
   if (error instanceof Error) return error.message;
   return fallback;
 };
@@ -52,35 +188,15 @@ export default function RegisterSection() {
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const [submitMessage, setSubmitMessage] = useState('');
   const [submitError, setSubmitError] = useState('');
-  const [submissionReference, setSubmissionReference] = useState('');
   const [profilePhoto, setProfilePhoto] = useState<File | null>(null);
-  const [subjectOptions, setSubjectOptions] = useState<string[]>([]);
+  const [subjectOptions, setSubjectOptions] = useState<string[]>(SUBJECTS);
   const [loadingSubjects, setLoadingSubjects] = useState(true);
   const [subjectsError, setSubjectsError] = useState('');
 
   // Form state
-  const [form, setForm] = useState({
-    fullNameTamil: '', fullNameEnglish: '', dateOfBirth: '',
-    nicNo: '', address: '', school: '', whatsappNo: '', parentsNo: '', email: '', password: '', confirmPassword: '',
-    // Address
-    permanentAddress: '', administrativeDistrict: '', fixedTelephone: '',
-    race: '', religion: '',
-    contactAddress: '', postalCode: '',
-    // Parents
-    fatherName: '', motherName: '', guardianName: '',
-    contactPerson: 'Mother' as 'Father' | 'Mother' | 'Guardian',
-    guardianAddress: '', guardianFixedTel: '', guardianMobile: '',
-    // OL
-    olCategory: 'Local O/L', olYear: '', olIndexNumber: '', olNameUsed: '',
-    olAccept: 'Accept' as 'Accept' | 'Change',
-    // Subjects
-    batch: '',
-    subjects: [] as string[],
-    // Agreement
-    declarationRules: false,
-    declarationAccuracy: false,
-  });
+  const [form, setForm] = useState(createInitialForm);
 
   const [olRows, setOlRows] = useState<OLRow[]>([{ ...emptyOL }]);
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -88,40 +204,42 @@ export default function RegisterSection() {
   const set = (key: string, value: string | boolean | string[]) => setForm(f => ({ ...f, [key]: value }));
 
   useEffect(() => {
-    let active = true;
+    let mounted = true;
 
-    const loadSubjects = async () => {
+    const loadModules = async () => {
       setLoadingSubjects(true);
       setSubjectsError('');
 
       try {
-        const result = await apiClient.get('/modules');
+        const modules = (await dashboardApi.getModules()) as RegistrationModule[];
+        const names = Array.from(
+          new Set(
+            modules
+              .filter((module) => !module.status || module.status === 'active')
+              .map((module) => module.name?.trim())
+              .filter((name): name is string => Boolean(name))
+          )
+        );
 
-        const modules = Array.isArray(result)
-          ? result
-          : Array.isArray((result as { data?: unknown })?.data)
-            ? (result as { data: ModuleOption[] }).data
-            : [];
-
-        const options = modules
-          .map((module: ModuleOption) => module.name || '')
-          .filter((name: string) => Boolean(name.trim()));
-
-        if (active) setSubjectOptions(Array.from(new Set(options)));
-      } catch {
-        if (active) {
-          setSubjectOptions([]);
+        if (mounted && names.length > 0) {
+          setSubjectOptions(names);
+        }
+      } catch (error) {
+        console.error('Failed to load modules:', error);
+        if (mounted) {
           setSubjectsError('Unable to load subjects');
         }
       } finally {
-        if (active) setLoadingSubjects(false);
+        if (mounted) {
+          setLoadingSubjects(false);
+        }
       }
     };
 
-    loadSubjects();
+    void loadModules();
 
     return () => {
-      active = false;
+      mounted = false;
     };
   }, []);
 
@@ -146,6 +264,7 @@ export default function RegisterSection() {
       if (!form.whatsappNo) e.whatsappNo = 'WhatsApp number is required';
       if (!form.email) e.email = 'Email is required';
       if (!form.password) e.password = 'Password is required';
+      if (form.password && form.password.length < 6) e.password = 'Password must be at least 6 characters';
       if (form.password !== form.confirmPassword) e.confirmPassword = 'Passwords do not match';
     }
     if (step === 2) {
@@ -167,96 +286,26 @@ export default function RegisterSection() {
   const handleSubmit = async () => {
     if (!validateStep()) return;
     setLoading(true);
+    setSubmitMessage('');
     setSubmitError('');
 
-    const olResults = olRows
-      .filter(row => row.year && row.indexNumber)
-      .map(row => ({
-        year: row.year,
-        indexNumber: row.indexNumber,
-        english: row.english || undefined,
-        mathematics: row.mathematics || undefined,
-        science: row.science || undefined,
-        sinhala: row.sinhala || undefined,
-        tamil: row.tamil || undefined,
-      }));
-
-    const hasOlData = Boolean(
-      form.olYear ||
-        form.olIndexNumber ||
-        form.olNameUsed ||
-        olResults.length,
-    );
-
-    const olRecords = hasOlData
-      ? {
-          olCategory: form.olCategory || undefined,
-          olYear: form.olYear || undefined,
-          olIndexNumber: form.olIndexNumber || undefined,
-          olNameUsed: form.olNameUsed || undefined,
-          olAccept: form.olAccept || undefined,
-          olResults,
-        }
-      : undefined;
-
-    const payload = {
-      account: {
-        email: form.email,
-        password: form.password,
-      },
-      personal: {
-        fullNameTamil: form.fullNameTamil,
-        fullNameEnglish: form.fullNameEnglish,
-        dateOfBirth: form.dateOfBirth,
-        nicNo: form.nicNo,
-        school: form.school,
-        whatsappNo: form.whatsappNo,
-        parentsNo: form.parentsNo,
-        permanentAddress: form.permanentAddress || form.address,
-        administrativeDistrict: form.administrativeDistrict,
-        fixedTelephone: form.fixedTelephone,
-        race: form.race || undefined,
-        religion: form.religion || undefined,
-        contactAddress: form.contactAddress,
-        postalCode: form.postalCode,
-      },
-      parent: {
-        fatherName: form.fatherName,
-        motherName: form.motherName,
-        guardianName: form.guardianName,
-        contactPerson: form.contactPerson || undefined,
-        guardianAddress: form.guardianAddress,
-        guardianFixedTel: form.guardianFixedTel,
-        guardianMobile: form.guardianMobile,
-      },
-      olRecords,
-      subjectSelection: {
-        subjects: form.subjects,
-        agreed: form.declarationRules && form.declarationAccuracy,
-      },
-      batch: form.batch,
-    };
-
     const formData = new FormData();
-    formData.append('payload', JSON.stringify(payload));
-    if (profilePhoto != null) {
-      formData.append('profilePhoto', profilePhoto as File);
+    formData.append('payload', JSON.stringify(buildRegisterPayload(form, olRows)));
+    if (profilePhoto) {
+      formData.append('profilePhoto', profilePhoto);
     }
 
     try {
-      const result = await registerStudent(formData);
+      const result = await authApi.registerStudent(formData);
 
-      setSubmissionReference(
-        result.data?.applicationReference ||
-          result.applicationReference ||
-          result.data?.reference ||
-          result.reference ||
-          '',
+      setSubmitMessage(
+        result?.message ||
+          'Registration submitted successfully. Awaiting admin approval.'
       );
-      setLoading(false);
       setSubmitted(true);
     } catch (error) {
       setSubmitError(getApiErrorMessage(error, 'Registration failed. Please try again.'));
+    } finally {
       setLoading(false);
     }
   };
@@ -282,7 +331,7 @@ export default function RegisterSection() {
           </div>
 
           <h2 className="mb-3 text-2xl font-bold text-slate-950">Application Submitted!</h2>
-          <p className="mb-7 text-base text-gray-500">You can login only after admin approval.</p>
+          <p className="mb-7 text-base text-gray-500">{submitMessage || 'You can login only after admin approval.'}</p>
 
           <div className="mb-5 border-t border-gray-200 pt-3">
             <p className="text-sm text-gray-600">A confirmation email will be sent to</p>
@@ -680,26 +729,31 @@ export default function RegisterSection() {
               <div>
                 <label className="block text-sm font-semibold text-gray-800 mb-3">Select Subjects <span className="text-red-500">*</span></label>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  {subjectOptions.map(sub => {
-                    const selected = form.subjects.includes(sub);
-                    return (
-                      <label
-                        key={sub}
-                        className={`flex items-center gap-3 p-3.5 rounded-xl border-2 cursor-pointer transition-all ${selected ? 'border-blue-500 bg-blue-50' : 'border-gray-200 bg-gray-50 hover:border-blue-300'}`}
-                      >
-                        <input
-                          type="checkbox"
-                          checked={selected}
-                          onChange={() => toggleSubject(sub)}
-                          className="text-blue-600 rounded w-4 h-4"
-                        />
-                        <span className={`text-sm font-medium ${selected ? 'text-blue-800' : 'text-gray-700'}`}>{subjectLabel(sub)}</span>
-                        {selected && <Check className="w-4 h-4 text-blue-600 ml-auto" />}
-                      </label>
-                    );
-                  })}
+                  {loadingSubjects ? (
+                    <div className="sm:col-span-2 rounded-xl border border-gray-200 bg-gray-50 p-4 text-sm text-gray-500">
+                      Loading subjects...
+                    </div>
+                  ) : (
+                    subjectOptions.map(sub => {
+                      const selected = form.subjects.includes(sub);
+                      return (
+                        <label
+                          key={sub}
+                          className={`flex items-center gap-3 p-3.5 rounded-xl border-2 cursor-pointer transition-all ${selected ? 'border-blue-500 bg-blue-50' : 'border-gray-200 bg-gray-50 hover:border-blue-300'}`}
+                        >
+                          <input
+                            type="checkbox"
+                            checked={selected}
+                            onChange={() => toggleSubject(sub)}
+                            className="text-blue-600 rounded w-4 h-4"
+                          />
+                          <span className={`text-sm font-medium ${selected ? 'text-blue-800' : 'text-gray-700'}`}>{subjectLabel(sub)}</span>
+                          {selected && <Check className="w-4 h-4 text-blue-600 ml-auto" />}
+                        </label>
+                      );
+                    })
+                  )}
                 </div>
-                {loadingSubjects && <p className="text-gray-500 text-xs mt-2">Loading subjects...</p>}
                 {!loadingSubjects && subjectsError && <p className="text-red-500 text-xs mt-2">{subjectsError}</p>}
                 {!loadingSubjects && !subjectsError && subjectOptions.length === 0 && <p className="text-gray-500 text-xs mt-2">No subjects are available.</p>}
                 {errors.subjects && <p className="text-red-500 text-xs mt-2">{errors.subjects}</p>}

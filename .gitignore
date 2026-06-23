@@ -20,6 +20,9 @@
 # production
 /build
 
+# yarn cache
+.yarn-cache/
+
 # misc
 .DS_Store
 *.pem

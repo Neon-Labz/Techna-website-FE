@@ -1,121 +1,171 @@
 export interface Student {
-  _id?: string;       // MongoDB ObjectId from backend
-  id: string;
-  batch?: string;     // e.g. "may 2026"
-  studentId?: string; // e.g. "STU084"
+  _id?: string;
+  studentId?: string;
+  name?: string;
+  role?: string;
+  batch?: string;
+  modules?: string[];
+  enrolledModules?: string[];
+  subjectSelection?: {
+    subjects?: string[];
+    enrolledModules?: string[];
+  };
+
   status?: 'pending' | 'approved' | 'rejected';
-  admissionNumber: string;
-  serialNumber: string;
-  fullNameTamil: string;
-  fullNameEnglish: string;
-  dateOfBirth: string;
-  nicNo: string;
-  address: string;
-  school: string;
-  whatsappNo: string;
-  parentsNo: string;
-  email: string;
-  subjects: string[];
+  admissionNumber?: string;
+  serialNumber?: string;
+  fullNameTamil?: string;
+  fullNameEnglish?: string;
+  dateOfBirth?: string;
+  dob?: string;
+  nicNo?: string;
+  address?: string;
+  school?: string;
+  whatsappNo?: string;
+  parentsNo?: string;
+  email?: string;
+  subjects?: string[];
 
-  // Personal Details
-  permanentAddress: string;
-  administrativeDistrict: string;
-  fixedTelephone: string;
-  residingSince: string;
-  race: string;
-  religion: string;
-  citizenByDescent: string;
-  contactAddress: string;
-  postalCode: string;
-  fatherName: string;
-  motherName: string;
-  guardianName: string;
-  contactPerson: 'Father' | 'Mother' | 'Guardian';
-  guardianAddress: string;
-  guardianFixedTel: string;
-  guardianMobile: string;
+  permanentAddress?: string;
+  administrativeDistrict?: string;
+  fixedTelephone?: string;
+  residingSince?: string;
+  race?: string;
+  religion?: string;
+  citizenByDescent?: string;
+  contactAddress?: string;
+  postalCode?: string;
+  fatherName?: string;
+  motherName?: string;
+  guardianName?: string;
+  contactPerson?: 'Father' | 'Mother' | 'Guardian';
+  guardianAddress?: string;
+  guardianFixedTel?: string;
+  guardianMobile?: string;
 
-  // OL Results
-  olCategory: string;
-  olYear: string;
-  olIndexNumber: string;
-  olNameUsed: string;
-  olResults: OLResult[];
+  olCategory?: string;
+  olYear?: string;
+  olIndexNumber?: string;
+  olNameUsed?: string;
+  olResults?: OLResult[];
 
   profilePhoto?: string;
-  createdAt: string;
+  avatar?: string;
+  profileImage?: string;
+  createdAt?: string;
 }
 
 export interface OLResult {
   year: string;
   indexNumber: string;
-  english: string;
-  mathematics: string;
-  science: string;
-  sinhala: string;
-  tamil: string;
+  english?: string;
+  mathematics?: string;
+  science?: string;
+  sinhala?: string;
+  tamil?: string;
 }
 
 export interface Module {
-  id: string;
+  _id?: string;
   name: string;
-  code: string;
-  description: string;
-  duration: string;
-  credits: number;
-  instructor: string;
+  code?: string;
+  description?: string;
+  duration?: string;
+  credits?: number;
+  instructor?: string;
   instructorPhotoUrl?: string;
-  schedule: string;
-  category: string;
-  videos: LectureVideo[];
-  notices: Notice[];
+  schedule?: string;
+  category?: string;
+  videos?: LectureVideo[];
+  notices?: Notice[];
+  resources?: LectureVideo[];
+  recordings?: LectureVideo[];
+  lectureRecordings?: LectureVideo[];
+  status?: string;
 }
 
 export interface LectureVideo {
-  id: string;
+  _id?: string;
   title: string;
-  moduleId: string;
-  moduleName: string;
-  duration: string;
-  uploadedAt: string;
-  thumbnail: string;
-  url: string;
-  description: string;
+  moduleId?: string;
+  moduleName?: string;
+  duration?: string;
+  uploadedAt?: string;
+  createdAt?: string;
+  thumbnail?: string;
+  url?: string;
+  fileUrl?: string;
+  videoUrl?: string;
+  link?: string;
+  fileType?: string;
+  description?: string;
+  isPublished?: boolean | string;
+  published?: boolean | string;
+  status?: string;
 }
 
 export interface Notice {
-  id: string;
+  _id?: string;
   title: string;
-  content: string;
+  content?: string;
+  description?: string;
   type: 'exam' | 'general' | 'assignment' | 'holiday';
-  date: string;
+  date?: string;
+  examDate?: string;
   moduleId?: string;
+  moduleName?: string;
+  module?:
+    | string
+    | {
+        _id?: string;
+        name?: string;
+        moduleId?: string;
+        moduleName?: string;
+      };
+  subject?: string;
+  batch?: string;
+  startTime?: string;
+  endTime?: string;
+  venue?: string;
+  createdAt?: string;
+  isPublished?: boolean | string;
+  published?: boolean | string;
+  status?: string;
 }
 
 export interface ExamResult {
-  id: string;
-  studentId: string;
-  moduleId: string;
-  moduleName: string;
-  moduleCode: string;
-  examType: string;
+  _id?: string;
+  studentId?: string;
+  moduleId?: string;
+  moduleName?: string;
+  moduleCode?: string;
+  examType?: string;
   marks: number;
   maxMarks: number;
-  grade: string;
-  date: string;
-  semester: string;
+  grade?: string;
+  date?: string;
+  semester?: string;
+  result?: string;
+  hasResult?: boolean;
 }
 
 export interface Payment {
-  id: string;
-  studentId: string;
-  description: string;
+  _id?: string;
+  studentId?: string;
+  studentName?: string;
+  moduleId?: string;
+  moduleName?: string;
+  description?: string;
   amount: number;
   status: 'paid' | 'pending' | 'overdue';
-  date: string;
-  receiptNumber: string;
-  method: string;
-  semester: string;
+  date?: string;
+  paidDate?: string;
+  receiptNumber?: string;
+  receiptNo?: string;
+  method?: 'cash' | 'bank' | 'online' | string;
+  semester?: string;
+  batch?: string;
+  notes?: string;
 }
 
 export interface AuthState {
@@ -127,7 +177,7 @@ export interface AuthState {
   login: (
     student: Student | null,
     token: string,
-    rememberMe?: boolean
+    rememberMe?: boolean,
   ) => void;
 
   logout: () => void;

@@ -33,7 +33,7 @@ const isValidStudent = (data: unknown): data is Student => {
 
   if (obj.success === false || obj.message === 'Unauthorized') return false;
 
-  return !!(obj.email || obj._id || obj.id);
+  return !!(obj.email || obj._id || obj.studentId);
 };
 
 const authStorage: StateStorage = {

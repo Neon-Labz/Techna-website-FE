@@ -16,18 +16,23 @@ import {
 } from 'lucide-react';
 import { useAuthStore } from '../../store/authStore';
 import { updateStudentProfile } from '../../api/students.api';
-import { DISTRICTS, RACE_OPTIONS, RELIGION_OPTIONS } from '../website/RegisterSection';
+import {
+  DISTRICTS,
+  RACE_OPTIONS,
+  RELIGION_OPTIONS,
+} from '../website/RegisterSection';
 import { changePassword } from '../../api/auth.api';
 
 const getApiErrorMessage = (error: unknown, fallback: string) => {
   const axiosError = error as {
     response?: {
       status?: number;
-      data?: { message?: string | string[]; error?: string; statusCode?: number };
+      data?: { message?: string | string[]; error?: string };
       config?: { url?: string; baseURL?: string };
     };
     config?: { url?: string; baseURL?: string };
   };
+
   const responseData = axiosError?.response?.data;
   const message = responseData?.message;
   const status = axiosError?.response?.status;
@@ -35,9 +40,9 @@ const getApiErrorMessage = (error: unknown, fallback: string) => {
   const backendMessage = Array.isArray(message) ? message.join(', ') : message;
 
   if (status === 403) {
-    console.log('[Profile update] 403 endpoint:', endpoint);
-    console.log('[Profile update] 403 response body:', responseData);
-    return `Profile update was rejected by the backend${endpoint ? ` (${endpoint})` : ''}: ${backendMessage || responseData?.error || 'Forbidden'}`;
+    return `Profile update was rejected by the backend${endpoint ? ` (${endpoint})` : ''}: ${
+      backendMessage || responseData?.error || 'Forbidden'
+    }`;
   }
 
   if (backendMessage) return backendMessage;
@@ -58,25 +63,30 @@ const getUpdatedStudentData = (result: any) => {
     result?.data,
   ];
 
-  return candidates.find((candidate) => {
-    if (!candidate || typeof candidate !== 'object' || Array.isArray(candidate)) return false;
+  return (
+    candidates.find((candidate) => {
+      if (!candidate || typeof candidate !== 'object' || Array.isArray(candidate)) {
+        return false;
+      }
 
-    return Boolean(
-      candidate.email ||
-      candidate.id ||
-      candidate._id ||
-      candidate.studentId ||
-      candidate.fullNameEnglish ||
-      candidate.fullNameTamil
-    );
-  }) || null;
+      return Boolean(
+        candidate.email ||
+          candidate._id ||
+          candidate.studentId ||
+          candidate.fullNameEnglish ||
+          candidate.fullNameTamil,
+      );
+    }) || null
+  );
 };
 
 export default function ProfileSection() {
   const { student, updateStudent } = useAuthStore();
   const studentData = student as any;
 
-  const [activeTab, setActiveTab] = useState<'personal' | 'academic' | 'password'>('personal');
+  const [activeTab, setActiveTab] = useState<
+    'personal' | 'academic' | 'password'
+  >('personal');
   const [editing, setEditing] = useState(false);
   const [saved, setSaved] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -92,7 +102,10 @@ export default function ProfileSection() {
   const [editForm, setEditForm] = useState<any>({ ...studentData });
 
   const profileImage =
-    studentData?.profilePhoto || studentData?.avatar || studentData?.profileImage || '';
+    studentData?.profilePhoto ||
+    studentData?.avatar ||
+    studentData?.profileImage ||
+    '';
 
   useEffect(() => {
     setEditForm({ ...studentData });
@@ -123,30 +136,29 @@ export default function ProfileSection() {
     const studentId = studentData?._id || studentData?.id || studentData?.studentId;
 
     if (!studentId) {
-      setProfileMessage('');
       setProfileError('Profile update is not available for this session.');
       return;
     }
 
     const payload = {
-  fullNameEnglish: editForm.fullNameEnglish,
-  fullNameTamil: editForm.fullNameTamil,
-  dateOfBirth: editForm.dateOfBirth,
-  dob: editForm.dob,
-  nicNo: editForm.nicNo,
-  whatsappNo: editForm.whatsappNo,
-  parentsNo: editForm.parentsNo,
-  school: editForm.school,
-  address: editForm.address,
-  permanentAddress: editForm.permanentAddress,
-  administrativeDistrict: editForm.administrativeDistrict,
-  race: editForm.race,
-  religion: editForm.religion,
-  citizenByDescent: editForm.citizenByDescent,
-  fatherName: editForm.fatherName,
-  motherName: editForm.motherName,
-  guardianName: editForm.guardianName,
-};
+      fullNameEnglish: editForm.fullNameEnglish,
+      fullNameTamil: editForm.fullNameTamil,
+      dateOfBirth: editForm.dateOfBirth,
+      dob: editForm.dob,
+      nicNo: editForm.nicNo,
+      whatsappNo: editForm.whatsappNo,
+      parentsNo: editForm.parentsNo,
+      school: editForm.school,
+      address: editForm.address,
+      permanentAddress: editForm.permanentAddress,
+      administrativeDistrict: editForm.administrativeDistrict,
+      race: editForm.race,
+      religion: editForm.religion,
+      citizenByDescent: editForm.citizenByDescent,
+      fatherName: editForm.fatherName,
+      motherName: editForm.motherName,
+      guardianName: editForm.guardianName,
+    };
 
     setSaving(true);
     setProfileMessage('');
@@ -164,7 +176,9 @@ export default function ProfileSection() {
       setProfileMessage('Profile updated successfully.');
       setTimeout(() => setSaved(false), 3000);
     } catch (error) {
-      setProfileError(getApiErrorMessage(error, 'Unable to update profile. Please try again.'));
+      setProfileError(
+        getApiErrorMessage(error, 'Unable to update profile. Please try again.'),
+      );
     } finally {
       setSaving(false);
     }
@@ -178,10 +192,12 @@ export default function ProfileSection() {
       setPwError('Please fill all fields.');
       return;
     }
+
     if (pwForm.newPw !== pwForm.confirm) {
       setPwError('New passwords do not match.');
       return;
     }
+
     if (pwForm.newPw.length < 6) {
       setPwError('Password must be at least 6 characters.');
       return;
@@ -189,8 +205,8 @@ export default function ProfileSection() {
 
     setPwSaving(true);
     try {
-      const result = await changePassword(pwForm.old, pwForm.newPw);
-      setPwMsg(result?.message || 'Password changed successfully!');
+      await changePassword(pwForm.old, pwForm.newPw);
+      setPwMsg('Password changed successfully!');
       setPwForm({ old: '', newPw: '', confirm: '' });
       setTimeout(() => setPwMsg(''), 4000);
     } catch (error) {
@@ -227,18 +243,25 @@ export default function ProfileSection() {
           </div>
 
           <div className="text-center md:text-left flex-1">
-            <h1 className="text-2xl font-bold">{studentData?.fullNameEnglish}</h1>
-            <p className="text-[#8EC5FF] text-sm mt-1">{studentData?.fullNameTamil}</p>
+            <h1 className="text-2xl font-bold">
+              {studentData?.fullNameEnglish || 'Student'}
+            </h1>
+            <p className="text-blue-300 text-sm mt-1">
+              {studentData?.fullNameTamil || ''}
+            </p>
 
             <div className="flex flex-wrap justify-center md:justify-start gap-3 mt-3">
               <span className="px-3 py-1 bg-white/10 rounded-full text-xs font-medium">
-                {studentData?.studentId || studentData?.admissionNumber || studentData?.id}
+                {studentData?.studentId ||
+                  studentData?.admissionNumber ||
+                  studentData?.id ||
+                  '-'}
               </span>
               <span className="px-3 py-1 bg-white border border-[#34BFF3] text-[#34BFF3] rounded-full text-xs font-medium">
                 Active Student
               </span>
               <span className="px-3 py-1 bg-white/10 rounded-full text-xs font-medium">
-                {studentData?.email}
+                {studentData?.email || '-'}
               </span>
             </div>
           </div>
@@ -252,8 +275,9 @@ export default function ProfileSection() {
       </div>
 
       <div className="flex gap-2 flex-wrap">
-        {tabs.map(tab => {
+        {tabs.map((tab) => {
           const Icon = tab.icon;
+
           return (
             <button
               key={tab.id}
@@ -273,7 +297,9 @@ export default function ProfileSection() {
       {activeTab === 'personal' && (
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
           <div className="flex items-center justify-between mb-6">
-            <h2 className="font-bold text-gray-900 text-lg">Personal Information</h2>
+            <h2 className="font-bold text-gray-900 text-lg">
+              Personal Information
+            </h2>
 
             {!editing ? (
               <button
@@ -296,7 +322,8 @@ export default function ProfileSection() {
                   disabled={saving}
                   className="flex items-center gap-2 px-4 py-2 text-sm bg-blue-900 text-white rounded-xl hover:bg-blue-800 disabled:opacity-60"
                 >
-                  <Save className="w-4 h-4" /> {saving ? 'Saving...' : 'Save Changes'}
+                  <Save className="w-4 h-4" />{' '}
+                  {saving ? 'Saving...' : 'Save Changes'}
                 </button>
               </div>
             )}
@@ -315,20 +342,75 @@ export default function ProfileSection() {
           )}
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-            <Input label="Full Name (English)" value={editing ? editForm?.fullNameEnglish : studentData?.fullNameEnglish} disabled={!editing} onChange={v => setEditForm((f: any) => ({ ...f, fullNameEnglish: v }))} inputCls={inputCls} />
-            <Input label="Full Name (Tamil)" value={editing ? editForm?.fullNameTamil : studentData?.fullNameTamil} disabled={!editing} onChange={v => setEditForm((f: any) => ({ ...f, fullNameTamil: v }))} inputCls={inputCls} />
-            <Input label="Date of Birth" value={editing ? editForm?.dateOfBirth || editForm?.dob : studentData?.dateOfBirth || studentData?.dob} disabled={!editing} onChange={v => setEditForm((f: any) => ({ ...f, dateOfBirth: v }))} inputCls={inputCls} />
             <Input
-  label="NIC Number"
-  value={editing ? editForm?.nicNo : studentData?.nicNo}
-  disabled={!editing}
-  onChange={v => setEditForm((f: any) => ({ ...f, nicNo: v }))}
-  inputCls={inputCls}
-/>
-            <Input label="Email Address" value={studentData?.email} disabled inputCls={inputCls} />
-            <Input label="WhatsApp No." value={editing ? editForm?.whatsappNo : studentData?.whatsappNo} disabled={!editing} onChange={v => setEditForm((f: any) => ({ ...f, whatsappNo: v }))} inputCls={inputCls} />
-            <Input label="Parent's No." value={editing ? editForm?.parentsNo : studentData?.parentsNo} disabled={!editing} onChange={v => setEditForm((f: any) => ({ ...f, parentsNo: v }))} inputCls={inputCls} />
-            <Input label="School" value={editing ? editForm?.school : studentData?.school} disabled={!editing} onChange={v => setEditForm((f: any) => ({ ...f, school: v }))} inputCls={inputCls} />
+              label="Full Name (English)"
+              value={editing ? editForm?.fullNameEnglish : studentData?.fullNameEnglish}
+              disabled={!editing}
+              onChange={(v) =>
+                setEditForm((f: any) => ({ ...f, fullNameEnglish: v }))
+              }
+              inputCls={inputCls}
+            />
+            <Input
+              label="Full Name (Tamil)"
+              value={editing ? editForm?.fullNameTamil : studentData?.fullNameTamil}
+              disabled={!editing}
+              onChange={(v) =>
+                setEditForm((f: any) => ({ ...f, fullNameTamil: v }))
+              }
+              inputCls={inputCls}
+            />
+            <Input
+              label="Date of Birth"
+              value={
+                editing
+                  ? editForm?.dateOfBirth || editForm?.dob
+                  : studentData?.dateOfBirth || studentData?.dob
+              }
+              disabled={!editing}
+              onChange={(v) =>
+                setEditForm((f: any) => ({ ...f, dateOfBirth: v }))
+              }
+              inputCls={inputCls}
+            />
+            <Input
+              label="NIC Number"
+              value={editing ? editForm?.nicNo : studentData?.nicNo}
+              disabled={!editing}
+              onChange={(v) => setEditForm((f: any) => ({ ...f, nicNo: v }))}
+              inputCls={inputCls}
+            />
+            <Input
+              label="Email Address"
+              value={studentData?.email}
+              disabled
+              inputCls={inputCls}
+            />
+            <Input
+              label="WhatsApp No."
+              value={editing ? editForm?.whatsappNo : studentData?.whatsappNo}
+              disabled={!editing}
+              onChange={(v) =>
+                setEditForm((f: any) => ({ ...f, whatsappNo: v }))
+              }
+              inputCls={inputCls}
+            />
+            <Input
+              label="Parent's No."
+              value={editing ? editForm?.parentsNo : studentData?.parentsNo}
+              disabled={!editing}
+              onChange={(v) =>
+                setEditForm((f: any) => ({ ...f, parentsNo: v }))
+              }
+              inputCls={inputCls}
+            />
+            <Input
+              label="School"
+              value={editing ? editForm?.school : studentData?.school}
+              disabled={!editing}
+              onChange={(v) => setEditForm((f: any) => ({ ...f, school: v }))}
+              inputCls={inputCls}
+            />
 
             <div className="md:col-span-2">
               <label className="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1.5">
@@ -336,7 +418,9 @@ export default function ProfileSection() {
               </label>
               <textarea
                 value={editing ? editForm?.address || '' : studentData?.address || ''}
-                onChange={e => setEditForm((f: any) => ({ ...f, address: e.target.value }))}
+                onChange={(e) =>
+                  setEditForm((f: any) => ({ ...f, address: e.target.value }))
+                }
                 disabled={!editing}
                 rows={2}
                 className={inputCls(!editing) + ' resize-none'}
@@ -348,24 +432,97 @@ export default function ProfileSection() {
             <h3 className="font-semibold text-gray-800 mb-4 flex items-center gap-2 text-sm">
               <MapPin className="w-4 h-4 text-[#34BFF3]" /> Residence Details
             </h3>
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <Input label="Permanent Address" value={editing ? editForm?.permanentAddress : studentData?.permanentAddress} disabled={!editing} onChange={v => setEditForm((f: any) => ({ ...f, permanentAddress: v }))} inputCls={inputCls} className="md:col-span-2" />
+              <Input
+                label="Permanent Address"
+                value={
+                  editing
+                    ? editForm?.permanentAddress
+                    : studentData?.permanentAddress
+                }
+                disabled={!editing}
+                onChange={(v) =>
+                  setEditForm((f: any) => ({ ...f, permanentAddress: v }))
+                }
+                inputCls={inputCls}
+                className="md:col-span-2"
+              />
+
               {editing ? (
-                <SelectInput label="District" value={editForm?.administrativeDistrict} options={DISTRICTS} placeholder="Select District" onChange={v => setEditForm((f: any) => ({ ...f, administrativeDistrict: v }))} inputCls={inputCls} />
+                <SelectInput
+                  label="District"
+                  value={editForm?.administrativeDistrict}
+                  options={DISTRICTS}
+                  placeholder="Select District"
+                  onChange={(v) =>
+                    setEditForm((f: any) => ({
+                      ...f,
+                      administrativeDistrict: v,
+                    }))
+                  }
+                  inputCls={inputCls}
+                />
               ) : (
-                <Input label="District" value={studentData?.administrativeDistrict} disabled inputCls={inputCls} />
+                <Input
+                  label="District"
+                  value={studentData?.administrativeDistrict}
+                  disabled
+                  inputCls={inputCls}
+                />
               )}
+
               {editing ? (
-                <SelectInput label="Race" value={editForm?.race} options={RACE_OPTIONS} placeholder="Select Race" onChange={v => setEditForm((f: any) => ({ ...f, race: v }))} inputCls={inputCls} />
+                <SelectInput
+                  label="Race"
+                  value={editForm?.race}
+                  options={RACE_OPTIONS}
+                  placeholder="Select Race"
+                  onChange={(v) => setEditForm((f: any) => ({ ...f, race: v }))}
+                  inputCls={inputCls}
+                />
               ) : (
-                <Input label="Race" value={studentData?.race} disabled inputCls={inputCls} />
+                <Input
+                  label="Race"
+                  value={studentData?.race}
+                  disabled
+                  inputCls={inputCls}
+                />
               )}
+
               {editing ? (
-                <SelectInput label="Religion" value={editForm?.religion} options={RELIGION_OPTIONS} placeholder="Select Religion" onChange={v => setEditForm((f: any) => ({ ...f, religion: v }))} inputCls={inputCls} />
+                <SelectInput
+                  label="Religion"
+                  value={editForm?.religion}
+                  options={RELIGION_OPTIONS}
+                  placeholder="Select Religion"
+                  onChange={(v) =>
+                    setEditForm((f: any) => ({ ...f, religion: v }))
+                  }
+                  inputCls={inputCls}
+                />
               ) : (
-                <Input label="Religion" value={studentData?.religion} disabled inputCls={inputCls} />
+                <Input
+                  label="Religion"
+                  value={studentData?.religion}
+                  disabled
+                  inputCls={inputCls}
+                />
               )}
-              <Input label="Citizen by Descent" value={editing ? editForm?.citizenByDescent : studentData?.citizenByDescent} disabled={!editing} onChange={v => setEditForm((f: any) => ({ ...f, citizenByDescent: v }))} inputCls={inputCls} />
+
+              <Input
+                label="Citizen by Descent"
+                value={
+                  editing
+                    ? editForm?.citizenByDescent
+                    : studentData?.citizenByDescent
+                }
+                disabled={!editing}
+                onChange={(v) =>
+                  setEditForm((f: any) => ({ ...f, citizenByDescent: v }))
+                }
+                inputCls={inputCls}
+              />
             </div>
           </div>
 
@@ -373,10 +530,35 @@ export default function ProfileSection() {
             <h3 className="font-semibold text-gray-800 mb-4 flex items-center gap-2 text-sm">
               <Phone className="w-4 h-4 text-[#34BFF3]" /> Parent / Guardian Details
             </h3>
+
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <Input label="Father's Name" value={editing ? editForm?.fatherName : studentData?.fatherName} disabled={!editing} onChange={v => setEditForm((f: any) => ({ ...f, fatherName: v }))} inputCls={inputCls} />
-              <Input label="Mother's Name" value={editing ? editForm?.motherName : studentData?.motherName} disabled={!editing} onChange={v => setEditForm((f: any) => ({ ...f, motherName: v }))} inputCls={inputCls} />
-              <Input label="Guardian's Name" value={editing ? editForm?.guardianName : studentData?.guardianName} disabled={!editing} onChange={v => setEditForm((f: any) => ({ ...f, guardianName: v }))} inputCls={inputCls} />
+              <Input
+                label="Father's Name"
+                value={editing ? editForm?.fatherName : studentData?.fatherName}
+                disabled={!editing}
+                onChange={(v) =>
+                  setEditForm((f: any) => ({ ...f, fatherName: v }))
+                }
+                inputCls={inputCls}
+              />
+              <Input
+                label="Mother's Name"
+                value={editing ? editForm?.motherName : studentData?.motherName}
+                disabled={!editing}
+                onChange={(v) =>
+                  setEditForm((f: any) => ({ ...f, motherName: v }))
+                }
+                inputCls={inputCls}
+              />
+              <Input
+                label="Guardian's Name"
+                value={editing ? editForm?.guardianName : studentData?.guardianName}
+                disabled={!editing}
+                onChange={(v) =>
+                  setEditForm((f: any) => ({ ...f, guardianName: v }))
+                }
+                inputCls={inputCls}
+              />
             </div>
           </div>
         </div>
@@ -384,41 +566,110 @@ export default function ProfileSection() {
 
       {activeTab === 'academic' && (
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
-          <h2 className="font-bold text-gray-900 text-lg mb-6">Academic Information</h2>
+          <h2 className="font-bold text-gray-900 text-lg mb-6">
+            Academic Information
+          </h2>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-6">
-  <Input
-    label="Admission Number"
-    value={studentData?.admissionNumber}
-    disabled
-    inputCls={inputCls}
-  />
-
-  <Input
-    label="Batch"
-    value={
-      studentData?.batch ||
-      studentData?.batchName ||
-      studentData?.enrolledBatch ||
-      studentData?.currentBatch ||
-      '-'
-    }
-    disabled
-    inputCls={inputCls}
-  />
-</div>
-
+            <Input
+              label="Student ID"
+              value={studentData?.studentId}
+              disabled
+              inputCls={inputCls}
+            />
+            <Input
+              label="Admission Number"
+              value={studentData?.admissionNumber}
+              disabled
+              inputCls={inputCls}
+            />
+            <Input
+              label="Batch"
+              value={
+                studentData?.batch ||
+                studentData?.batchName ||
+                studentData?.enrolledBatch ||
+                studentData?.currentBatch ||
+                '-'
+              }
+              disabled
+              inputCls={inputCls}
+            />
+          </div>
           <div className="mb-6">
-            <h3 className="font-semibold text-gray-800 mb-3 text-sm">Enrolled Subjects</h3>
+            <h3 className="font-semibold text-gray-800 mb-3 text-sm">
+              Enrolled Subjects
+            </h3>
             <div className="flex flex-wrap gap-2">
-              {(studentData?.subjects || studentData?.modules || []).map((sub: string) => (
-                <span key={sub} className="px-3 py-1.5 bg-blue-50 text-[#34BFF3] text-sm font-medium rounded-xl border border-blue-100">
-                  {sub}
-                </span>
-              ))}
+              {(studentData?.subjects || studentData?.modules || []).map(
+                (sub: string) => (
+                  <span
+                    key={sub}
+                    className="px-3 py-1.5 bg-blue-50 text-[#34BFF3] text-sm font-medium rounded-xl border border-blue-100"
+                  >
+                    {sub}
+                  </span>
+                ),
+              )}
             </div>
           </div>
 
+          <div>
+            <h3 className="font-semibold text-gray-800 mb-3 text-sm">
+              G.C.E. (O/L) Results
+            </h3>
+
+            <div className="bg-gray-50 rounded-xl border border-gray-200 overflow-hidden">
+              <div className="p-4 border-b border-gray-200 grid grid-cols-1 md:grid-cols-3 gap-4 text-xs text-gray-500">
+                <div>
+                  <span className="font-medium text-gray-700">Category:</span>{' '}
+                  {studentData?.olCategory || '-'}
+                </div>
+                <div>
+                  <span className="font-medium text-gray-700">Year:</span>{' '}
+                  {studentData?.olYear || '-'}
+                </div>
+                <div>
+                  <span className="font-medium text-gray-700">Index:</span>{' '}
+                  {studentData?.olIndexNumber || '-'}
+                </div>
+              </div>
+
+              <div className="p-4 overflow-x-auto">
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="text-left text-gray-500">
+                      <th className="py-2">English</th>
+                      <th className="py-2">Maths</th>
+                      <th className="py-2">Science</th>
+                      <th className="py-2">Sinhala</th>
+                      <th className="py-2">Tamil</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {(studentData?.olResults || []).map((r: any, i: number) => (
+                      <tr
+                        key={i}
+                        className="border-t border-gray-200 text-gray-800"
+                      >
+                        <td className="py-2">{r.english || '-'}</td>
+                        <td className="py-2">{r.mathematics || '-'}</td>
+                        <td className="py-2">{r.science || '-'}</td>
+                        <td className="py-2">{r.sinhala || '-'}</td>
+                        <td className="py-2">{r.tamil || '-'}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+
+                {!studentData?.olResults?.length && (
+                  <p className="text-sm text-gray-500">
+                    No O/L results available.
+                  </p>
+                )}
+              </div>
+            </div>
+          </div>
          
         </div>
       )}
@@ -499,7 +750,7 @@ function Input({
       <input
         value={value || ''}
         disabled={disabled}
-        onChange={e => onChange?.(e.target.value)}
+        onChange={(e) => onChange?.(e.target.value)}
         className={inputCls(disabled)}
       />
     </div>
@@ -528,11 +779,11 @@ function SelectInput({
       </label>
       <select
         value={value || ''}
-        onChange={e => onChange(e.target.value)}
+        onChange={(e) => onChange(e.target.value)}
         className={inputCls(false)}
       >
         <option value="">{placeholder}</option>
-        {options.map(option => (
+        {options.map((option) => (
           <option key={option} value={option}>
             {option}
           </option>
