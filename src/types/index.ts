@@ -1,6 +1,5 @@
 export interface Student {
   _id?: string;
-  id?: string;
   studentId?: string;
   name?: string;
   role?: string;
@@ -67,7 +66,6 @@ export interface OLResult {
 }
 
 export interface Module {
-  id: string;
   _id?: string;
   name: string;
   code?: string;
@@ -87,7 +85,6 @@ export interface Module {
 }
 
 export interface LectureVideo {
-  id: string;
   _id?: string;
   title: string;
   moduleId?: string;
@@ -108,7 +105,6 @@ export interface LectureVideo {
 }
 
 export interface Notice {
-  id: string;
   _id?: string;
   title: string;
   content?: string;
@@ -121,7 +117,6 @@ export interface Notice {
   module?:
     | string
     | {
-        id?: string;
         _id?: string;
         name?: string;
         moduleId?: string;
@@ -139,7 +134,6 @@ export interface Notice {
 }
 
 export interface ExamResult {
-  id: string;
   _id?: string;
   studentId?: string;
   moduleId?: string;
@@ -156,7 +150,6 @@ export interface ExamResult {
 }
 
 export interface Payment {
-  id: string;
   _id?: string;
   studentId?: string;
   studentName?: string;

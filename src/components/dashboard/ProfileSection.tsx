@@ -71,7 +71,6 @@ const getUpdatedStudentData = (result: any) => {
 
       return Boolean(
         candidate.email ||
-          candidate.id ||
           candidate._id ||
           candidate.studentId ||
           candidate.fullNameEnglish ||

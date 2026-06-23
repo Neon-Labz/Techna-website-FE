@@ -68,7 +68,7 @@ export default function PaymentsSection() {
         'N/A',
       admissionNumber: student?.admissionNumber ?? student?.studentId ?? 'N/A',
       batch: student?.batch ?? 'N/A',
-      studentId: student?._id ?? student?.id ?? student?.studentId ?? '',
+      studentId: student?._id ?? student?.studentId ?? '',
     }),
     [student],
   );

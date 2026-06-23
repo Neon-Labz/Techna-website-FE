@@ -60,7 +60,7 @@ export default function ResultsSection() {
         }
 
         const session = await getSession(token);
-        const studentId = session?.studentId || session?._id || session?.id;
+        const studentId = session?.studentId || session?._id ;
 
         if (!studentId) {
           setError('Student ID not found');

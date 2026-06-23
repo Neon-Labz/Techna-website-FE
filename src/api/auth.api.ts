@@ -114,7 +114,6 @@ const isStudentLike = (value: unknown): value is Student => {
   return Boolean(
     item.email ||
       item._id ||
-      item.id ||
       item.studentId ||
       item.fullNameEnglish ||
       item.fullNameTamil,

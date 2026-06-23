@@ -19,7 +19,6 @@ import { useAuthStore } from '../../store/authStore';
 type NoticeType = 'exam' | 'general' | 'assignment' | 'holiday';
 
 type Notice = {
-  id?: string;
   _id?: string;
   type?: NoticeType;
   moduleId?: string;
@@ -27,7 +26,6 @@ type Notice = {
   module?:
     | string
     | {
-        id?: string;
         _id?: string;
         name?: string;
         moduleId?: string;
@@ -50,7 +48,6 @@ type Notice = {
 };
 
 type Video = {
-  id?: string;
   _id?: string;
   moduleId?: string;
   moduleName?: string;
@@ -70,7 +67,6 @@ type Video = {
 };
 
 type Module = {
-  id?: string;
   _id?: string;
   name?: string;
   batch?: string;
@@ -81,7 +77,6 @@ type Module = {
 };
 
 type Result = {
-  id?: string;
   _id?: string;
   title?: string | null;
   moduleName?: string;
@@ -101,7 +96,6 @@ type Result = {
 type ModuleSelection =
   | string
   | {
-      id?: string;
       _id?: string;
       name?: string;
       moduleId?: string;
@@ -127,7 +121,7 @@ const normalizeText = (value?: unknown) =>
   String(value ?? '').trim().toLowerCase();
 
 const moduleKey = (module: Module) =>
-  module._id || module.id || module.name || '';
+  module._id || module.name || '';
 
 const selectionKeys = (selection: ModuleSelection) => {
   if (typeof selection === 'string') {
@@ -136,7 +130,6 @@ const selectionKeys = (selection: ModuleSelection) => {
 
   return [
     selection._id,
-    selection.id,
     selection.moduleId,
     selection.moduleName,
     selection.name,
@@ -150,7 +143,6 @@ const moduleReferenceKeys = (
   value:
     | string
     | {
-        id?: string;
         _id?: string;
         name?: string;
         moduleId?: string;
@@ -163,7 +155,6 @@ const moduleReferenceKeys = (
 
   return [
     value._id,
-    value.id,
     value.moduleId,
     value.moduleName,
     value.name,
@@ -177,7 +168,7 @@ const moduleReferenceLabel = (
 ) => {
   if (!value) return '';
   if (typeof value === 'string') return value;
-  return value.moduleName || value.name || value.moduleId || value._id || value.id || '';
+  return value.moduleName || value.name || value.moduleId || value._id || '';
 };
 
 const formatNoticeDate = (value?: string) => {
@@ -232,8 +223,8 @@ export default function DashboardHomeSection() {
   const { student, token } = useAuthStore();
 
   const studentKey =
-    student?._id || student?.id || student?.studentId || student?.email || '';
-  const studentResultId = student?.studentId || student?._id || student?.id || '';
+    student?._id || student?.studentId || student?.email || '';
+  const studentResultId = student?.studentId || student?._id ||'';
 
   const [activeModule, setActiveModule] = useState<string>('all');
   const [notices, setNotices] = useState<Notice[]>([]);
@@ -312,7 +303,7 @@ export default function DashboardHomeSection() {
   const selectedModules = useMemo(
     () =>
       modules.filter((module) =>
-        [module._id, module.id, module.name]
+        [module._id, module.name]
           .map(normalizeText)
           .filter(Boolean)
           .some((key) => studentModuleSelectionSet.has(key))
@@ -324,7 +315,7 @@ export default function DashboardHomeSection() {
     () =>
       new Set(
         selectedModules
-          .map((module) => normalizeText(module._id || module.id))
+          .map((module) => normalizeText(module._id ))
           .filter(Boolean)
       ),
     [selectedModules]
@@ -483,7 +474,7 @@ export default function DashboardHomeSection() {
                     return (
                       <button
                         type="button"
-                        key={notice._id || notice.id}
+                        key={notice._id }
                         onClick={() => setSelectedNotice(notice)}
                         className={`w-full rounded-xl border p-3.5 text-left text-sm transition hover:shadow-sm focus:outline-none focus:ring-2 focus:ring-red-300 ${typeColors[noticeType]}`}
                       >
@@ -562,7 +553,7 @@ export default function DashboardHomeSection() {
 
                     return (
                       <a
-                        key={video._id || video.id}
+                        key={video._id }
                         href={videoUrl}
                         target="_blank"
                         rel="noreferrer"
@@ -653,7 +644,6 @@ export default function DashboardHomeSection() {
                   <div
                     key={
                       result._id ||
-                      result.id ||
                       `${result.moduleName || 'module'}-${result.examType || 'exam'}-${result.marks ?? 'marks'}-${index}`
                     }
                     className="rounded-xl border border-gray-100 p-4 transition-all hover:shadow-sm"

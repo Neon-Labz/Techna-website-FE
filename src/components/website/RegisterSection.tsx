@@ -38,7 +38,6 @@ const subjectLabel = (name: string) => SUBJECT_LABELS[name] || name;
 
 type RegistrationModule = {
   _id?: string;
-  id?: string;
   name?: string;
   status?: string;
 };
@@ -191,7 +190,6 @@ export default function RegisterSection() {
   const [submitted, setSubmitted] = useState(false);
   const [submitMessage, setSubmitMessage] = useState('');
   const [submitError, setSubmitError] = useState('');
-  const [submissionReference, setSubmissionReference] = useState('');
   const [profilePhoto, setProfilePhoto] = useState<File | null>(null);
   const [subjectOptions, setSubjectOptions] = useState<string[]>(SUBJECTS);
   const [loadingSubjects, setLoadingSubjects] = useState(true);
@@ -303,13 +301,6 @@ export default function RegisterSection() {
       setSubmitMessage(
         result?.message ||
           'Registration submitted successfully. Awaiting admin approval.'
-      );
-      setSubmissionReference(
-        result?.data?.applicationReference ||
-          result.applicationReference ||
-          result?.data?.reference ||
-          result.reference ||
-          '',
       );
       setSubmitted(true);
     } catch (error) {

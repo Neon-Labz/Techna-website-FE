@@ -28,9 +28,9 @@ export default function DashboardHeroSection() {
   const { student, token } = useAuthStore();
 
   const studentKey =
-    student?._id || student?.id || student?.studentId || student?.email || '';
+    student?._id  || student?.studentId || student?.email || '';
 
-  const studentResultId = student?.studentId || student?._id || student?.id || '';
+  const studentResultId = student?.studentId || student?._id ||  '';
 
   const studentFullName =
     student?.fullNameEnglish?.trim() || student?.name?.trim() || 'Student';
