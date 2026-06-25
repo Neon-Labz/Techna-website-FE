@@ -108,24 +108,24 @@ export default function ContactSection() {
     <div className="min-h-screen bg-white">
       {/* Hero Section */}
       <div
-        className="relative overflow-hidden h-[294px] bg-cover bg-center bg-no-repeat"
+        className="relative overflow-hidden min-h-[220px] sm:min-h-[260px] lg:h-[294px] bg-cover bg-center bg-no-repeat py-10 sm:py-12 lg:py-0"
         style={{
           backgroundImage: "url('/contact_hero.png')",
           backgroundColor: '#0183CB',
         }}
       >
         {/* Content container */}
-        <div className="absolute left-1/2 -translate-x-1/2 top-[80px] w-full max-w-[896px] px-4">
+        <div className="relative lg:absolute lg:left-1/2 lg:-translate-x-1/2 lg:top-[80px] w-full max-w-[896px] px-4 sm:px-6 mx-auto">
           {/* GET IN TOUCH */}
-          <p className="text-center text-sm font-semibold tracking-[1.4px] uppercase text-white leading-5">
+          <p className="text-center text-xs sm:text-sm font-semibold tracking-[1.4px] uppercase text-white leading-5">
             GET IN TOUCH
           </p>
           {/* Contact Us */}
-          <h1 className="text-center text-[48px] font-bold text-white leading-[48px] mt-3">
+          <h1 className="text-center text-[32px] sm:text-[40px] lg:text-[48px] font-bold text-white leading-[1.15] lg:leading-[48px] mt-3">
             Contact Us
           </h1>
           {/* Subtitle */}
-          <p className="text-center text-lg text-white opacity-90 leading-[29px] mt-5 max-w-[685px] mx-auto">
+          <p className="text-center text-sm sm:text-base lg:text-lg text-white opacity-90 leading-[1.6] lg:leading-[29px] mt-4 sm:mt-5 max-w-[685px] mx-auto">
             Have questions about admissions, courses, or anything else? We&apos;re here to help!
           </p>
         </div>
@@ -133,8 +133,8 @@ export default function ContactSection() {
 
       {/* Main Content */}
       <div className="relative" style={{ background: 'rgba(1, 131, 203, 0.05)' }}>
-        <div className="max-w-[1240px] mx-auto px-4 py-12">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+        <div className="max-w-7xl mx-auto px-4 sm:px-5 lg:px-4 py-8 sm:py-12">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8">
             {/* Left Column - Contact Details */}
             <div className="lg:col-span-5 space-y-4">
               {/* Phone Card */}
@@ -143,9 +143,9 @@ export default function ContactSection() {
                   <div className="w-12 h-12 bg-[#F0F9FF] rounded-lg flex items-center justify-center shrink-0">
                     <Phone className="w-6 h-6 text-[#34BFF3]" strokeWidth={2} />
                   </div>
-                  <div>
+                  <div className="min-w-0">
                     <p className="text-xs font-bold uppercase tracking-[0.3px] text-[#1F2937]">PHONE</p>
-                    <p className="text-lg font-bold text-[#1F2937] mt-0.5">021-222-3436</p>
+                    <p className="text-lg font-bold text-[#1F2937] mt-0.5">0771703549</p>
                     <p className="text-sm text-[#6B7280] mt-0.5">Mon-Sat, 8AM-6PM</p>
                   </div>
                 </div>
@@ -157,9 +157,9 @@ export default function ContactSection() {
                   <div className="w-12 h-12 bg-[#F0F9FF] rounded-lg flex items-center justify-center shrink-0">
                     <Mail className="w-6 h-6 text-[#34BFF3]" strokeWidth={2} />
                   </div>
-                  <div>
+                  <div className="min-w-0">
                     <p className="text-xs font-bold uppercase tracking-[0.3px] text-[#1F2937]">EMAIL</p>
-                    <p className="text-lg font-bold text-[#1F2937] mt-0.5">info@techna.lk</p>
+                    <p className="text-base sm:text-lg font-bold text-[#1F2937] mt-0.5 break-all">technatechnicalinstitute@gmail.com</p>
                     <p className="text-sm text-[#6B7280] mt-0.5">We reply within 24 hours</p>
                   </div>
                 </div>
@@ -171,9 +171,9 @@ export default function ContactSection() {
                   <div className="w-12 h-12 bg-[#F0F9FF] rounded-lg flex items-center justify-center shrink-0">
                     <MapPin className="w-6 h-6 text-[#34BFF3]" strokeWidth={2} />
                   </div>
-                  <div>
+                  <div className="min-w-0">
                     <p className="text-xs font-bold uppercase tracking-[0.3px] text-[#1F2937]">ADDRESS</p>
-                    <p className="text-lg font-bold text-[#1F2937] mt-0.5">No. 42, Main Street, Jaffna</p>
+                    <p className="text-lg font-bold text-[#1F2937] mt-0.5">Verasigam Hall 3rd floor, Jaffna</p>
                     <p className="text-sm text-[#6B7280] mt-0.5">Sri Lanka</p>
                   </div>
                 </div>
@@ -185,10 +185,10 @@ export default function ContactSection() {
                   <div className="w-12 h-12 bg-[#F0F9FF] rounded-lg flex items-center justify-center shrink-0">
                     <Clock className="w-6 h-6 text-[#34BFF3]" strokeWidth={2} />
                   </div>
-                  <div>
+                  <div className="min-w-0">
                     <p className="text-xs font-bold uppercase tracking-[0.3px] text-[#1F2937]">OFFICE HOURS</p>
-                    <p className="text-lg font-bold text-[#1F2937] mt-0.5">Mon-Fri: 8AM-6PM</p>
-                    <p className="text-sm text-[#6B7280] mt-0.5">Sat: 8AM-1PM</p>
+                    <p className="text-lg font-bold text-[#1F2937] mt-0.5">Mon-Sun: 8AM-6PM</p>
+                    <p className="text-sm text-[#6B7280] mt-0.5">Open all week</p>
                   </div>
                 </div>
               </div>
@@ -214,14 +214,14 @@ export default function ContactSection() {
               {/* Location Mini Block */}
               <div className="bg-white border border-[#F3F4F6] rounded-2xl p-6 shadow-[0px_1px_3px_rgba(0,0,0,0.1),0px_1px_2px_-1px_rgba(0,0,0,0.1)] flex flex-col items-center justify-center">
                 <MapPin className="w-8 h-8 text-[#34BFF3] mb-2" strokeWidth={2.67} />
-                <p className="text-sm font-medium text-[#99A1AF] text-center">No. 42, Main Street</p>
+                <p className="text-sm font-medium text-[#99A1AF] text-center">Verasigam Hall 3rd floor</p>
                 <p className="text-xs text-[#99A1AF] text-center">Jaffna, Sri Lanka</p>
               </div>
             </div>
 
             {/* Right Column - Contact Form */}
             <div className="lg:col-span-7">
-              <div className="bg-white border border-[#F3F4F6] rounded-2xl p-12 shadow-[0px_4px_20px_rgba(0,0,0,0.05)]">
+              <div className="bg-white border border-[#F3F4F6] rounded-2xl p-5 sm:p-8 lg:p-12 shadow-[0px_4px_20px_rgba(0,0,0,0.05)]">
                 {sent ? (
                   <div className="text-center py-12">
                     <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-5">
