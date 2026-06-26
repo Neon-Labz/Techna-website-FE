@@ -446,7 +446,7 @@ export default function DashboardHomeSection() {
             <div className="h-full rounded-2xl border border-gray-100 bg-white p-4 shadow-sm sm:p-5">
               <div className="mb-4 flex items-center justify-between gap-3">
                 <h2 className="flex items-center gap-2 font-bold text-gray-900">
-                  <Bell className="h-5 w-5 text-[#0183CB]" /> Exam Notices
+                  <Bell className="h-5 w-5 text-[#38BDF8]" /> Exam Notices
                 </h2>
                 <span className="shrink-0 text-xs text-gray-400">
                   {examNotices.length} active
@@ -507,7 +507,7 @@ export default function DashboardHomeSection() {
             <div className="h-full rounded-2xl border border-gray-100 bg-white p-4 shadow-sm sm:p-5">
               <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                 <h2 className="flex items-center gap-2 font-bold text-gray-900">
-                  <Play className="h-5 w-5 text-[#0183CB]" /> Lecture Recordings
+                  <Play className="h-5 w-5 text-[#38BDF8]" /> Lecture Recordings
                 </h2>
 
                 <div className="flex items-center gap-1.5 sm:justify-end">
@@ -604,7 +604,7 @@ export default function DashboardHomeSection() {
         <div className="rounded-2xl border border-gray-100 bg-white p-4 shadow-sm sm:p-5">
           <div className="mb-4 flex items-center justify-between gap-3">
             <h2 className="flex items-center gap-2 font-bold text-gray-900">
-              <Award className="h-5 w-5 text-[#0183CB]" /> Recent Results
+              <Award className="h-5 w-5 text-[#38BDF8]" /> Recent Results
             </h2>
 
             <Link

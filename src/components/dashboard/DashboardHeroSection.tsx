@@ -133,7 +133,7 @@ export default function DashboardHeroSection() {
       label: 'Latest Grade',
       value: recentResults[0]?.grade || '-',
       sub: recentResults[0]?.moduleName || 'No results yet',
-      color: 'text-blue-600 bg-blue-50',
+      color: 'text-[#38BDF8] bg-sky-50',
     },
     {
       icon: TrendingUp,
