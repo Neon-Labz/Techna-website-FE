@@ -85,7 +85,7 @@ export default function PrivateHeader() {
         <div className="flex h-14 items-center justify-between gap-3">
           <Link
             href="/dashboard"
-            className="flex shrink-0 items-center gap-2 -ml-5"
+            className="flex min-w-0 shrink-0 items-center gap-2 md:-ml-5"
           >
             <Image
               src="/logo.png"
