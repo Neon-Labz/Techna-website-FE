@@ -196,14 +196,25 @@ export const authApi = {
     return { student, token };
   },
 
-  async registerStudent(payload: RegisterStudentPayload | FormData) {
-    const data = (await api.post<RegisterStudentResponse>(
-      '/students/register',
-      payload,
-      { headers: { 'X-Skip-Auth': 'true' } },
-    )) as unknown as RegisterStudentResponse;
+  async registerStudent(formData: FormData) {
+    const baseUrl = (process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:4000/api').replace(/\/$/, '');
+    const response = await fetch(`${baseUrl}/students/register`, {
+      method: 'POST',
+      body: formData,
+      // No Content-Type — browser sets multipart/form-data with boundary automatically
+    });
 
-    return data;
+    const json = await response.json().catch(() => ({ message: 'Registration failed' }));
+
+    if (!response.ok) {
+      const msg =
+        (json as any)?.error?.details?.[0]?.message ||
+        (json as any)?.message ||
+        'Registration failed. Please try again.';
+      throw Object.assign(new Error(msg), { response: { data: json } });
+    }
+
+    return ((json as any)?.data ?? json) as RegisterStudentResponse;
   },
 
   async getSession(token?: string) {
