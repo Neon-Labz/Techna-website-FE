@@ -6,20 +6,13 @@ import {
   Clock,
   Calendar,
   ArrowRight,
-  Settings,
-  FlaskConical,
-  Calculator,
-  Globe,
-  Monitor,
-  Leaf,
   BookOpen,
-  Microscope,
   Loader2,
   Home,
   ChevronRight,
-  Layers,
 } from 'lucide-react';
 import api from '@/lib/axios';
+import { moduleIcons } from '@/lib/moduleIcons';
 
 interface ApiModule {
   _id: string;
@@ -44,25 +37,6 @@ function normalizeSubjects(raw: string | string[] | undefined): string[] {
   if (!raw) return [];
   if (Array.isArray(raw)) return raw.map((s) => s.trim()).filter(Boolean);
   return raw.split(',').map((s) => s.trim()).filter(Boolean);
-}
-
-function getIcon(name: string) {
-  const lower = name.toLowerCase();
-  if (lower.includes('engineering')) return Settings;
-  if (lower.includes('science')) return FlaskConical;
-  if (lower.includes('mathematics') || lower.includes('math')) return Calculator;
-  if (lower.includes('geography')) return Globe;
-  if (
-    lower.includes('computer') ||
-    lower.includes('ict') ||
-    lower.includes('information')
-  ) {
-    return Monitor;
-  }
-  if (lower.includes('agriculture') || lower.includes('agricultural')) return Leaf;
-  if (lower.includes('biology') || lower.includes('bio')) return Microscope;
-  if (lower.includes('commerce') || lower.includes('business')) return Layers;
-  return BookOpen;
 }
 
 export default function ModulesSection() {
@@ -148,8 +122,8 @@ export default function ModulesSection() {
             </div>
 
             <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-              {modules.map((module) => {
-                const Icon = getIcon(module.name);
+              {modules.map((module, idx) => {
+                const Icon = moduleIcons[idx % moduleIcons.length];
                 const matchedTeacher =
                   teacherBySubject[module.name.toLowerCase()];
                 const teacherId = matchedTeacher?._id ?? module.teacherId;
