@@ -9,9 +9,7 @@ export default function ProtectedRoute({ children }: { children: React.ReactNode
   const [isChecking, setIsChecking] = useState(true);
 
   useEffect(() => {
-    // Wait for the persisted auth state to finish hydrating from storage.
-    // Without this, a page refresh/reopen redirects to /login before the
-    // remembered token in localStorage is loaded, breaking "Remember me".
+    
     if (!hasHydrated) return;
 
     if (!isAuthenticated) {
