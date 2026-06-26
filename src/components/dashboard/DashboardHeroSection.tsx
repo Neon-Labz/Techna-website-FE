@@ -6,11 +6,6 @@ import { Bell, BookOpen, Award, TrendingUp } from 'lucide-react';
 import { dashboardApi } from '@/api/dashboard.api';
 import { announcementApi, type Announcement } from '@/api/announcement.api';
 
-type Module = {
-  _id?: string;
-  name?: string;
-};
-
 type Result = {
   _id?: string;
   marks?: number | null;
@@ -35,24 +30,20 @@ export default function DashboardHeroSection() {
   const admissionNo = student?.studentId?.trim() || '-';
 
   const [announcements, setAnnouncements] = useState<Announcement[]>([]);
-  const [modules, setModules] = useState<Module[]>([]);
   const [results, setResults] = useState<Result[]>([]);
 
   useEffect(() => {
     const fetchDashboardData = async () => {
       setAnnouncements([]);
-      setModules([]);
       setResults([]);
 
       try {
-        const [announcementData, moduleData, resultData] = await Promise.all([
+        const [announcementData, resultData] = await Promise.all([
           announcementApi.getAll(),
-          dashboardApi.getModules(),
           dashboardApi.getResults(studentResultId, token || undefined),
         ]);
 
         setAnnouncements(Array.isArray(announcementData) ? announcementData : []);
-        setModules(moduleData);
         setResults(resultData);
       } catch (error) {
         console.error('Dashboard data fetch error:', error);
@@ -113,20 +104,18 @@ export default function DashboardHeroSection() {
   }, [announcements, student?.batch]);
 
   const enrolledModuleCount = useMemo(() => {
-    const selectedModules = [
+    const enrolledSubjects = [
       ...(student?.subjects ?? []),
       ...(student?.modules ?? []),
       ...(student?.subjectSelection?.subjects ?? []),
       ...(student?.subjectSelection?.enrolledModules ?? []),
       ...(student?.enrolledModules ?? []),
-      ...modules.map((module) => module.name ?? ''),
     ]
       .map((module) => module?.trim())
       .filter((module): module is string => Boolean(module));
 
-    return new Set(selectedModules).size;
+    return new Set(enrolledSubjects).size;
   }, [
-    modules,
     student?.enrolledModules,
     student?.modules,
     student?.subjectSelection?.enrolledModules,
