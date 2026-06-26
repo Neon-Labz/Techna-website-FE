@@ -23,7 +23,7 @@ export default function HeroSection() {
         }}
       />
 
-      {/* Dark overlay gradient - left side darker for text readability */}
+      {/* Dark overlay gradient */}
       <div className="absolute inset-0 [background:linear-gradient(90deg,rgba(10,10,15,0.75)_0%,rgba(10,10,15,0.35)_55%,rgba(10,10,15,0.1)_100%)]" />
 
       {/* Grid texture */}
@@ -53,9 +53,9 @@ export default function HeroSection() {
       <div className="absolute top-4 right-4 w-7 h-7 border-t-[1.5px] border-r-[1.5px] border-[rgba(232,184,75,0.35)] opacity-60" />
       <div className="absolute bottom-4 left-4 w-7 h-7 border-b-[1.5px] border-l-[1.5px] border-[rgba(232,184,75,0.35)] opacity-60" />
 
-      {/* ── MAIN CONTENT ── */}
-      <div className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex flex-col max-w-[520px] -ml-16">
+      {/* MAIN CONTENT */}
+      <div className="relative z-10 w-full max-w-7xl mx-auto px-6">
+        <div className="flex flex-col max-w-[520px] ml-2">
 
           {/* Headline */}
           <h1
@@ -111,33 +111,42 @@ export default function HeroSection() {
 
           {/* Stats Bar */}
           <div
-            className="inline-flex items-center bg-white rounded-[12px] h-[72px] px-20 gap-0"
+            className="inline-flex items-center bg-white rounded-[12px] px-4 gap-0"
             style={{
               border: "1px solid #EFEFEF",
               width: "fit-content",
+              height: "54px",
               boxShadow: "0 8px 24px rgba(0,0,0,0.08)",
             }}
           >
             {stats.map(({ icon: Icon, value, label }, index) => (
               <div key={label} className="flex items-center">
                 {index !== 0 && (
-                  <div className="mx-10 h-9 w-px border-l border-dashed border-[#34BFF3]" />
+                  <div
+                    className="mx-3 shrink-0"
+                    style={{
+                      width: "1px",
+                      height: "28px",
+                      backgroundImage:
+                        "repeating-linear-gradient(to bottom, #34BFF3 0px, #34BFF3 4px, transparent 4px, transparent 8px)",
+                    }}
+                  />
                 )}
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-2">
                   <Icon
                     className="text-[#34BFF3] shrink-0"
-                    style={{ width: "26px", height: "26px" }}
+                    style={{ width: "20px", height: "20px" }}
                   />
                   <div className="flex flex-col leading-none">
                     <span
                       className="text-[#0a0a0f] font-bold"
-                      style={{ fontSize: "19px", lineHeight: "1.2" }}
+                      style={{ fontSize: "15px", lineHeight: "1.2" }}
                     >
                       {value}
                     </span>
                     <span
                       className="uppercase text-[#6b7280] font-medium tracking-[0.07em]"
-                      style={{ fontSize: "9.5px", marginTop: "3px" }}
+                      style={{ fontSize: "8px", marginTop: "2px" }}
                     >
                       {label}
                     </span>

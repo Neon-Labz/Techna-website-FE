@@ -21,17 +21,18 @@ export default function PublicHeader() {
   return (
     <header className="bg-white shadow-md sticky top-0 z-40">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-18 py-3">
-          {/* Logo - sized per Figma spec: 208x208px, lifted -86px, offset 94px */}
+        <div className="flex items-center justify-between h-20">
+
+          {/* ✅ Mobile: ml-[-35px], Desktop: ml-[-60px] */}
           <Link
             href="/"
-            className="relative flex items-center z-50"
-            style={{ width: '208px', height: '208px', marginBottom: '-20px', marginLeft: '-95px' }}
+            className="flex-shrink-0 ml-[-35px] md:ml-[-60px]"
           >
             <Image
               src="/newlogo.png"
               alt="Techna Logo"
-              fill
+              width={220}
+              height={70}
               className="object-contain"
               priority
             />
@@ -43,7 +44,7 @@ export default function PublicHeader() {
               <Link
                 key={link.path}
                 href={link.path}
-                className={`px-8 py-2 rounded-md text-base font-medium transition-all duration-200 ${
+                className={`px-6 lg:px-8 py-2 rounded-md text-sm lg:text-base font-medium transition-all duration-200 ${
                   isActive(link.path)
                     ? 'bg-[#0183CB] text-white'
                     : 'text-gray-700 hover:bg-blue-50 hover:text-[#0183CB]'
@@ -62,7 +63,6 @@ export default function PublicHeader() {
             >
               Login
             </button>
-
             <button
               onClick={() => router.push('/register')}
               className="px-5 py-2 text-sm font-semibold text-white bg-[#0183CB] rounded-lg hover:bg-[#0170ad] transition-all duration-200 shadow-md"
@@ -90,7 +90,7 @@ export default function PublicHeader() {
                   key={link.path}
                   href={link.path}
                   onClick={() => setMenuOpen(false)}
-                  className={`px-4 py-2.5 rounded-lg text-sm font-medium transition-all ${
+                  className={`px-4 py-3 rounded-lg text-sm font-medium transition-all ${
                     isActive(link.path)
                       ? 'bg-[#0183CB] text-white'
                       : 'text-gray-700 hover:bg-blue-50'
@@ -100,17 +100,16 @@ export default function PublicHeader() {
                 </Link>
               ))}
 
-              <div className="flex gap-2 mt-3 pt-3 border-t border-gray-100">
+              <div className="flex gap-3 mt-3 pt-3 border-t border-gray-100">
                 <button
                   onClick={() => { router.push('/login'); setMenuOpen(false); }}
-                  className="flex-1 py-2 text-sm font-semibold text-[#0183CB] border-2 border-[#0183CB] rounded-lg hover:bg-blue-50"
+                  className="flex-1 py-2.5 text-sm font-semibold text-[#0183CB] border-2 border-[#0183CB] rounded-lg hover:bg-blue-50"
                 >
                   Login
                 </button>
-
                 <button
                   onClick={() => { router.push('/register'); setMenuOpen(false); }}
-                  className="flex-1 py-2 text-sm font-semibold text-white bg-[#0183CB] rounded-lg hover:bg-[#0170ad]"
+                  className="flex-1 py-2.5 text-sm font-semibold text-white bg-[#0183CB] rounded-lg hover:bg-[#0170ad]"
                 >
                   Register
                 </button>
