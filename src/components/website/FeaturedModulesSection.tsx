@@ -39,9 +39,12 @@ export default function FeaturedModulesSection() {
           </div>
           <button
             onClick={() => router.push('/modules')}
-            className="flex items-center gap-2 bg-[#34BFF3] hover:bg-[#2aadd8] text-white text-[12px] sm:text-[13px] font-semibold px-4 py-2.5 rounded-full transition-all duration-200 whitespace-nowrap"
+            className="flex items-center gap-2 text-[#34BFF3] hover:gap-3 text-[13px] sm:text-[14px] font-bold transition-all duration-200 whitespace-nowrap"
           >
-            View All Programs <ArrowRight className="w-4 h-4" />
+            View All Programs
+            <span className="flex items-center justify-center w-7 h-7 bg-[#34BFF3] rounded-full">
+              <ArrowRight className="w-3.5 h-3.5 text-white" />
+            </span>
           </button>
         </div>
 
