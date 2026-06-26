@@ -4,11 +4,14 @@ import { useRouter } from 'next/navigation';
 import { useAuthStore } from '../../store/authStore';
 
 export default function ProtectedRoute({ children }: { children: React.ReactNode }) {
-  const { isAuthenticated, student } = useAuthStore();
+  const { hasHydrated, isAuthenticated, student } = useAuthStore();
   const router = useRouter();
   const [isChecking, setIsChecking] = useState(true);
 
   useEffect(() => {
+    
+    if (!hasHydrated) return;
+
     if (!isAuthenticated) {
       router.replace('/login');
       return;
@@ -18,9 +21,9 @@ export default function ProtectedRoute({ children }: { children: React.ReactNode
       return;
     }
     setIsChecking(false);
-  }, [isAuthenticated, student, router]);
+  }, [hasHydrated, isAuthenticated, student, router]);
 
-  if (isChecking) {
+  if (!hasHydrated || isChecking) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600" />
