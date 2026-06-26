@@ -510,19 +510,6 @@ export default function ProfileSection() {
                 />
               )}
 
-              <Input
-                label="Citizen by Descent"
-                value={
-                  editing
-                    ? editForm?.citizenByDescent
-                    : studentData?.citizenByDescent
-                }
-                disabled={!editing}
-                onChange={(v) =>
-                  setEditForm((f: any) => ({ ...f, citizenByDescent: v }))
-                }
-                inputCls={inputCls}
-              />
             </div>
           </div>
 
@@ -578,12 +565,6 @@ export default function ProfileSection() {
               inputCls={inputCls}
             />
             <Input
-              label="Admission Number"
-              value={studentData?.admissionNumber}
-              disabled
-              inputCls={inputCls}
-            />
-            <Input
               label="Batch"
               value={
                 studentData?.batch ||
@@ -614,63 +595,6 @@ export default function ProfileSection() {
             </div>
           </div>
 
-          <div>
-            <h3 className="font-semibold text-gray-800 mb-3 text-sm">
-              G.C.E. (O/L) Results
-            </h3>
-
-            <div className="bg-gray-50 rounded-xl border border-gray-200 overflow-hidden">
-              <div className="p-4 border-b border-gray-200 grid grid-cols-1 md:grid-cols-3 gap-4 text-xs text-gray-500">
-                <div>
-                  <span className="font-medium text-gray-700">Category:</span>{' '}
-                  {studentData?.olCategory || '-'}
-                </div>
-                <div>
-                  <span className="font-medium text-gray-700">Year:</span>{' '}
-                  {studentData?.olYear || '-'}
-                </div>
-                <div>
-                  <span className="font-medium text-gray-700">Index:</span>{' '}
-                  {studentData?.olIndexNumber || '-'}
-                </div>
-              </div>
-
-              <div className="p-4 overflow-x-auto">
-                <table className="w-full text-sm">
-                  <thead>
-                    <tr className="text-left text-gray-500">
-                      <th className="py-2">English</th>
-                      <th className="py-2">Maths</th>
-                      <th className="py-2">Science</th>
-                      <th className="py-2">Sinhala</th>
-                      <th className="py-2">Tamil</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {(studentData?.olResults || []).map((r: any, i: number) => (
-                      <tr
-                        key={i}
-                        className="border-t border-gray-200 text-gray-800"
-                      >
-                        <td className="py-2">{r.english || '-'}</td>
-                        <td className="py-2">{r.mathematics || '-'}</td>
-                        <td className="py-2">{r.science || '-'}</td>
-                        <td className="py-2">{r.sinhala || '-'}</td>
-                        <td className="py-2">{r.tamil || '-'}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-
-                {!studentData?.olResults?.length && (
-                  <p className="text-sm text-gray-500">
-                    No O/L results available.
-                  </p>
-                )}
-              </div>
-            </div>
-          </div>
-         
         </div>
       )}
 
