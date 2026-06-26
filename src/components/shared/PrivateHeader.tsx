@@ -85,7 +85,7 @@ export default function PrivateHeader() {
         <div className="flex h-14 items-center justify-between gap-3">
           <Link
             href="/dashboard"
-            className="flex shrink-0 items-center gap-3"
+            className="flex shrink-0 items-center gap-2"
           >
             <Image
               src="/logo.png"
@@ -95,13 +95,6 @@ export default function PrivateHeader() {
               className="h-auto w-[125px] object-contain sm:w-[145px]"
               priority
             />
-
-            {/* <div className="leading-tight">
-              <h1 className="text-xl font-semibold text-[#0183CB]">Techna</h1>
-              <p className="text-sm font-medium text-[#0183CB]">
-                Student Portal
-              </p>
-            </div> */}
           </Link>
 
           <nav className="hidden items-center gap-1 md:flex">
@@ -120,7 +113,7 @@ export default function PrivateHeader() {
             ))}
           </nav>
 
-         <div className="hidden items-center gap-3 md:flex pr-8">
+          <div className="hidden items-center gap-3 pr-8 md:flex">
             <NotificationBell />
 
             <div ref={dropdownRef} className="relative">

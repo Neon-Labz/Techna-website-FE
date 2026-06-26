@@ -4,16 +4,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { useAuthStore } from '../../store/authStore';
 import { Bell, BookOpen, Award, TrendingUp } from 'lucide-react';
 import { dashboardApi } from '@/api/dashboard.api';
-
-type Notice = {
-  _id?: string;
-  type?: 'exam' | 'general' | 'assignment' | 'holiday';
-};
-
-type Module = {
-  _id?: string;
-  name?: string;
-};
+import { announcementApi, type Announcement } from '@/api/announcement.api';
 
 type Result = {
   _id?: string;
@@ -38,25 +29,21 @@ export default function DashboardHeroSection() {
   const studentFirstName = studentFullName?.split(' ')?.[0] || 'Student';
   const admissionNo = student?.studentId?.trim() || '-';
 
-  const [notices, setNotices] = useState<Notice[]>([]);
-  const [modules, setModules] = useState<Module[]>([]);
+  const [announcements, setAnnouncements] = useState<Announcement[]>([]);
   const [results, setResults] = useState<Result[]>([]);
 
   useEffect(() => {
     const fetchDashboardData = async () => {
-      setNotices([]);
-      setModules([]);
+      setAnnouncements([]);
       setResults([]);
 
       try {
-        const [noticeData, moduleData, resultData] = await Promise.all([
-          dashboardApi.getNotices(),
-          dashboardApi.getModules(),
+        const [announcementData, resultData] = await Promise.all([
+          announcementApi.getAll(),
           dashboardApi.getResults(studentResultId, token || undefined),
         ]);
 
-        setNotices(noticeData);
-        setModules(moduleData);
+        setAnnouncements(Array.isArray(announcementData) ? announcementData : []);
         setResults(resultData);
       } catch (error) {
         console.error('Dashboard data fetch error:', error);
@@ -103,23 +90,32 @@ export default function DashboardHeroSection() {
 
   const recentResults = releasedResults.slice(0, 3);
 
-  const examNoticesCount = notices.filter((n) => n.type === 'exam').length;
+  const announcementCount = useMemo(() => {
+    const studentBatch = student?.batch?.trim();
+
+    return announcements.filter((announcement) => {
+      const target =
+        announcement.batch && announcement.batch !== 'None'
+          ? announcement.batch
+          : 'All Students';
+
+      return target === 'All Students' || target === studentBatch;
+    }).length;
+  }, [announcements, student?.batch]);
 
   const enrolledModuleCount = useMemo(() => {
-    const selectedModules = [
+    const enrolledSubjects = [
       ...(student?.subjects ?? []),
       ...(student?.modules ?? []),
       ...(student?.subjectSelection?.subjects ?? []),
       ...(student?.subjectSelection?.enrolledModules ?? []),
       ...(student?.enrolledModules ?? []),
-      ...modules.map((module) => module.name ?? ''),
     ]
       .map((module) => module?.trim())
       .filter((module): module is string => Boolean(module));
 
-    return new Set(selectedModules).size;
+    return new Set(enrolledSubjects).size;
   }, [
-    modules,
     student?.enrolledModules,
     student?.modules,
     student?.subjectSelection?.enrolledModules,
@@ -151,9 +147,9 @@ export default function DashboardHeroSection() {
     },
     {
       icon: Bell,
-      label: 'Notices',
-      value: examNoticesCount.toString(),
-      sub: 'Exam Notices',
+      label: 'Announcements',
+      value: announcementCount.toString(),
+      sub: 'Latest updates',
       color: 'text-red-600 bg-red-50',
     },
   ];

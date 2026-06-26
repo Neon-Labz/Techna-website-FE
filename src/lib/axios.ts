@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { useAuthStore } from '../store/authStore';
 
 const AUTH_STORAGE_KEYS = ['techna-auth', 'edu-auth'];
 
@@ -14,15 +15,17 @@ const PUBLIC_PATHS = [
 ];
 
 const api = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api',
-  headers: {
-    'Content-Type': 'application/json',
-  },
+  baseURL: process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:4000/api',
   timeout: 15000,
 });
 
 const readStoredToken = (): string | null => {
   if (typeof window === 'undefined') return null;
+
+  // In-memory token first. This covers the "Remember me" OFF case where the
+  // token lives only in the zustand store and is not written to storage.
+  const stateToken = useAuthStore.getState().token;
+  if (stateToken) return stateToken;
 
   const storages = [window.localStorage, window.sessionStorage];
 
