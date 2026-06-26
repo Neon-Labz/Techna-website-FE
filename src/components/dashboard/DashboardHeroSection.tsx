@@ -4,11 +4,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { useAuthStore } from '../../store/authStore';
 import { Bell, BookOpen, Award, TrendingUp } from 'lucide-react';
 import { dashboardApi } from '@/api/dashboard.api';
-
-type Notice = {
-  _id?: string;
-  type?: 'exam' | 'general' | 'assignment' | 'holiday';
-};
+import { announcementApi, type Announcement } from '@/api/announcement.api';
 
 type Module = {
   _id?: string;
@@ -38,24 +34,24 @@ export default function DashboardHeroSection() {
   const studentFirstName = studentFullName?.split(' ')?.[0] || 'Student';
   const admissionNo = student?.studentId?.trim() || '-';
 
-  const [notices, setNotices] = useState<Notice[]>([]);
+  const [announcements, setAnnouncements] = useState<Announcement[]>([]);
   const [modules, setModules] = useState<Module[]>([]);
   const [results, setResults] = useState<Result[]>([]);
 
   useEffect(() => {
     const fetchDashboardData = async () => {
-      setNotices([]);
+      setAnnouncements([]);
       setModules([]);
       setResults([]);
 
       try {
-        const [noticeData, moduleData, resultData] = await Promise.all([
-          dashboardApi.getNotices(),
+        const [announcementData, moduleData, resultData] = await Promise.all([
+          announcementApi.getAll(),
           dashboardApi.getModules(),
           dashboardApi.getResults(studentResultId, token || undefined),
         ]);
 
-        setNotices(noticeData);
+        setAnnouncements(Array.isArray(announcementData) ? announcementData : []);
         setModules(moduleData);
         setResults(resultData);
       } catch (error) {
@@ -103,7 +99,18 @@ export default function DashboardHeroSection() {
 
   const recentResults = releasedResults.slice(0, 3);
 
-  const examNoticesCount = notices.filter((n) => n.type === 'exam').length;
+  const announcementCount = useMemo(() => {
+    const studentBatch = student?.batch?.trim();
+
+    return announcements.filter((announcement) => {
+      const target =
+        announcement.batch && announcement.batch !== 'None'
+          ? announcement.batch
+          : 'All Students';
+
+      return target === 'All Students' || target === studentBatch;
+    }).length;
+  }, [announcements, student?.batch]);
 
   const enrolledModuleCount = useMemo(() => {
     const selectedModules = [
@@ -151,9 +158,9 @@ export default function DashboardHeroSection() {
     },
     {
       icon: Bell,
-      label: 'Notices',
-      value: examNoticesCount.toString(),
-      sub: 'Exam Notices',
+      label: 'Announcements',
+      value: announcementCount.toString(),
+      sub: 'Latest updates',
       color: 'text-red-600 bg-red-50',
     },
   ];
