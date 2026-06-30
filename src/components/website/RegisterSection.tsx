@@ -1,12 +1,18 @@
 'use client';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Check, ChevronRight, ChevronLeft, User, MapPin, BookOpen, FileText, Plus, Trash2, Upload, GraduationCap } from 'lucide-react';
 import { authApi } from '@/api/auth.api';
-import { dashboardApi } from '@/api/dashboard.api';
 import type { RegisterStudentPayload } from '@/api/auth.api';
-import { SUBJECTS } from '@/data/mockData';
+import {
+  getSubjectCategory,
+  countSubjectsByCategory,
+  MAIN_SUBJECTS,
+  BASKET_SUBJECTS,
+  MAX_MAIN_SUBJECTS,
+  MAX_BASKET_SUBJECTS,
+} from '@/utils/subjectCategory';
 
 const STEPS = [
   { id: 1, label: 'Basic Info', icon: User, desc: 'Personal details' },
@@ -35,12 +41,6 @@ const SUBJECT_LABELS: Record<string, string> = {
   'Information Communication Technology': 'ICT',
 };
 const subjectLabel = (name: string) => SUBJECT_LABELS[name] || name;
-
-type RegistrationModule = {
-  _id?: string;
-  name?: string;
-  status?: string;
-};
 
 const clean = (value: string) => value.trim();
 
@@ -196,9 +196,6 @@ export default function RegisterSection() {
   const [submitMessage, setSubmitMessage] = useState('');
   const [submitError, setSubmitError] = useState('');
   const [profilePhoto, setProfilePhoto] = useState<File | null>(null);
-  const [subjectOptions, setSubjectOptions] = useState<string[]>(SUBJECTS);
-  const [loadingSubjects, setLoadingSubjects] = useState(true);
-  const [subjectsError, setSubjectsError] = useState('');
 
   // Form state
   const [form, setForm] = useState(createInitialForm);
@@ -208,50 +205,35 @@ export default function RegisterSection() {
 
   const set = (key: string, value: string | boolean | string[]) => setForm(f => ({ ...f, [key]: value }));
 
-  useEffect(() => {
-    let mounted = true;
-
-    const loadModules = async () => {
-      setLoadingSubjects(true);
-      setSubjectsError('');
-
-      try {
-        const modules = (await dashboardApi.getModules()) as RegistrationModule[];
-        const names = Array.from(
-          new Set(
-            modules
-              .filter((module) => !module.status || module.status === 'active')
-              .map((module) => module.name?.trim())
-              .filter((name): name is string => Boolean(name))
-          )
-        );
-
-        if (mounted && names.length > 0) {
-          setSubjectOptions(names);
-        }
-      } catch (error) {
-        console.error('Failed to load modules:', error);
-        if (mounted) {
-          setSubjectsError('Unable to load subjects');
-        }
-      } finally {
-        if (mounted) {
-          setLoadingSubjects(false);
-        }
-      }
-    };
-
-    void loadModules();
-
-    return () => {
-      mounted = false;
-    };
-  }, []);
-
   const toggleSubject = (sub: string) => {
     const current = form.subjects;
-    if (current.includes(sub)) set('subjects', current.filter(s => s !== sub));
-    else set('subjects', [...current, sub]);
+    if (current.includes(sub)) {
+      set('subjects', current.filter(s => s !== sub));
+      return;
+    }
+
+    const category = getSubjectCategory(sub);
+    const counts = countSubjectsByCategory(current);
+    const limit = category === 'main' ? MAX_MAIN_SUBJECTS : MAX_BASKET_SUBJECTS;
+
+    if (counts[category] >= limit) {
+      setErrors(prev => ({
+        ...prev,
+        subjects:
+          category === 'main'
+            ? `You can select only ${MAX_MAIN_SUBJECTS} Main Subjects`
+            : `You can select only ${MAX_BASKET_SUBJECTS} Basket Subject`,
+      }));
+      return;
+    }
+
+    setErrors(prev => {
+      if (!prev.subjects) return prev;
+      const rest = { ...prev };
+      delete rest.subjects;
+      return rest;
+    });
+    set('subjects', [...current, sub]);
   };
 
   const addOlRow = () => setOlRows(rows => [...rows, { ...emptyOL }]);
@@ -322,7 +304,10 @@ export default function RegisterSection() {
 
     if (targetStep === 5) {
       if (!clean(form.batch)) e.batch = 'Batch is required';
-      if (form.subjects.length === 0) e.subjects = 'Select at least one subject';
+      const counts = countSubjectsByCategory(form.subjects);
+      if (counts.main !== MAX_MAIN_SUBJECTS || counts.basket !== MAX_BASKET_SUBJECTS) {
+        e.subjects = `Select exactly ${MAX_MAIN_SUBJECTS} Main Subjects and ${MAX_BASKET_SUBJECTS} Basket Subject`;
+      }
       if (!form.declarationRules || !form.declarationAccuracy) e.declaration = 'Both declarations are required';
     }
 
@@ -814,34 +799,68 @@ export default function RegisterSection() {
 
               <div>
                 <label className="block text-sm font-semibold text-gray-800 mb-3">Select Subjects <span className="text-red-500">*</span></label>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  {loadingSubjects ? (
-                    <div className="sm:col-span-2 rounded-xl border border-gray-200 bg-gray-50 p-4 text-sm text-gray-500">
-                      Loading subjects...
+                <p className="text-xs text-gray-500 mb-3">
+                  Select exactly {MAX_MAIN_SUBJECTS} Main Subjects and {MAX_BASKET_SUBJECTS} Basket Subject.
+                </p>
+                {(() => {
+                  const counts = countSubjectsByCategory(form.subjects);
+
+                  const renderCategory = (
+                    title: string,
+                    items: string[],
+                    limit: number,
+                    category: 'main' | 'basket',
+                  ) => (
+                    <div className="mb-5" key={category}>
+                      <div className="mb-2 flex items-center justify-between">
+                        <span className="text-xs font-semibold uppercase tracking-wide text-gray-600">
+                          {title}
+                        </span>
+                        <span className="text-xs text-gray-400">
+                          {counts[category]}/{limit} selected
+                        </span>
+                      </div>
+
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        {items.map(sub => {
+                          const selected = form.subjects.includes(sub);
+                          const limitReached = counts[category] >= limit;
+                          const disabled = !selected && limitReached;
+
+                          return (
+                            <label
+                              key={sub}
+                              className={`flex items-center gap-3 p-3.5 rounded-xl border-2 transition-all ${
+                                selected
+                                  ? 'border-blue-500 bg-blue-50 cursor-pointer'
+                                  : disabled
+                                    ? 'border-gray-200 bg-gray-100 opacity-60 cursor-not-allowed'
+                                    : 'border-gray-200 bg-gray-50 hover:border-blue-300 cursor-pointer'
+                              }`}
+                            >
+                              <input
+                                type="checkbox"
+                                checked={selected}
+                                disabled={disabled}
+                                onChange={() => toggleSubject(sub)}
+                                className="text-blue-600 rounded w-4 h-4"
+                              />
+                              <span className={`text-sm font-medium ${selected ? 'text-blue-800' : disabled ? 'text-gray-400' : 'text-gray-700'}`}>{subjectLabel(sub)}</span>
+                              {selected && <Check className="w-4 h-4 text-blue-600 ml-auto" />}
+                            </label>
+                          );
+                        })}
+                      </div>
                     </div>
-                  ) : (
-                    subjectOptions.map(sub => {
-                      const selected = form.subjects.includes(sub);
-                      return (
-                        <label
-                          key={sub}
-                          className={`flex items-center gap-3 p-3.5 rounded-xl border-2 cursor-pointer transition-all ${selected ? 'border-blue-500 bg-blue-50' : 'border-gray-200 bg-gray-50 hover:border-blue-300'}`}
-                        >
-                          <input
-                            type="checkbox"
-                            checked={selected}
-                            onChange={() => toggleSubject(sub)}
-                            className="text-blue-600 rounded w-4 h-4"
-                          />
-                          <span className={`text-sm font-medium ${selected ? 'text-blue-800' : 'text-gray-700'}`}>{subjectLabel(sub)}</span>
-                          {selected && <Check className="w-4 h-4 text-blue-600 ml-auto" />}
-                        </label>
-                      );
-                    })
-                  )}
-                </div>
-                {!loadingSubjects && subjectsError && <p className="text-red-500 text-xs mt-2">{subjectsError}</p>}
-                {!loadingSubjects && !subjectsError && subjectOptions.length === 0 && <p className="text-gray-500 text-xs mt-2">No subjects are available.</p>}
+                  );
+
+                  return (
+                    <>
+                      {renderCategory('Main Subjects', MAIN_SUBJECTS, MAX_MAIN_SUBJECTS, 'main')}
+                      {renderCategory('Basket Subject', BASKET_SUBJECTS, MAX_BASKET_SUBJECTS, 'basket')}
+                    </>
+                  );
+                })()}
                 {errors.subjects && <p className="text-red-500 text-xs mt-2">{errors.subjects}</p>}
               </div>
 
