@@ -36,6 +36,14 @@ const SUBJECT_LABELS: Record<string, string> = {
 };
 const subjectLabel = (name: string) => SUBJECT_LABELS[name] || name;
 
+// Subject categorisation for Step 5 (hardcoded module names).
+// Main Subjects: exactly 2 must be selected.
+// Basket Subjects: exactly 1 must be selected.
+const MAIN_SUBJECTS = ['Engineering Technology', 'Bio Systems Technology', 'Science For Technology'];
+const MAIN_SUBJECTS_REQUIRED = 2;
+const BASKET_SUBJECTS = ['Information Communication Technology', 'Agricultural Science', 'Mathematics', 'Geography'];
+const BASKET_SUBJECTS_REQUIRED = 1;
+
 type RegistrationModule = {
   _id?: string;
   name?: string;
@@ -243,10 +251,30 @@ export default function RegisterSection() {
     };
   }, []);
 
-  const toggleSubject = (sub: string) => {
-    const current = form.subjects;
-    if (current.includes(sub)) set('subjects', current.filter(s => s !== sub));
-    else set('subjects', [...current, sub]);
+  // Main Subjects: exactly 2 must be selected. Selecting a 3rd one is blocked.
+  const toggleMainSubject = (sub: string) => {
+    const mainSelected = form.subjects.filter(s => MAIN_SUBJECTS.includes(s));
+    const otherSubjects = form.subjects.filter(s => !MAIN_SUBJECTS.includes(s));
+
+    if (mainSelected.includes(sub)) {
+      // unselect
+      set('subjects', [...otherSubjects, ...mainSelected.filter(s => s !== sub)]);
+    } else {
+      if (mainSelected.length >= MAIN_SUBJECTS_REQUIRED) return; // block selecting a 3rd
+      set('subjects', [...otherSubjects, ...mainSelected, sub]);
+    }
+  };
+
+  // Basket Subjects: exactly 1 can be selected (radio behaviour).
+  const toggleBasketSubject = (sub: string) => {
+    const otherSubjects = form.subjects.filter(s => !BASKET_SUBJECTS.includes(s));
+    const basketSelected = form.subjects.filter(s => BASKET_SUBJECTS.includes(s));
+
+    if (basketSelected.includes(sub)) {
+      set('subjects', otherSubjects); // unselect
+    } else {
+      set('subjects', [...otherSubjects, sub]); // replace any previous basket selection
+    }
   };
 
   const addOlRow = () => setOlRows(rows => [...rows, { ...emptyOL }]);
@@ -273,7 +301,18 @@ export default function RegisterSection() {
     }
     if (step === 5) {
       if (!form.batch) e.batch = 'Batch is required';
-      if (form.subjects.length === 0) e.subjects = 'Select at least one subject';
+
+      const mainSelected = form.subjects.filter(s => MAIN_SUBJECTS.includes(s));
+      const basketSelected = form.subjects.filter(s => BASKET_SUBJECTS.includes(s));
+
+      if (mainSelected.length !== MAIN_SUBJECTS_REQUIRED) {
+        e.mainSubjects = `Select exactly ${MAIN_SUBJECTS_REQUIRED} main subjects`;
+      }
+
+      if (basketSelected.length !== BASKET_SUBJECTS_REQUIRED) {
+        e.basketSubjects = `Select exactly ${BASKET_SUBJECTS_REQUIRED} basket subject`;
+      }
+
       if (!form.declarationRules || !form.declarationAccuracy) e.declaration = 'Both declarations are required';
     }
     setErrors(e);
@@ -726,15 +765,52 @@ export default function RegisterSection() {
                 {errors.batch && <p className="text-red-500 text-xs mt-1">{errors.batch}</p>}
               </div>
 
+              {/* Main Subjects - only 1 selectable */}
               <div>
-                <label className="block text-sm font-semibold text-gray-800 mb-3">Select Subjects <span className="text-red-500">*</span></label>
+                <label className="block text-sm font-semibold text-gray-800 mb-1">
+                  Main Subjects <span className="text-red-500">*</span>
+                </label>
+                <p className="text-xs text-gray-400 mb-3">Select exactly {MAIN_SUBJECTS_REQUIRED} subjects</p>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  {loadingSubjects ? (
-                    <div className="sm:col-span-2 rounded-xl border border-gray-200 bg-gray-50 p-4 text-sm text-gray-500">
-                      Loading subjects...
-                    </div>
-                  ) : (
-                    subjectOptions.map(sub => {
+                  {MAIN_SUBJECTS.map(sub => {
+                      const selected = form.subjects.includes(sub);
+                      const mainSelectedCount = form.subjects.filter(s => MAIN_SUBJECTS.includes(s)).length;
+                      const disabled = !selected && mainSelectedCount >= MAIN_SUBJECTS_REQUIRED;
+                      return (
+                        <label
+                          key={sub}
+                          className={`flex items-center gap-3 p-3.5 rounded-xl border-2 transition-all ${
+                            selected
+                              ? 'border-blue-500 bg-blue-50 cursor-pointer'
+                              : disabled
+                              ? 'border-gray-200 bg-gray-100 opacity-60 cursor-not-allowed'
+                              : 'border-gray-200 bg-gray-50 hover:border-blue-300 cursor-pointer'
+                          }`}
+                        >
+                          <input
+                            type="checkbox"
+                            checked={selected}
+                            disabled={disabled}
+                            onChange={() => toggleMainSubject(sub)}
+                            className="text-blue-600 rounded w-4 h-4"
+                          />
+                          <span className={`text-sm font-medium ${selected ? 'text-blue-800' : 'text-gray-700'}`}>{subjectLabel(sub)}</span>
+                          {selected && <Check className="w-4 h-4 text-blue-600 ml-auto" />}
+                        </label>
+                      );
+                    })}
+                </div>
+                {errors.mainSubjects && <p className="text-red-500 text-xs mt-2">{errors.mainSubjects}</p>}
+              </div>
+
+              {/* Basket Subjects - multi select, at least 1 required */}
+              <div>
+                <label className="block text-sm font-semibold text-gray-800 mb-1">
+                  Basket Subjects <span className="text-red-500">*</span>
+                </label>
+                <p className="text-xs text-gray-400 mb-3">Select exactly {BASKET_SUBJECTS_REQUIRED} subject</p>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  {BASKET_SUBJECTS.map(sub => {
                       const selected = form.subjects.includes(sub);
                       return (
                         <label
@@ -744,19 +820,17 @@ export default function RegisterSection() {
                           <input
                             type="checkbox"
                             checked={selected}
-                            onChange={() => toggleSubject(sub)}
+                            onChange={() => toggleBasketSubject(sub)}
                             className="text-blue-600 rounded w-4 h-4"
                           />
                           <span className={`text-sm font-medium ${selected ? 'text-blue-800' : 'text-gray-700'}`}>{subjectLabel(sub)}</span>
                           {selected && <Check className="w-4 h-4 text-blue-600 ml-auto" />}
                         </label>
                       );
-                    })
-                  )}
+                    })}
                 </div>
+                {errors.basketSubjects && <p className="text-red-500 text-xs mt-2">{errors.basketSubjects}</p>}
                 {!loadingSubjects && subjectsError && <p className="text-red-500 text-xs mt-2">{subjectsError}</p>}
-                {!loadingSubjects && !subjectsError && subjectOptions.length === 0 && <p className="text-gray-500 text-xs mt-2">No subjects are available.</p>}
-                {errors.subjects && <p className="text-red-500 text-xs mt-2">{errors.subjects}</p>}
               </div>
 
               {/* Summary */}
