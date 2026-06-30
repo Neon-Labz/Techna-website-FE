@@ -23,6 +23,9 @@ export interface ModuleFromApi {
   fee: number;
   batch: string;
   status: 'active' | 'inactive';
+  term?: string;
+  unit?: number;
+  subjectCategory?: 'main' | 'basket' | 'none';
   resources?: ResourceFromApi[];
   createdAt?: string;
   updatedAt?: string;
@@ -42,7 +45,7 @@ function unwrapList(res: unknown): ModuleFromApi[] {
 
 export const moduleApi = {
   getAll(): Promise<ModuleFromApi[]> {
-    return api.get('/modules').then((res) => unwrapList(res.data ?? res));
+    return api.get('/modules/public').then((res) => unwrapList(res.data ?? res));
   },
 
   getById(id: string): Promise<ModuleFromApi> {

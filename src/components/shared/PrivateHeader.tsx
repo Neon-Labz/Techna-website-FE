@@ -81,27 +81,20 @@ export default function PrivateHeader() {
 
   return (
     <header className="sticky top-0 z-40 w-full border-b border-gray-200 bg-white shadow-sm">
-      <div className="mx-auto w-full max-w-[1215px] px-3">
+      <div className="mx-auto w-full max-w-[1250px] px-2">
         <div className="flex h-14 items-center justify-between gap-3">
           <Link
             href="/dashboard"
-            className="flex min-w-0 shrink-0 items-center gap-2 md:-ml-5"
+            className="flex shrink-0 items-center gap-2"
           >
             <Image
               src="/logo.png"
               alt="Techna Logo"
-              width={95}
-              height={36}
-              className="h-auto w-[88px] object-contain sm:w-[95px]"
+              width={150}
+              height={60}
+              className="h-auto w-[125px] object-contain sm:w-[145px]"
               priority
             />
-
-            <div className="leading-tight">
-              <h1 className="text-xl font-semibold text-[#0183CB]">Techna</h1>
-              <p className="text-sm font-medium text-[#0183CB]">
-                Student Portal
-              </p>
-            </div>
           </Link>
 
           <nav className="hidden items-center gap-1 md:flex">
@@ -120,7 +113,7 @@ export default function PrivateHeader() {
             ))}
           </nav>
 
-          <div className="hidden items-center gap-3 md:flex">
+          <div className="hidden items-center gap-3 pr-8 md:flex">
             <NotificationBell />
 
             <div ref={dropdownRef} className="relative">
