@@ -101,9 +101,9 @@ export default function NoticesSection({
               Latest Updates
             </span>
 
-            <h2 className="mt-1 text-2xl font-extrabold text-gray-900 sm:text-3xl">
-              Notices & Announcements
-            </h2>
+            <h2 className="mt-1 text-2xl font-normal text-gray-900 sm:text-3xl">
+  Notices & Announcements
+</h2>
 
             <p className="mx-auto mt-2 max-w-xl text-sm leading-relaxed text-gray-500">
               Stay updated with the latest exam schedules, assignments,
@@ -131,7 +131,7 @@ export default function NoticesSection({
                     className="flex min-h-[220px] flex-col rounded-md border border-gray-200 bg-white p-5 shadow-sm"
                   >
 
-                  <p className="mb-4 text-[11px] font-bold uppercase tracking-wider text-[#0069B4]">
+                  <p className="mb-4 text-[11px] font-bold uppercase tracking-wider text-[#0183CB]">
                     {formatDateUpper(notice.date)}
                   </p>
 
@@ -142,10 +142,10 @@ export default function NoticesSection({
                   <button
                     type="button"
                     onClick={() => setSelectedNotice(notice)}
-                    className="mt-4 inline-flex w-fit items-center gap-1 text-sm font-bold text-[#005EB8] transition hover:text-[#00498f]"
+                    className="mt-4 inline-flex w-fit items-center gap-1 text-sm font-bold text-[#0183CB] transition hover:text-[#0183CB]"
                   >
                     View Full Schedule
-                    <ArrowRight className="h-4 w-4" />
+                    <ArrowRight className="h-4 w-4 text-[#0183CB]" />
                   </button>
                 </div>
               ))}
