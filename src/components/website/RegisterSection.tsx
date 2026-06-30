@@ -30,11 +30,15 @@ export const RELIGION_OPTIONS = ['Buddhism', 'Hinduism', 'Islam', 'Christianity'
 interface OLRow { year: string; indexNumber: string; english: string; mathematics: string; science: string; sinhala: string; tamil: string; }
 const emptyOL: OLRow = { year: '', indexNumber: '', english: '', mathematics: '', science: '', sinhala: '', tamil: '' };
 
-// Display-only labels; the original module name is still sent to the backend.
 const SUBJECT_LABELS: Record<string, string> = {
   'Information Communication Technology': 'ICT',
 };
 const subjectLabel = (name: string) => SUBJECT_LABELS[name] || name;
+
+const MAIN_SUBJECTS = ['Engineering Technology', 'Bio Systems Technology', 'Science For Technology'];
+const MAIN_SUBJECTS_REQUIRED = 2;
+const BASKET_SUBJECTS = ['Information Communication Technology', 'Agricultural Science', 'Mathematics', 'Geography'];
+const BASKET_SUBJECTS_REQUIRED = 1;
 
 type RegistrationModule = {
   _id?: string;
@@ -44,7 +48,6 @@ type RegistrationModule = {
 
 const clean = (value: string) => value.trim();
 
-// Validation patterns for mandatory fields.
 const PHONE_REGEX = /^(?:\+94|0094|0)[0-9]{9}$/;
 const NIC_REGEX = /^(?:[0-9]{9}[vVxX]|[0-9]{12})$/;
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -200,7 +203,6 @@ export default function RegisterSection() {
   const [loadingSubjects, setLoadingSubjects] = useState(true);
   const [subjectsError, setSubjectsError] = useState('');
 
-  // Form state
   const [form, setForm] = useState(createInitialForm);
 
   const [olRows, setOlRows] = useState<OLRow[]>([{ ...emptyOL }]);
@@ -248,10 +250,27 @@ export default function RegisterSection() {
     };
   }, []);
 
-  const toggleSubject = (sub: string) => {
-    const current = form.subjects;
-    if (current.includes(sub)) set('subjects', current.filter(s => s !== sub));
-    else set('subjects', [...current, sub]);
+  const toggleMainSubject = (sub: string) => {
+    const mainSelected = form.subjects.filter(s => MAIN_SUBJECTS.includes(s));
+    const otherSubjects = form.subjects.filter(s => !MAIN_SUBJECTS.includes(s));
+
+    if (mainSelected.includes(sub)) {
+      set('subjects', [...otherSubjects, ...mainSelected.filter(s => s !== sub)]);
+    } else {
+      if (mainSelected.length >= MAIN_SUBJECTS_REQUIRED) return;
+      set('subjects', [...otherSubjects, ...mainSelected, sub]);
+    }
+  };
+
+  const toggleBasketSubject = (sub: string) => {
+    const otherSubjects = form.subjects.filter(s => !BASKET_SUBJECTS.includes(s));
+    const basketSelected = form.subjects.filter(s => BASKET_SUBJECTS.includes(s));
+
+    if (basketSelected.includes(sub)) {
+      set('subjects', otherSubjects);
+    } else {
+      set('subjects', [...otherSubjects, sub]);
+    }
   };
 
   const addOlRow = () => setOlRows(rows => [...rows, { ...emptyOL }]);
@@ -260,8 +279,6 @@ export default function RegisterSection() {
     setOlRows(rows => rows.map((r, idx) => idx === i ? { ...r, [key]: val } : r));
   };
 
-  // Every field outside the O/L Results section (step 4) is mandatory.
-  // Step 4 is the only optional section.
   const getStepErrors = (targetStep: number) => {
     const e: Record<string, string> = {};
 
@@ -322,7 +339,18 @@ export default function RegisterSection() {
 
     if (targetStep === 5) {
       if (!clean(form.batch)) e.batch = 'Batch is required';
-      if (form.subjects.length === 0) e.subjects = 'Select at least one subject';
+
+      const mainSelected = form.subjects.filter(s => MAIN_SUBJECTS.includes(s));
+      const basketSelected = form.subjects.filter(s => BASKET_SUBJECTS.includes(s));
+
+      if (mainSelected.length !== MAIN_SUBJECTS_REQUIRED) {
+        e.mainSubjects = `Select exactly ${MAIN_SUBJECTS_REQUIRED} main subjects`;
+      }
+
+      if (basketSelected.length !== BASKET_SUBJECTS_REQUIRED) {
+        e.basketSubjects = `Select exactly ${BASKET_SUBJECTS_REQUIRED} basket subject`;
+      }
+
       if (!form.declarationRules || !form.declarationAccuracy) e.declaration = 'Both declarations are required';
     }
 
@@ -339,7 +367,6 @@ export default function RegisterSection() {
   const prev = () => setStep(s => Math.max(s - 1, 1));
 
   const handleSubmit = async () => {
-    // Validate every mandatory section (all steps except the optional O/L step 4).
     const stepsToValidate = [1, 2, 3, 5];
     const allErrors = stepsToValidate.reduce<Record<string, string>>(
       (acc, s) => ({ ...acc, ...getStepErrors(s) }),
@@ -437,14 +464,12 @@ export default function RegisterSection() {
       }}
     >
       <div className="max-w-3xl mx-auto">
-        {/* Header */}
         <div className="text-center mb-8">
           <Image src="/techna-logo.png" alt="Techna Logo" width={120} height={50} className="mx-auto mb-4 rounded-full" />
           <h1 className="text-2xl font-bold text-white">Techna Technical Institute</h1>
           <p className="text-blue-300 text-sm">A/L Technology Stream – Admission Form 2024</p>
         </div>
 
-        {/* Stepper */}
         <div className="flex items-center justify-between mb-8 px-2">
           {STEPS.map((s, i) => {
             const Icon = s.icon;
@@ -491,14 +516,12 @@ export default function RegisterSection() {
           })}
         </div>
 
-        {/* Form Card */}
         <div className="bg-white rounded-3xl shadow-2xl p-6 md:p-8">
           <div className="mb-6">
             <h2 className="text-xl font-bold text-gray-900">{STEPS[step - 1].label}</h2>
             <p className="text-gray-500 text-sm">{STEPS[step - 1].desc}</p>
           </div>
 
-          {/* Step 1: Basic Info */}
           {step === 1 && (
             <div className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -592,7 +615,6 @@ export default function RegisterSection() {
             </div>
           )}
 
-          {/* Step 2: Address & Contact */}
           {step === 2 && (
             <div className="space-y-4">
               <div>
@@ -652,7 +674,6 @@ export default function RegisterSection() {
             </div>
           )}
 
-          {/* Step 3: Parent/Guardian Details */}
           {step === 3 && (
             <div className="space-y-4">
               <div>
@@ -711,7 +732,6 @@ export default function RegisterSection() {
             </div>
           )}
 
-          {/* Step 4: O/L Results */}
           {step === 4 && (
             <div className="space-y-5">
               <div className="bg-gray-50 rounded-2xl p-4 border border-gray-200">
@@ -740,7 +760,6 @@ export default function RegisterSection() {
                 </div>
               </div>
 
-              {/* O/L Results Table */}
               <div>
                 <div className="flex items-center justify-between mb-3">
                   <h4 className="text-sm font-semibold text-gray-700">Subject Results</h4>
@@ -798,7 +817,6 @@ export default function RegisterSection() {
             </div>
           )}
 
-          {/* Step 5: Subjects & Confirm */}
           {step === 5 && (
             <div className="space-y-6">
               <div>
@@ -813,14 +831,49 @@ export default function RegisterSection() {
               </div>
 
               <div>
-                <label className="block text-sm font-semibold text-gray-800 mb-3">Select Subjects <span className="text-red-500">*</span></label>
+                <label className="block text-sm font-semibold text-gray-800 mb-1">
+                  Main Subjects <span className="text-red-500">*</span>
+                </label>
+                <p className="text-xs text-gray-400 mb-3">Select exactly {MAIN_SUBJECTS_REQUIRED} subjects</p>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  {loadingSubjects ? (
-                    <div className="sm:col-span-2 rounded-xl border border-gray-200 bg-gray-50 p-4 text-sm text-gray-500">
-                      Loading subjects...
-                    </div>
-                  ) : (
-                    subjectOptions.map(sub => {
+                  {MAIN_SUBJECTS.map(sub => {
+                      const selected = form.subjects.includes(sub);
+                      const mainSelectedCount = form.subjects.filter(s => MAIN_SUBJECTS.includes(s)).length;
+                      const disabled = !selected && mainSelectedCount >= MAIN_SUBJECTS_REQUIRED;
+                      return (
+                        <label
+                          key={sub}
+                          className={`flex items-center gap-3 p-3.5 rounded-xl border-2 transition-all ${
+                            selected
+                              ? 'border-blue-500 bg-blue-50 cursor-pointer'
+                              : disabled
+                              ? 'border-gray-200 bg-gray-100 opacity-60 cursor-not-allowed'
+                              : 'border-gray-200 bg-gray-50 hover:border-blue-300 cursor-pointer'
+                          }`}
+                        >
+                          <input
+                            type="checkbox"
+                            checked={selected}
+                            disabled={disabled}
+                            onChange={() => toggleMainSubject(sub)}
+                            className="text-blue-600 rounded w-4 h-4"
+                          />
+                          <span className={`text-sm font-medium ${selected ? 'text-blue-800' : 'text-gray-700'}`}>{subjectLabel(sub)}</span>
+                          {selected && <Check className="w-4 h-4 text-blue-600 ml-auto" />}
+                        </label>
+                      );
+                    })}
+                </div>
+                {errors.mainSubjects && <p className="text-red-500 text-xs mt-2">{errors.mainSubjects}</p>}
+              </div>
+
+              <div>
+                <label className="block text-sm font-semibold text-gray-800 mb-1">
+                  Basket Subjects <span className="text-red-500">*</span>
+                </label>
+                <p className="text-xs text-gray-400 mb-3">Select exactly {BASKET_SUBJECTS_REQUIRED} subject</p>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  {BASKET_SUBJECTS.map(sub => {
                       const selected = form.subjects.includes(sub);
                       return (
                         <label
@@ -830,22 +883,19 @@ export default function RegisterSection() {
                           <input
                             type="checkbox"
                             checked={selected}
-                            onChange={() => toggleSubject(sub)}
+                            onChange={() => toggleBasketSubject(sub)}
                             className="text-blue-600 rounded w-4 h-4"
                           />
                           <span className={`text-sm font-medium ${selected ? 'text-blue-800' : 'text-gray-700'}`}>{subjectLabel(sub)}</span>
                           {selected && <Check className="w-4 h-4 text-blue-600 ml-auto" />}
                         </label>
                       );
-                    })
-                  )}
+                    })}
                 </div>
+                {errors.basketSubjects && <p className="text-red-500 text-xs mt-2">{errors.basketSubjects}</p>}
                 {!loadingSubjects && subjectsError && <p className="text-red-500 text-xs mt-2">{subjectsError}</p>}
-                {!loadingSubjects && !subjectsError && subjectOptions.length === 0 && <p className="text-gray-500 text-xs mt-2">No subjects are available.</p>}
-                {errors.subjects && <p className="text-red-500 text-xs mt-2">{errors.subjects}</p>}
               </div>
 
-              {/* Summary */}
               <div className="bg-blue-50 rounded-2xl p-5 border border-blue-100">
                 <h4 className="font-semibold text-blue-900 mb-3 text-sm">Application Summary</h4>
                 <div className="space-y-1.5 text-sm text-gray-700">
@@ -860,7 +910,6 @@ export default function RegisterSection() {
                 </div>
               </div>
 
-              {/* Declaration */}
               <div className="bg-gray-50 border border-gray-200 rounded-xl p-4 text-xs text-gray-600 italic leading-relaxed">
                 I hereby declare that all the information provided in this admission form is true and correct to the best of my knowledge. I agree to follow all the rules and regulations of the institution.
               </div>
@@ -893,7 +942,6 @@ export default function RegisterSection() {
             </div>
           )}
 
-          {/* Navigation Buttons */}
           <div className="flex items-center justify-between mt-8 pt-6 border-t border-gray-100">
             <div>
               {step > 1 && (
