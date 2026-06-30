@@ -5,12 +5,15 @@ import type { AuthState, Student } from '../types';
 const AUTH_STORAGE_KEY = 'techna-auth';
 const TOKEN_STORAGE_KEYS = ['token', 'access_token', 'accessToken'];
 
-let authStorageTarget: 'local' | 'session' = 'session';
+// 'local'  -> "Remember me" ON: session is persisted and survives a page refresh.
+// 'memory' -> "Remember me" OFF: nothing is persisted, so a refresh logs the user out.
+let authStorageTarget: 'local' | 'memory' = 'memory';
 
-const getBrowserStorage = (target: 'local' | 'session') => {
-  if (typeof window === 'undefined') return null;
-  return target === 'local' ? window.localStorage : window.sessionStorage;
-};
+const getLocalStorage = () =>
+  typeof window === 'undefined' ? null : window.localStorage;
+
+const getSessionStorage = () =>
+  typeof window === 'undefined' ? null : window.sessionStorage;
 
 const removeAuthData = (storage: Storage | null) => {
   if (!storage) return;
@@ -18,12 +21,21 @@ const removeAuthData = (storage: Storage | null) => {
   TOKEN_STORAGE_KEYS.forEach((key) => storage.removeItem(key));
 };
 
-const writeToken = (token: string, rememberMe: boolean) => {
-  const targetStorage = getBrowserStorage(rememberMe ? 'local' : 'session');
-  const otherStorage = getBrowserStorage(rememberMe ? 'session' : 'local');
+const clearAllAuthStorages = () => {
+  removeAuthData(getLocalStorage());
+  removeAuthData(getSessionStorage());
+};
 
-  removeAuthData(otherStorage);
-  targetStorage?.setItem('token', token);
+const writeToken = (token: string, rememberMe: boolean) => {
+  // Always clear any stale tokens from both storages first.
+  clearAllAuthStorages();
+
+  // Only persist the raw token when "Remember me" is enabled.
+  // Otherwise the token lives in-memory (zustand state) only and is
+  // cleared on refresh.
+  if (rememberMe) {
+    getLocalStorage()?.setItem('token', token);
+  }
 };
 
 const isValidStudent = (data: unknown): data is Student => {
@@ -38,41 +50,36 @@ const isValidStudent = (data: unknown): data is Student => {
 
 const authStorage: StateStorage = {
   getItem: (name) => {
-    const localValue = getBrowserStorage('local')?.getItem(name);
-
-    if (localValue) {
-      authStorageTarget = 'local';
-      return localValue;
-    }
-
-    const sessionValue = getBrowserStorage('session')?.getItem(name) || null;
-
-    if (sessionValue) {
-      authStorageTarget = 'session';
-    }
-
-    return sessionValue;
+    // Only localStorage persists a session across refreshes
+    // (the "Remember me" case). sessionStorage is intentionally ignored
+    // so that non-remembered sessions are dropped on refresh.
+    return getLocalStorage()?.getItem(name) ?? null;
   },
 
   setItem: (name, value) => {
+    // When "Remember me" is OFF we keep auth in-memory only, so skip
+    // persisting entirely. A refresh then has no stored session and the
+    // user is logged out.
+    if (authStorageTarget !== 'local') {
+      return;
+    }
+
     try {
       const parsed = JSON.parse(value);
 
       if (!parsed?.state?.token) {
-        removeAuthData(getBrowserStorage('local'));
-        removeAuthData(getBrowserStorage('session'));
+        clearAllAuthStorages();
         return;
       }
     } catch {
       return;
     }
 
-    getBrowserStorage(authStorageTarget)?.setItem(name, value);
+    getLocalStorage()?.setItem(name, value);
   },
 
-  removeItem: (name) => {
-    getBrowserStorage('local')?.removeItem(name);
-    getBrowserStorage('session')?.removeItem(name);
+  removeItem: () => {
+    clearAllAuthStorages();
   },
 };
 
@@ -85,7 +92,7 @@ export const useAuthStore = create<AuthState>()(
       hasHydrated: false,
 
       login: (student: Student | null, token: string, rememberMe = false) => {
-        authStorageTarget = rememberMe ? 'local' : 'session';
+        authStorageTarget = rememberMe ? 'local' : 'memory';
 
         const validStudent = isValidStudent(student) ? student : null;
 
@@ -106,8 +113,7 @@ export const useAuthStore = create<AuthState>()(
       },
 
       logout: () => {
-        removeAuthData(getBrowserStorage('local'));
-        removeAuthData(getBrowserStorage('session'));
+        clearAllAuthStorages();
 
         set({
           isAuthenticated: false,
@@ -145,8 +151,7 @@ export const useAuthStore = create<AuthState>()(
         const hasValidSession = Boolean(state.isAuthenticated && state.token);
 
         if (!hasValidSession) {
-          removeAuthData(getBrowserStorage('local'));
-          removeAuthData(getBrowserStorage('session'));
+          clearAllAuthStorages();
           state.logout();
         }
 

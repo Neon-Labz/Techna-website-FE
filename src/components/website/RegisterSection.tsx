@@ -30,15 +30,11 @@ export const RELIGION_OPTIONS = ['Buddhism', 'Hinduism', 'Islam', 'Christianity'
 interface OLRow { year: string; indexNumber: string; english: string; mathematics: string; science: string; sinhala: string; tamil: string; }
 const emptyOL: OLRow = { year: '', indexNumber: '', english: '', mathematics: '', science: '', sinhala: '', tamil: '' };
 
-// Display-only labels; the original module name is still sent to the backend.
 const SUBJECT_LABELS: Record<string, string> = {
   'Information Communication Technology': 'ICT',
 };
 const subjectLabel = (name: string) => SUBJECT_LABELS[name] || name;
 
-// Subject categorisation for Step 5 (hardcoded module names).
-// Main Subjects: exactly 2 must be selected.
-// Basket Subjects: exactly 1 must be selected.
 const MAIN_SUBJECTS = ['Engineering Technology', 'Bio Systems Technology', 'Science For Technology'];
 const MAIN_SUBJECTS_REQUIRED = 2;
 const BASKET_SUBJECTS = ['Information Communication Technology', 'Agricultural Science', 'Mathematics', 'Geography'];
@@ -51,6 +47,10 @@ type RegistrationModule = {
 };
 
 const clean = (value: string) => value.trim();
+
+const PHONE_REGEX = /^(?:\+94|0094|0)[0-9]{9}$/;
+const NIC_REGEX = /^(?:[0-9]{9}[vVxX]|[0-9]{12})$/;
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 const optional = (value: string) => {
   const trimmed = clean(value);
@@ -203,7 +203,6 @@ export default function RegisterSection() {
   const [loadingSubjects, setLoadingSubjects] = useState(true);
   const [subjectsError, setSubjectsError] = useState('');
 
-  // Form state
   const [form, setForm] = useState(createInitialForm);
 
   const [olRows, setOlRows] = useState<OLRow[]>([{ ...emptyOL }]);
@@ -251,29 +250,26 @@ export default function RegisterSection() {
     };
   }, []);
 
-  // Main Subjects: exactly 2 must be selected. Selecting a 3rd one is blocked.
   const toggleMainSubject = (sub: string) => {
     const mainSelected = form.subjects.filter(s => MAIN_SUBJECTS.includes(s));
     const otherSubjects = form.subjects.filter(s => !MAIN_SUBJECTS.includes(s));
 
     if (mainSelected.includes(sub)) {
-      // unselect
       set('subjects', [...otherSubjects, ...mainSelected.filter(s => s !== sub)]);
     } else {
-      if (mainSelected.length >= MAIN_SUBJECTS_REQUIRED) return; // block selecting a 3rd
+      if (mainSelected.length >= MAIN_SUBJECTS_REQUIRED) return;
       set('subjects', [...otherSubjects, ...mainSelected, sub]);
     }
   };
 
-  // Basket Subjects: exactly 1 can be selected (radio behaviour).
   const toggleBasketSubject = (sub: string) => {
     const otherSubjects = form.subjects.filter(s => !BASKET_SUBJECTS.includes(s));
     const basketSelected = form.subjects.filter(s => BASKET_SUBJECTS.includes(s));
 
     if (basketSelected.includes(sub)) {
-      set('subjects', otherSubjects); // unselect
+      set('subjects', otherSubjects);
     } else {
-      set('subjects', [...otherSubjects, sub]); // replace any previous basket selection
+      set('subjects', [...otherSubjects, sub]);
     }
   };
 
@@ -283,24 +279,66 @@ export default function RegisterSection() {
     setOlRows(rows => rows.map((r, idx) => idx === i ? { ...r, [key]: val } : r));
   };
 
-  const validateStep = () => {
+  const getStepErrors = (targetStep: number) => {
     const e: Record<string, string> = {};
-    if (step === 1) {
-      if (!form.fullNameEnglish) e.fullNameEnglish = 'Full name (English) is required';
-      if (!form.dateOfBirth) e.dateOfBirth = 'Date of birth is required';
-      if (!form.nicNo) e.nicNo = 'NIC number is required';
-      if (!form.whatsappNo) e.whatsappNo = 'WhatsApp number is required';
-      if (!form.email) e.email = 'Email is required';
+
+    if (targetStep === 1) {
+      if (!clean(form.fullNameEnglish)) e.fullNameEnglish = 'Full name (English) is required';
+      if (!clean(form.dateOfBirth)) e.dateOfBirth = 'Date of birth is required';
+
+      if (!clean(form.nicNo)) e.nicNo = 'NIC number is required';
+      else if (!NIC_REGEX.test(clean(form.nicNo))) e.nicNo = 'Enter a valid NIC (9 digits + V/X or 12 digits)';
+
+      if (!profilePhoto) e.profilePhoto = 'Profile picture is required';
+      if (!clean(form.address)) e.address = 'Address is required';
+      if (!clean(form.school)) e.school = 'School is required';
+
+      if (!clean(form.whatsappNo)) e.whatsappNo = 'WhatsApp number is required';
+      else if (!PHONE_REGEX.test(cleanPhone(form.whatsappNo))) e.whatsappNo = 'Enter a valid number e.g. 0771234567';
+
+      if (!clean(form.parentsNo)) e.parentsNo = "Parent's number is required";
+      else if (!PHONE_REGEX.test(cleanPhone(form.parentsNo))) e.parentsNo = 'Enter a valid number e.g. 0771234567';
+
+      if (!clean(form.email)) e.email = 'Email is required';
+      else if (!EMAIL_REGEX.test(clean(form.email))) e.email = 'Enter a valid email address';
+
       if (!form.password) e.password = 'Password is required';
-      if (form.password && form.password.length < 6) e.password = 'Password must be at least 6 characters';
-      if (form.password !== form.confirmPassword) e.confirmPassword = 'Passwords do not match';
+      else if (form.password.length < 6) e.password = 'Password must be at least 6 characters';
+
+      if (!form.confirmPassword) e.confirmPassword = 'Please confirm your password';
+      else if (form.password !== form.confirmPassword) e.confirmPassword = 'Passwords do not match';
     }
-    if (step === 2) {
-      if (!form.permanentAddress) e.permanentAddress = 'Address is required';
+
+    if (targetStep === 2) {
+      if (!clean(form.permanentAddress)) e.permanentAddress = 'Permanent address is required';
       if (!form.administrativeDistrict) e.administrativeDistrict = 'District is required';
+
+      if (!clean(form.fixedTelephone)) e.fixedTelephone = 'Fixed telephone number is required';
+      else if (!PHONE_REGEX.test(cleanPhone(form.fixedTelephone))) e.fixedTelephone = 'Enter a valid number e.g. 0112345678';
+
+      if (!form.race) e.race = 'Race is required';
+      if (!form.religion) e.religion = 'Religion is required';
+      if (!clean(form.contactAddress)) e.contactAddress = 'Contact address is required';
+
+      if (!clean(form.postalCode)) e.postalCode = 'Postal code is required';
+      else if (!/^[0-9]{4,6}$/.test(clean(form.postalCode))) e.postalCode = 'Enter a valid postal code';
     }
-    if (step === 5) {
-      if (!form.batch) e.batch = 'Batch is required';
+
+    if (targetStep === 3) {
+      if (!clean(form.fatherName)) e.fatherName = "Father's full name is required";
+      if (!clean(form.motherName)) e.motherName = "Mother's full name is required";
+      if (!clean(form.guardianName)) e.guardianName = "Guardian's full name is required";
+      if (!clean(form.guardianAddress)) e.guardianAddress = 'Guardian address is required';
+
+      if (!clean(form.guardianFixedTel)) e.guardianFixedTel = 'Fixed telephone number is required';
+      else if (!PHONE_REGEX.test(cleanPhone(form.guardianFixedTel))) e.guardianFixedTel = 'Enter a valid number e.g. 0112345678';
+
+      if (!clean(form.guardianMobile)) e.guardianMobile = 'Mobile number is required';
+      else if (!PHONE_REGEX.test(cleanPhone(form.guardianMobile))) e.guardianMobile = 'Enter a valid number e.g. 0771234567';
+    }
+
+    if (targetStep === 5) {
+      if (!clean(form.batch)) e.batch = 'Batch is required';
 
       const mainSelected = form.subjects.filter(s => MAIN_SUBJECTS.includes(s));
       const basketSelected = form.subjects.filter(s => BASKET_SUBJECTS.includes(s));
@@ -315,6 +353,12 @@ export default function RegisterSection() {
 
       if (!form.declarationRules || !form.declarationAccuracy) e.declaration = 'Both declarations are required';
     }
+
+    return e;
+  };
+
+  const validateStep = () => {
+    const e = getStepErrors(step);
     setErrors(e);
     return Object.keys(e).length === 0;
   };
@@ -323,7 +367,22 @@ export default function RegisterSection() {
   const prev = () => setStep(s => Math.max(s - 1, 1));
 
   const handleSubmit = async () => {
-    if (!validateStep()) return;
+    const stepsToValidate = [1, 2, 3, 5];
+    const allErrors = stepsToValidate.reduce<Record<string, string>>(
+      (acc, s) => ({ ...acc, ...getStepErrors(s) }),
+      {}
+    );
+
+    if (Object.keys(allErrors).length > 0) {
+      setErrors(allErrors);
+      const firstInvalidStep = stepsToValidate.find(
+        (s) => Object.keys(getStepErrors(s)).length > 0
+      );
+      if (firstInvalidStep) setStep(firstInvalidStep);
+      setSubmitError('Please complete all required fields before submitting.');
+      return;
+    }
+
     setLoading(true);
     setSubmitMessage('');
     setSubmitError('');
@@ -405,14 +464,12 @@ export default function RegisterSection() {
       }}
     >
       <div className="max-w-3xl mx-auto">
-        {/* Header */}
         <div className="text-center mb-8">
           <Image src="/techna-logo.png" alt="Techna Logo" width={120} height={50} className="mx-auto mb-4 rounded-full" />
           <h1 className="text-2xl font-bold text-white">Techna Technical Institute</h1>
           <p className="text-blue-300 text-sm">A/L Technology Stream – Admission Form 2024</p>
         </div>
 
-        {/* Stepper */}
         <div className="flex items-center justify-between mb-8 px-2">
           {STEPS.map((s, i) => {
             const Icon = s.icon;
@@ -459,14 +516,12 @@ export default function RegisterSection() {
           })}
         </div>
 
-        {/* Form Card */}
         <div className="bg-white rounded-3xl shadow-2xl p-6 md:p-8">
           <div className="mb-6">
             <h2 className="text-xl font-bold text-gray-900">{STEPS[step - 1].label}</h2>
             <p className="text-gray-500 text-sm">{STEPS[step - 1].desc}</p>
           </div>
 
-          {/* Step 1: Basic Info */}
           {step === 1 && (
             <div className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -499,8 +554,8 @@ export default function RegisterSection() {
                   {errors.nicNo && <p className="text-red-500 text-xs mt-1">{errors.nicNo}</p>}
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Profile Picture</label>
-                  <label className="flex h-[42px] w-full cursor-pointer items-center justify-center gap-2 rounded-xl border border-dashed border-blue-300 bg-blue-50 px-3 text-sm font-semibold text-blue-800 transition-all hover:border-blue-500 hover:bg-blue-100">
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Profile Picture <span className="text-red-500">*</span></label>
+                  <label className={`flex h-[42px] w-full cursor-pointer items-center justify-center gap-2 rounded-xl border border-dashed px-3 text-sm font-semibold transition-all ${errors.profilePhoto ? 'border-red-400 bg-red-50 text-red-700' : 'border-blue-300 bg-blue-50 text-blue-800 hover:border-blue-500 hover:bg-blue-100'}`}>
                     <Upload className="h-4 w-4" />
                     <span className="truncate">{profilePhoto ? profilePhoto.name : 'Upload Photo'}</span>
                     <input
@@ -510,17 +565,20 @@ export default function RegisterSection() {
                       className="sr-only"
                     />
                   </label>
+                  {errors.profilePhoto && <p className="text-red-500 text-xs mt-1">{errors.profilePhoto}</p>}
                 </div>
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Address</label>
-                <textarea value={form.address} onChange={e => set('address', e.target.value)} rows={2} placeholder="Full residential address" className={inputCls() + ' resize-none'} />
+                <label className="block text-sm font-medium text-gray-700 mb-1">Address <span className="text-red-500">*</span></label>
+                <textarea value={form.address} onChange={e => set('address', e.target.value)} rows={2} placeholder="Full residential address" className={inputCls(errors.address) + ' resize-none'} />
+                {errors.address && <p className="text-red-500 text-xs mt-1">{errors.address}</p>}
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">School</label>
-                <input value={form.school} onChange={e => set('school', e.target.value)} placeholder="School / College name" className={inputCls()} />
+                <label className="block text-sm font-medium text-gray-700 mb-1">School <span className="text-red-500">*</span></label>
+                <input value={form.school} onChange={e => set('school', e.target.value)} placeholder="School / College name" className={inputCls(errors.school)} />
+                {errors.school && <p className="text-red-500 text-xs mt-1">{errors.school}</p>}
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -530,8 +588,9 @@ export default function RegisterSection() {
                   {errors.whatsappNo && <p className="text-red-500 text-xs mt-1">{errors.whatsappNo}</p>}
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Parent's No.</label>
-                  <input value={form.parentsNo} onChange={e => set('parentsNo', e.target.value)} placeholder="Parent/Guardian phone" className={inputCls()} />
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Parent's No. <span className="text-red-500">*</span></label>
+                  <input value={form.parentsNo} onChange={e => set('parentsNo', e.target.value)} placeholder="Parent/Guardian phone" className={inputCls(errors.parentsNo)} />
+                  {errors.parentsNo && <p className="text-red-500 text-xs mt-1">{errors.parentsNo}</p>}
                 </div>
               </div>
 
@@ -556,7 +615,6 @@ export default function RegisterSection() {
             </div>
           )}
 
-          {/* Step 2: Address & Contact */}
           {step === 2 && (
             <div className="space-y-4">
               <div>
@@ -575,56 +633,63 @@ export default function RegisterSection() {
                   {errors.administrativeDistrict && <p className="text-red-500 text-xs mt-1">{errors.administrativeDistrict}</p>}
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Fixed Telephone Number</label>
-                  <input value={form.fixedTelephone} onChange={e => set('fixedTelephone', e.target.value)} placeholder="0XX-XXXXXXX" className={inputCls()} />
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Fixed Telephone Number <span className="text-red-500">*</span></label>
+                  <input value={form.fixedTelephone} onChange={e => set('fixedTelephone', e.target.value)} placeholder="0XX-XXXXXXX" className={inputCls(errors.fixedTelephone)} />
+                  {errors.fixedTelephone && <p className="text-red-500 text-xs mt-1">{errors.fixedTelephone}</p>}
                 </div>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Race</label>
-                  <select value={form.race} onChange={e => set('race', e.target.value)} className={inputCls()}>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Race <span className="text-red-500">*</span></label>
+                  <select value={form.race} onChange={e => set('race', e.target.value)} className={inputCls(errors.race)}>
                     <option value="">Select Race</option>
                     {RACE_OPTIONS.map(r => <option key={r} value={r}>{r}</option>)}
                   </select>
+                  {errors.race && <p className="text-red-500 text-xs mt-1">{errors.race}</p>}
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Religion</label>
-                  <select value={form.religion} onChange={e => set('religion', e.target.value)} className={inputCls()}>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Religion <span className="text-red-500">*</span></label>
+                  <select value={form.religion} onChange={e => set('religion', e.target.value)} className={inputCls(errors.religion)}>
                     <option value="">Select Religion</option>
                     {RELIGION_OPTIONS.map(r => <option key={r} value={r}>{r}</option>)}
                   </select>
+                  {errors.religion && <p className="text-red-500 text-xs mt-1">{errors.religion}</p>}
                 </div>
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Contact Address</label>
-                <textarea value={form.contactAddress} onChange={e => set('contactAddress', e.target.value)} rows={2} placeholder="Contact/mailing address" className={inputCls() + ' resize-none'} />
+                <label className="block text-sm font-medium text-gray-700 mb-1">Contact Address <span className="text-red-500">*</span></label>
+                <textarea value={form.contactAddress} onChange={e => set('contactAddress', e.target.value)} rows={2} placeholder="Contact/mailing address" className={inputCls(errors.contactAddress) + ' resize-none'} />
+                {errors.contactAddress && <p className="text-red-500 text-xs mt-1">{errors.contactAddress}</p>}
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Postal Code</label>
-                  <input value={form.postalCode} onChange={e => set('postalCode', e.target.value)} placeholder="Postal code" className={inputCls()} />
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Postal Code <span className="text-red-500">*</span></label>
+                  <input value={form.postalCode} onChange={e => set('postalCode', e.target.value)} placeholder="Postal code" className={inputCls(errors.postalCode)} />
+                  {errors.postalCode && <p className="text-red-500 text-xs mt-1">{errors.postalCode}</p>}
                 </div>
               </div>
             </div>
           )}
 
-          {/* Step 3: Parent/Guardian Details */}
           {step === 3 && (
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Father's Full Name</label>
-                <input value={form.fatherName} onChange={e => set('fatherName', e.target.value.toUpperCase())} placeholder="FATHER'S FULL NAME" className={inputCls()} />
+                <label className="block text-sm font-medium text-gray-700 mb-1">Father's Full Name <span className="text-red-500">*</span></label>
+                <input value={form.fatherName} onChange={e => set('fatherName', e.target.value.toUpperCase())} placeholder="FATHER'S FULL NAME" className={inputCls(errors.fatherName)} />
+                {errors.fatherName && <p className="text-red-500 text-xs mt-1">{errors.fatherName}</p>}
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Mother's Full Name</label>
-                <input value={form.motherName} onChange={e => set('motherName', e.target.value.toUpperCase())} placeholder="MOTHER'S FULL NAME" className={inputCls()} />
+                <label className="block text-sm font-medium text-gray-700 mb-1">Mother's Full Name <span className="text-red-500">*</span></label>
+                <input value={form.motherName} onChange={e => set('motherName', e.target.value.toUpperCase())} placeholder="MOTHER'S FULL NAME" className={inputCls(errors.motherName)} />
+                {errors.motherName && <p className="text-red-500 text-xs mt-1">{errors.motherName}</p>}
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Guardian's Full Name</label>
-                <input value={form.guardianName} onChange={e => set('guardianName', e.target.value.toUpperCase())} placeholder="GUARDIAN'S FULL NAME" className={inputCls()} />
+                <label className="block text-sm font-medium text-gray-700 mb-1">Guardian's Full Name <span className="text-red-500">*</span></label>
+                <input value={form.guardianName} onChange={e => set('guardianName', e.target.value.toUpperCase())} placeholder="GUARDIAN'S FULL NAME" className={inputCls(errors.guardianName)} />
+                {errors.guardianName && <p className="text-red-500 text-xs mt-1">{errors.guardianName}</p>}
               </div>
 
               <div>
@@ -647,24 +712,26 @@ export default function RegisterSection() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Address of Father/Mother or Guardian</label>
-                <textarea value={form.guardianAddress} onChange={e => set('guardianAddress', e.target.value)} rows={2} placeholder="Guardian's address" className={inputCls() + ' resize-none'} />
+                <label className="block text-sm font-medium text-gray-700 mb-1">Address of Father/Mother or Guardian <span className="text-red-500">*</span></label>
+                <textarea value={form.guardianAddress} onChange={e => set('guardianAddress', e.target.value)} rows={2} placeholder="Guardian's address" className={inputCls(errors.guardianAddress) + ' resize-none'} />
+                {errors.guardianAddress && <p className="text-red-500 text-xs mt-1">{errors.guardianAddress}</p>}
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Fixed Telephone Number</label>
-                  <input value={form.guardianFixedTel} onChange={e => set('guardianFixedTel', e.target.value)} placeholder="0XX-XXXXXXX" className={inputCls()} />
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Fixed Telephone Number <span className="text-red-500">*</span></label>
+                  <input value={form.guardianFixedTel} onChange={e => set('guardianFixedTel', e.target.value)} placeholder="0XX-XXXXXXX" className={inputCls(errors.guardianFixedTel)} />
+                  {errors.guardianFixedTel && <p className="text-red-500 text-xs mt-1">{errors.guardianFixedTel}</p>}
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Mobile</label>
-                  <input value={form.guardianMobile} onChange={e => set('guardianMobile', e.target.value)} placeholder="07X-XXXXXXX" className={inputCls()} />
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Mobile <span className="text-red-500">*</span></label>
+                  <input value={form.guardianMobile} onChange={e => set('guardianMobile', e.target.value)} placeholder="07X-XXXXXXX" className={inputCls(errors.guardianMobile)} />
+                  {errors.guardianMobile && <p className="text-red-500 text-xs mt-1">{errors.guardianMobile}</p>}
                 </div>
               </div>
             </div>
           )}
 
-          {/* Step 4: O/L Results */}
           {step === 4 && (
             <div className="space-y-5">
               <div className="bg-gray-50 rounded-2xl p-4 border border-gray-200">
@@ -693,7 +760,6 @@ export default function RegisterSection() {
                 </div>
               </div>
 
-              {/* O/L Results Table */}
               <div>
                 <div className="flex items-center justify-between mb-3">
                   <h4 className="text-sm font-semibold text-gray-700">Subject Results</h4>
@@ -751,7 +817,6 @@ export default function RegisterSection() {
             </div>
           )}
 
-          {/* Step 5: Subjects & Confirm */}
           {step === 5 && (
             <div className="space-y-6">
               <div>
@@ -765,7 +830,6 @@ export default function RegisterSection() {
                 {errors.batch && <p className="text-red-500 text-xs mt-1">{errors.batch}</p>}
               </div>
 
-              {/* Main Subjects - only 1 selectable */}
               <div>
                 <label className="block text-sm font-semibold text-gray-800 mb-1">
                   Main Subjects <span className="text-red-500">*</span>
@@ -803,7 +867,6 @@ export default function RegisterSection() {
                 {errors.mainSubjects && <p className="text-red-500 text-xs mt-2">{errors.mainSubjects}</p>}
               </div>
 
-              {/* Basket Subjects - multi select, at least 1 required */}
               <div>
                 <label className="block text-sm font-semibold text-gray-800 mb-1">
                   Basket Subjects <span className="text-red-500">*</span>
@@ -833,7 +896,6 @@ export default function RegisterSection() {
                 {!loadingSubjects && subjectsError && <p className="text-red-500 text-xs mt-2">{subjectsError}</p>}
               </div>
 
-              {/* Summary */}
               <div className="bg-blue-50 rounded-2xl p-5 border border-blue-100">
                 <h4 className="font-semibold text-blue-900 mb-3 text-sm">Application Summary</h4>
                 <div className="space-y-1.5 text-sm text-gray-700">
@@ -848,7 +910,6 @@ export default function RegisterSection() {
                 </div>
               </div>
 
-              {/* Declaration */}
               <div className="bg-gray-50 border border-gray-200 rounded-xl p-4 text-xs text-gray-600 italic leading-relaxed">
                 I hereby declare that all the information provided in this admission form is true and correct to the best of my knowledge. I agree to follow all the rules and regulations of the institution.
               </div>
@@ -881,7 +942,6 @@ export default function RegisterSection() {
             </div>
           )}
 
-          {/* Navigation Buttons */}
           <div className="flex items-center justify-between mt-8 pt-6 border-t border-gray-100">
             <div>
               {step > 1 && (

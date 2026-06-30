@@ -140,25 +140,58 @@ export default function ProfileSection() {
       return;
     }
 
+    const trimmedDateOfBirth = String(
+      editForm.dateOfBirth ?? editForm.dob ?? '',
+    ).trim();
+
     const payload = {
-      fullNameEnglish: editForm.fullNameEnglish,
-      fullNameTamil: editForm.fullNameTamil,
-      dateOfBirth: editForm.dateOfBirth,
-      dob: editForm.dob,
-      nicNo: editForm.nicNo,
-      whatsappNo: editForm.whatsappNo,
-      parentsNo: editForm.parentsNo,
-      school: editForm.school,
-      address: editForm.address,
-      permanentAddress: editForm.permanentAddress,
-      administrativeDistrict: editForm.administrativeDistrict,
-      race: editForm.race,
-      religion: editForm.religion,
+      fullNameEnglish: String(editForm.fullNameEnglish ?? '').trim(),
+      fullNameTamil: String(editForm.fullNameTamil ?? '').trim(),
+      dateOfBirth: trimmedDateOfBirth,
+      dob: trimmedDateOfBirth,
+      nicNo: String(editForm.nicNo ?? '').trim(),
+      whatsappNo: String(editForm.whatsappNo ?? '').trim(),
+      parentsNo: String(editForm.parentsNo ?? '').trim(),
+      school: String(editForm.school ?? '').trim(),
+      address: String(editForm.address ?? '').trim(),
+      permanentAddress: String(editForm.permanentAddress ?? '').trim(),
+      administrativeDistrict: String(editForm.administrativeDistrict ?? '').trim(),
+      race: String(editForm.race ?? '').trim(),
+      religion: String(editForm.religion ?? '').trim(),
       citizenByDescent: editForm.citizenByDescent,
-      fatherName: editForm.fatherName,
-      motherName: editForm.motherName,
-      guardianName: editForm.guardianName,
+      fatherName: String(editForm.fatherName ?? '').trim(),
+      motherName: String(editForm.motherName ?? '').trim(),
+      guardianName: String(editForm.guardianName ?? '').trim(),
     };
+
+    const requiredFields: { key: keyof typeof payload; label: string }[] = [
+      { key: 'fullNameEnglish', label: 'Full Name (English)' },
+      { key: 'fullNameTamil', label: 'Full Name (Tamil)' },
+      { key: 'dateOfBirth', label: 'Date of Birth' },
+      { key: 'nicNo', label: 'NIC Number' },
+      { key: 'whatsappNo', label: 'WhatsApp No.' },
+      { key: 'parentsNo', label: "Parent's No." },
+      { key: 'school', label: 'School' },
+      { key: 'address', label: 'Address' },
+      { key: 'permanentAddress', label: 'Permanent Address' },
+      { key: 'administrativeDistrict', label: 'District' },
+      { key: 'race', label: 'Race' },
+      { key: 'religion', label: 'Religion' },
+      { key: 'fatherName', label: "Father's Name" },
+      { key: 'motherName', label: "Mother's Name" },
+    ];
+
+    const missingFields = requiredFields
+      .filter((field) => !String(payload[field.key] ?? '').trim())
+      .map((field) => field.label);
+
+    if (missingFields.length > 0) {
+      setProfileMessage('');
+      setProfileError(
+        `Please fill in all required fields. Missing: ${missingFields.join(', ')}.`,
+      );
+      return;
+    }
 
     setSaving(true);
     setProfileMessage('');
