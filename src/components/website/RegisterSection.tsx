@@ -2,7 +2,7 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { Check, ChevronRight, ChevronLeft, User, MapPin, BookOpen, FileText, Plus, Trash2, Upload, GraduationCap } from 'lucide-react';
+import { Check, ChevronRight, ChevronLeft, User, MapPin, BookOpen, FileText, Plus, Trash2, Upload, GraduationCap, X } from 'lucide-react';
 import { authApi } from '@/api/auth.api';
 import { dashboardApi } from '@/api/dashboard.api';
 import type { RegisterStudentPayload } from '@/api/auth.api';
@@ -422,6 +422,9 @@ export default function RegisterSection() {
         <GraduationCap className="absolute bottom-24 right-16 h-24 w-24 rotate-12 text-white/10 stroke-[1.5] sm:h-36 sm:w-36" />
 
         <div className="relative w-full max-w-md rounded-3xl bg-white px-7 py-8 text-center shadow-2xl sm:px-10 sm:py-10">
+          <Link href="/" className="absolute top-4 right-4 flex h-8 w-8 items-center justify-center rounded-full bg-gray-100 text-gray-500 hover:bg-gray-200 hover:text-gray-700 transition-colors">
+            <X className="h-4 w-4" />
+          </Link>
           <div className="mx-auto mb-5 flex h-24 w-24 items-center justify-center rounded-full bg-sky-100">
             <div className="flex h-[72px] w-[72px] items-center justify-center rounded-full bg-sky-400 shadow-lg shadow-sky-300/40">
               <Check className="h-10 w-10 text-white" />
@@ -517,6 +520,11 @@ export default function RegisterSection() {
         </div>
 
         <div className="bg-white rounded-3xl shadow-2xl p-6 md:p-8">
+          <div className="text-center mb-5">
+            <Image src="/techna-logo.png" alt="Techna Logo" width={150} height={150} className="mx-auto rounded-full" />
+            <h1 className="text-[30px] font-extrabold text-slate-800 leading-9 mt-1">Techna Technical Institute</h1>
+            <p className="text-slate-500 text-base font-medium mt-2">Sign up to your Techna LMS</p>
+          </div>
           <div className="mb-6">
             <h2 className="text-xl font-bold text-gray-900">{STEPS[step - 1].label}</h2>
             <p className="text-gray-500 text-sm">{STEPS[step - 1].desc}</p>
@@ -899,8 +907,6 @@ export default function RegisterSection() {
               <div className="bg-blue-50 rounded-2xl p-5 border border-blue-100">
                 <h4 className="font-semibold text-blue-900 mb-3 text-sm">Application Summary</h4>
                 <div className="space-y-1.5 text-sm text-gray-700">
-                  <div className="flex justify-between"><span className="text-gray-500">Race:</span><span className="font-medium">{form.race || '–'}</span></div>
-                  <div className="flex justify-between"><span className="text-gray-500">Religion:</span><span className="font-medium">{form.religion || '–'}</span></div>
                   <div className="flex justify-between"><span className="text-gray-500">Full Name:</span><span className="font-medium">{form.fullNameEnglish || '–'}</span></div>
                   <div className="flex justify-between"><span className="text-gray-500">NIC:</span><span className="font-medium">{form.nicNo || '–'}</span></div>
                   <div className="flex justify-between"><span className="text-gray-500">Email:</span><span className="font-medium">{form.email || '–'}</span></div>
@@ -942,30 +948,29 @@ export default function RegisterSection() {
             </div>
           )}
 
-          <div className="flex items-center justify-between mt-8 pt-6 border-t border-gray-100">
-            <div>
-              {step > 1 && (
-                <button onClick={prev} className="flex items-center gap-2 px-5 py-2.5 border-2 border-gray-200 text-gray-700 font-medium rounded-xl hover:border-gray-300 hover:bg-gray-50 transition-all text-sm">
+          {/* Navigation Buttons */}
+          <div className="mt-8 pt-6 border-t border-gray-100 space-y-3">
+            <div className="text-center">
+              <span className="text-xs text-gray-400">Step {step} of {STEPS.length}</span>
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              {step > 1 ? (
+                <button onClick={prev} className="w-full flex items-center justify-center gap-2 px-5 py-2.5 border-2 border-gray-200 text-gray-700 font-medium rounded-xl hover:border-gray-300 hover:bg-gray-50 transition-all text-sm">
                   <ChevronLeft className="w-4 h-4" /> Previous
                 </button>
+              ) : (
+                <div />
               )}
-            </div>
-            <div className="flex items-center gap-3">
-              <span className="text-xs text-gray-400">Step {step} of {STEPS.length}</span>
               {step < 5 ? (
-                <button onClick={next} className="flex items-center gap-2 px-6 py-2.5 text-white font-semibold rounded-xl transition-all text-sm shadow-md" style={{
-                    background: 'linear-gradient(135deg, #0183CB 0%, #34BFF3 100%)'
-                  }}>
+                <button onClick={next} className="w-full flex items-center justify-center gap-2 px-6 py-2.5 text-white font-semibold rounded-xl transition-all text-sm shadow-md" style={{ background: 'linear-gradient(135deg, #0183CB 0%, #34BFF3 100%)' }}>
                   Next <ChevronRight className="w-4 h-4" />
                 </button>
               ) : (
                 <button
                   onClick={handleSubmit}
                   disabled={loading}
-                  className="flex items-center gap-2 px-6 py-2.5 text-white font-semibold rounded-xl transition-all text-sm shadow-md disabled:opacity-60"
-                  style={{
-                    background: 'linear-gradient(135deg, #0183CB 0%, #34BFF3 100%)',
-                  }}
+                  className="w-full flex items-center justify-center gap-2 px-6 py-2.5 text-white font-semibold rounded-xl transition-all text-sm shadow-md disabled:opacity-60"
+                  style={{ background: 'linear-gradient(135deg, #0183CB 0%, #34BFF3 100%)' }}
                 >
                   {loading ? (
                     <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
@@ -977,7 +982,6 @@ export default function RegisterSection() {
               )}
             </div>
           </div>
-          {submitError && <p className="text-red-500 text-sm mt-4 text-right">{submitError}</p>}
         </div>
 
         <div className="text-center mt-6">
