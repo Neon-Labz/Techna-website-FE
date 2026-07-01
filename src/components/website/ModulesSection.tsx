@@ -24,6 +24,8 @@ interface ApiModule {
   fee: number;
   batch: string;
   status: 'active' | 'inactive';
+  term?: string;
+  unit?: number;
 }
 
 interface PublicTeacher {
@@ -49,11 +51,11 @@ export default function ModulesSection() {
 
   useEffect(() => {
     Promise.all([
-      api.get('/modules') as unknown as Promise<ApiModule[]>,
+      api.get('/modules/public') as unknown as Promise<ApiModule[]>,
       api.get('/public/teachers') as unknown as Promise<PublicTeacher[]>,
     ])
       .then(([modulesData, teachersData]) => {
-        setModules(modulesData.filter((module) => module.status === 'active'));
+        setModules(Array.isArray(modulesData) ? modulesData : []);
 
         const map: Record<string, PublicTeacher> = {};
         teachersData.forEach((teacher) => {
@@ -152,7 +154,7 @@ export default function ModulesSection() {
 
                       <div className="mb-4 border-t border-[#E5E7EB]" />
 
-                      <div className="mb-5 flex items-center gap-5 text-sm text-[#6B7280]">
+                      <div className="mb-5 flex flex-wrap items-center gap-4 text-sm text-[#6B7280]">
                         {module.duration && (
                           <span className="flex items-center gap-1.5">
                             <Clock className="h-4 w-4 text-[#0183CB]" />
@@ -160,10 +162,17 @@ export default function ModulesSection() {
                           </span>
                         )}
 
-                        {module.batch && (
+                        {module.unit != null && module.unit > 0 && (
+                          <span className="flex items-center gap-1.5">
+                            <BookOpen className="h-4 w-4 text-[#0183CB]" />
+                            {module.unit} Unit{module.unit !== 1 ? 's' : ''}
+                          </span>
+                        )}
+
+                        {module.term && (
                           <span className="flex items-center gap-1.5">
                             <Calendar className="h-4 w-4 text-[#0183CB]" />
-                            Batch: {module.batch}
+                            Term: {module.term}
                           </span>
                         )}
                       </div>
