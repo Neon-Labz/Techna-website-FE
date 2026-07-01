@@ -91,18 +91,18 @@ export default function LoginSection() {
       }}
     >
       <div className="w-full max-w-md relative z-10">
-        <div className="bg-white rounded-3xl shadow-2xl p-8">
-          <div className="text-center mb-8">
+        <div className="bg-white rounded-3xl shadow-2xl p-4 sm:p-8">
+          <div className="text-center mb-3 sm:mb-8">
             <Image
-              src="/new.png"
+              src="/techna-logo.png"
               alt="Techna Logo"
               width={150}
-              height={80}
-              className="mx-auto mb-4 rounded-full"
+              height={150}
+              className="mx-auto mb-1 rounded-full"
             />
-            <h1 className="text-2xl font-bold text-gray-900">Welcome Back</h1>
-            <p className="text-gray-500 text-sm mt-1">
-              Sign in to your Techna Student Portal
+            <h1 className="text-[30px] font-extrabold text-slate-800 leading-9">Welcome Back</h1>
+            <p className="text-slate-500 text-base font-medium mt-2">
+              Sign in to your Techna LMS
             </p>
           </div>
 
@@ -112,7 +112,7 @@ export default function LoginSection() {
             </div>
           )}
 
-          <form onSubmit={handleSubmit} className="space-y-5">
+          <form onSubmit={handleSubmit} className="space-y-3 sm:space-y-5">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1.5">
                 Email Address
@@ -194,7 +194,7 @@ export default function LoginSection() {
             </button>
           </form>
 
-          <div className="text-center mt-6 pt-6 border-t border-gray-100">
+          <div className="text-center mt-4 pt-4 sm:mt-6 sm:pt-6 border-t border-gray-100">
             <p className="text-gray-500 text-sm">
               Don&apos;t have an account?{' '}
               <Link
@@ -206,7 +206,7 @@ export default function LoginSection() {
             </p>
           </div>
 
-          <div className="mt-4 p-3 bg-blue-50 rounded-xl text-xs text-blue-700 text-center">
+          <div className="mt-3 p-2 sm:mt-4 sm:p-3 bg-blue-50 rounded-xl text-xs text-blue-700 text-center">
             Use your approved student email and password to login
           </div>
         </div>
