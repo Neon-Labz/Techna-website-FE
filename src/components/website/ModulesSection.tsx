@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import {
   Clock,
   Calendar,
@@ -42,6 +43,7 @@ function normalizeSubjects(raw: string | string[] | undefined): string[] {
 }
 
 export default function ModulesSection() {
+  const router = useRouter();
   const [modules, setModules] = useState<ApiModule[]>([]);
   const [teacherBySubject, setTeacherBySubject] = useState<
     Record<string, PublicTeacher>
@@ -133,7 +135,8 @@ export default function ModulesSection() {
                 return (
                   <div
                     key={module._id}
-                    className="flex flex-col rounded-xl border border-[#C1C6D7] bg-white shadow-sm transition-shadow hover:shadow-md"
+                    onClick={() => router.push(`/modules/${module._id}`)}
+                    className="flex cursor-pointer flex-col rounded-xl border border-[#C1C6D7] bg-white shadow-sm transition-shadow hover:shadow-md"
                   >
                     <div className="flex flex-1 flex-col p-6">
                       <div className="mb-5 flex h-14 w-14 items-center justify-center rounded-xl bg-[#0183CB]/10">
@@ -182,6 +185,7 @@ export default function ModulesSection() {
                           href={`/teachers/${teacherId}?subject=${encodeURIComponent(
                             module.name,
                           )}`}
+                          onClick={(e) => e.stopPropagation()}
                           className="flex w-full items-center justify-center gap-2 rounded-lg bg-[#0183CB] py-3 text-sm font-bold text-white transition-colors hover:bg-[#016fad]"
                         >
                           Visit Teacher <ArrowRight className="h-4 w-4" />
