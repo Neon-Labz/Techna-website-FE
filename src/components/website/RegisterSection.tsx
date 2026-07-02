@@ -1,12 +1,19 @@
 'use client';
-import { useEffect, useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Check, ChevronRight, ChevronLeft, User, MapPin, BookOpen, FileText, Plus, Trash2, Upload, GraduationCap, X } from 'lucide-react';
 import { authApi } from '@/api/auth.api';
 import { dashboardApi } from '@/api/dashboard.api';
 import type { RegisterStudentPayload } from '@/api/auth.api';
-import { SUBJECTS } from '@/data/mockData';
+import {
+  getSubjectCategory,
+  countSubjectsByCategory,
+  MAIN_SUBJECTS,
+  BASKET_SUBJECTS,
+  MAX_MAIN_SUBJECTS,
+  MAX_BASKET_SUBJECTS,
+} from '@/utils/subjectCategory';
 
 const STEPS = [
   { id: 1, label: 'Basic Info', icon: User, desc: 'Personal details' },
@@ -35,9 +42,7 @@ const SUBJECT_LABELS: Record<string, string> = {
 };
 const subjectLabel = (name: string) => SUBJECT_LABELS[name] || name;
 
-const MAIN_SUBJECTS = ['Engineering Technology', 'Bio Systems Technology', 'Science For Technology'];
 const MAIN_SUBJECTS_REQUIRED = 2;
-const BASKET_SUBJECTS = ['Information Communication Technology', 'Agricultural Science', 'Mathematics', 'Geography'];
 const BASKET_SUBJECTS_REQUIRED = 1;
 
 type RegistrationModule = {
@@ -199,14 +204,14 @@ export default function RegisterSection() {
   const [submitMessage, setSubmitMessage] = useState('');
   const [submitError, setSubmitError] = useState('');
   const [profilePhoto, setProfilePhoto] = useState<File | null>(null);
-  const [subjectOptions, setSubjectOptions] = useState<string[]>(SUBJECTS);
-  const [loadingSubjects, setLoadingSubjects] = useState(true);
-  const [subjectsError, setSubjectsError] = useState('');
 
   const [form, setForm] = useState(createInitialForm);
 
   const [olRows, setOlRows] = useState<OLRow[]>([{ ...emptyOL }]);
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [loadingSubjects, setLoadingSubjects] = useState(false);
+  const [subjectsError, setSubjectsError] = useState('');
+  const [subjectOptions, setSubjectOptions] = useState<string[]>([]);
 
   const set = (key: string, value: string | boolean | string[]) => setForm(f => ({ ...f, [key]: value }));
 
