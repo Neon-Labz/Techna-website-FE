@@ -197,7 +197,7 @@ export const authApi = {
   },
 
   async registerStudent(formData: FormData) {
-    const baseUrl = (process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:4000/api').replace(/\/$/, '');
+    const baseUrl = (process.env.NEXT_PUBLIC_SERVER_URL ?? 'http://localhost:4000/api').replace(/\/$/, '');
     const response = await fetch(`${baseUrl}/students/register`, {
       method: 'POST',
       body: formData,

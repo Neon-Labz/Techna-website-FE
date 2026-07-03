@@ -19,7 +19,7 @@ interface NotificationState {
   addNotification: (notification: Notification) => void;
 }
 
-const SOCKET_URL = (process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:4000/api').replace('/api', '');
+const SOCKET_URL = (process.env.NEXT_PUBLIC_SERVER_URL ?? 'http://localhost:4000/api').replace('/api', '');
 
 export const useNotificationStore = create<NotificationState>((set, get) => ({
   notifications: [],
