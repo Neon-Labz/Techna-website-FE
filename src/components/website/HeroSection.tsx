@@ -10,7 +10,11 @@ const stats = [
   { icon: Star, value: "98%", label: "Pass Rate" },
 ];
 
-const heroImages = ["/image 1.jpeg", "/image 2.jpeg", "/image 3.jpeg"];
+const heroImages = [
+  { src: "/image 1.jpeg", position: "object-top" },
+  { src: "/image 2.jpeg", position: "object-top" },
+  { src: "/image 3.jpeg", position: "object-top" },
+];
 
 export default function HeroSection() {
   const router = useRouter();
@@ -29,17 +33,17 @@ export default function HeroSection() {
 
       {/* Background image carousel */}
       <div className="absolute inset-0 overflow-hidden" style={{ opacity: 0.32 }}>
-        {heroImages.map((src, index) => (
+        {heroImages.map((img, index) => (
           <div
-            key={src}
+            key={img.src}
             className="absolute inset-0 transition-opacity duration-1000 ease-in-out"
             style={{ opacity: index === currentIndex ? 1 : 0 }}
           >
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
-              src={src}
+              src={img.src}
               alt={`Hero background ${index + 1}`}
-              className="w-full h-full object-cover"
+              className={`w-full h-full object-cover ${img.position}`}
             />
           </div>
         ))}
