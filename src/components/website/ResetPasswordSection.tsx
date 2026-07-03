@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Eye, EyeOff, KeyRound, GraduationCap, CheckCircle } from 'lucide-react';
 
-const API = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:4000/api';
+const API = process.env.NEXT_PUBLIC_SERVER_URL ?? 'http://localhost:4000/api';
 
 export default function ResetPasswordSection() {
   const router = useRouter();
