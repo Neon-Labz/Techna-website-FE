@@ -86,10 +86,15 @@ export default function LoginSection() {
     <div
       className="min-h-screen flex items-center justify-center px-4 relative overflow-hidden"
       style={{
-        background:
-          'radial-gradient(circle at center, #34BFF3 0%, #1EA6E6 50%, #0183CB 100%)',
+        backgroundImage: "url('/Back.jpeg')",
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundRepeat: 'no-repeat',
       }}
     >
+      {/* Dark overlay so the white card stays readable over the photo */}
+      <div className="absolute inset-0 bg-black/55" />
+
       <div className="w-full max-w-md relative z-10">
         <div className="bg-white rounded-3xl shadow-2xl p-4 sm:p-8">
           <div className="text-center mb-3 sm:mb-8">
@@ -214,7 +219,7 @@ export default function LoginSection() {
         <div className="text-center mt-6">
           <Link
             href="/"
-            className="text-blue-200 text-sm hover:text-white transition-colors"
+            className="inline-flex items-center gap-1.5 text-white text-sm font-medium bg-black/30 hover:bg-black/45 px-4 py-2 rounded-full backdrop-blur-sm transition-colors"
           >
             ← Back to Home
           </Link>

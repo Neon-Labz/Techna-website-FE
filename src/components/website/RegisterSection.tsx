@@ -418,10 +418,15 @@ export default function RegisterSection() {
       <div
         className="relative min-h-screen overflow-hidden flex items-center justify-center px-4 py-12"
         style={{
-          background:
-            'radial-gradient(circle at center, #34BFF3 0%, #1EA6E6 50%, #0183CB 100%)',
+          backgroundImage: "url('/Back.jpeg')",
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          backgroundRepeat: 'no-repeat',
+          backgroundAttachment: 'fixed',
         }}
       >
+        <div className="absolute inset-0 bg-black/55" />
+
         <GraduationCap className="absolute -left-12 top-10 h-80 w-80 rotate-12 text-white/10 stroke-[1.5] sm:h-[30rem] sm:w-[30rem]" />
         <BookOpen className="absolute -right-16 bottom-6 h-72 w-72 -rotate-12 text-white/10 stroke-[1.5] sm:h-[26rem] sm:w-[26rem]" />
         <GraduationCap className="absolute bottom-24 right-16 h-24 w-24 rotate-12 text-white/10 stroke-[1.5] sm:h-36 sm:w-36" />
@@ -465,20 +470,19 @@ export default function RegisterSection() {
 
   return (
     <div
-      className="min-h-screen py-10 px-4"
+      className="relative min-h-screen py-10 px-4 flex items-center"
       style={{
-        background:
-          'radial-gradient(circle at center, #34BFF3 0%, #1EA6E6 50%, #0183CB 100%)',
+        backgroundImage: "url('/Back.jpeg')",
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundRepeat: 'no-repeat',
+        backgroundAttachment: 'fixed',
       }}
     >
-      <div className="max-w-3xl mx-auto">
-        <div className="text-center mb-8">
-          <Image src="/techna-logo.png" alt="Techna Logo" width={120} height={50} className="mx-auto mb-4 rounded-full" />
-          <h1 className="text-2xl font-bold text-white">Techna Technical Institute</h1>
-          <p className="text-blue-300 text-sm">A/L Technology Stream – Admission Form 2024</p>
-        </div>
+      <div className="absolute inset-0 bg-black/55" />
 
-        <div className="flex items-center justify-between mb-8 px-2">
+      <div className="relative max-w-3xl mx-auto w-full">
+        <div className="flex items-center justify-between mb-8 px-2 pt-6">
           {STEPS.map((s, i) => {
             const Icon = s.icon;
             const active = step === s.id;
@@ -524,7 +528,7 @@ export default function RegisterSection() {
           })}
         </div>
 
-        <div className="bg-white rounded-3xl shadow-2xl p-6 md:p-8">
+        <div className="bg-white rounded-3xl shadow-2xl p-6 md:p-10">
           <div className="text-center mb-5">
             <Image src="/techna-logo.png" alt="Techna Logo" width={150} height={150} className="mx-auto rounded-full" />
             <h1 className="text-[30px] font-extrabold text-slate-800 leading-9 mt-1">Techna Technical Institute</h1>
@@ -990,7 +994,10 @@ export default function RegisterSection() {
         </div>
 
         <div className="text-center mt-6">
-          <Link href="/login" className="text-blue-200 text-sm hover:text-white transition-colors">
+          <Link
+            href="/login"
+            className="inline-flex items-center gap-1.5 text-white text-sm font-medium bg-black/30 hover:bg-black/45 px-4 py-2 rounded-full backdrop-blur-sm transition-colors"
+          >
             Already registered? Sign In →
           </Link>
         </div>
