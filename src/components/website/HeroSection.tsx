@@ -1,5 +1,6 @@
 "use client";
 import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 import { ArrowRight, Building2, BookOpen, Users, Star } from "lucide-react";
 
 const stats = [
@@ -9,17 +10,40 @@ const stats = [
   { icon: Star, value: "98%", label: "Pass Rate" },
 ];
 
+const heroImages = ["/image 1.jpeg", "/image 2.jpeg", "/image 3.jpeg"];
+
 export default function HeroSection() {
   const router = useRouter();
+  const [currentIndex, setCurrentIndex] = useState(0);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentIndex((prev) => (prev === heroImages.length - 1 ? 0 : prev + 1));
+    }, 5000);
+
+    return () => clearInterval(interval);
+  }, []);
 
   return (
     <section className="relative w-full flex items-center overflow-hidden bg-[#0a0a0f] h-[520px] sm:h-[580px] lg:h-[640px]">
 
-      {/* Background image */}
-      <div
-        className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-        style={{ backgroundImage: "url('/hero-bg.jpg')", opacity: 0.32 }}
-      />
+      {/* Background image carousel */}
+      <div className="absolute inset-0 overflow-hidden" style={{ opacity: 0.32 }}>
+        {heroImages.map((src, index) => (
+          <div
+            key={src}
+            className="absolute inset-0 transition-opacity duration-1000 ease-in-out"
+            style={{ opacity: index === currentIndex ? 1 : 0 }}
+          >
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={src}
+              alt={`Hero background ${index + 1}`}
+              className="w-full h-full object-cover"
+            />
+          </div>
+        ))}
+      </div>
 
       {/* Dark overlay gradient */}
       <div className="absolute inset-0 [background:linear-gradient(90deg,rgba(10,10,15,0.88)_0%,rgba(10,10,15,0.5)_55%,rgba(10,10,15,0.1)_100%)]" />

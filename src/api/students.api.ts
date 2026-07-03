@@ -30,7 +30,7 @@ export const updateStudentProfile = async (
 ): Promise<any> => {
   const endpoint = `/students/${studentId}`;
   const token = getStoredToken();
-  const endpointUrl = `${process.env.NEXT_PUBLIC_API_URL || ''}${endpoint}`;
+  const endpointUrl = `${process.env.NEXT_PUBLIC_SERVER_URL || ''}${endpoint}`;
 
   console.log('[Profile update] token being used:', token);
   console.log('[Profile update] endpoint URL:', endpointUrl);

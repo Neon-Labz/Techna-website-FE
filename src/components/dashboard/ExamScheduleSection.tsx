@@ -3,7 +3,7 @@ import { useEffect, useState, useMemo } from 'react';
 import { Calendar, Clock, MapPin, BookOpen, Filter, Award, AlertCircle, ClipboardList } from 'lucide-react';
 import { useAuthStore } from '../../store/authStore';
 
-const API = 'http://localhost:4000/api';
+const API = process.env.NEXT_PUBLIC_SERVER_URL ?? 'http://localhost:4000/api';
 
 interface ExamNotice {
   _id: string;

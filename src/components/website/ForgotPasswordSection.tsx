@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Mail, GraduationCap, ArrowRight, CheckCircle } from 'lucide-react';
 
-const API = 'http://localhost:4000/api';
+const API = process.env.NEXT_PUBLIC_SERVER_URL ?? 'http://localhost:4000/api';
 
 export default function ForgotPasswordSection() {
   const router = useRouter();
