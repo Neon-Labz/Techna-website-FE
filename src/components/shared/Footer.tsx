@@ -185,11 +185,28 @@ export default function Footer() {
       </div>
 
       <div className="w-full py-4" style={{ background: '#0183CB' }}>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center justify-between gap-2">
-          <p className="text-xs text-white">
-            © {new Date().getFullYear()} Techna Technical Institute. All Rights Reserved.
-          </p>
-          <p className="text-xs text-white">Developed by NeonLabz</p>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 md:grid-cols-3 items-center gap-2 text-center">
+            <p className="text-xs text-white md:text-left">
+              © {new Date().getFullYear()} Techna Technical Institute. All Rights Reserved.
+            </p>
+
+            <a
+              href="https://www.theneonlabz.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-xs text-white underline underline-offset-2 hover:text-gray-200 md:justify-self-center"
+            >
+              Developed by NeonLabz
+            </a>
+
+            <Link
+              href="/terms-and-conditions"
+              className="text-xs text-white underline underline-offset-2 hover:text-gray-200 md:justify-self-end"
+            >
+              Terms and Conditions
+            </Link>
+          </div>
         </div>
       </div>
     </footer>
