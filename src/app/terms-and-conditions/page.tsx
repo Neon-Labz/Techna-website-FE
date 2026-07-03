@@ -1,34 +1,176 @@
-import Link from 'next/link';
-import { Home, ChevronRight, FileText, UserCheck, ShieldCheck, RefreshCcw, Mail } from 'lucide-react';
+'use client';
 
-const sections = [
+import { useState } from 'react';
+import Link from 'next/link';
+import { Home, ChevronRight, Languages } from 'lucide-react';
+
+type Lang = 'ta' | 'en';
+
+const content: Record<
+  Lang,
   {
-    icon: FileText,
-    title: 'Use of Website',
-    description:
-      'This website is provided for informational purposes about Techna Technical Institute\u2019s courses, admissions, and services. You agree not to misuse the site or its content.',
+    heroTitle: string;
+    heroDesc: string;
+    rulesHeading: string;
+    rules: { title: string; desc: string }[];
+    termsHeading: string;
+    terms: string[];
+  }
+> = {
+  ta: {
+    heroTitle: 'விதிமுறைகள் மற்றும் ஒழுங்குவிதிகள்',
+    heroDesc:
+      'Techna Technical Institute இணையதளத்தை பயன்படுத்துவதற்கு முன் இந்த விதிமுறைகள் மற்றும் ஒழுங்குவிதிகளை கவனமாக வாசிக்கவும்.',
+    rulesHeading: 'விதிமுறைகள் மற்றும் ஒழுங்குவிதிகள்',
+    rules: [
+      {
+        title: '1. மாணவர் அடையாள அட்டை',
+        desc: 'மாணவர்கள் வகுப்புகளுக்கு வரும்போது தங்களது மாணவர் அடையாள அட்டையை (Student ID Card) கட்டாயமாக கைவசம் வைத்திருக்க வேண்டும்.',
+      },
+      {
+        title: '2. பாடக் கட்டணம்',
+        desc: 'மாணவர்கள் நிறுவனத்தினால் அறிவிக்கப்படும் கால எல்லைக்குள் பாடக் கட்டணங்களை செலுத்த வேண்டும். குறிப்பிட்ட காலத்திற்குள் கட்டணம் செலுத்த முடியாத பட்சத்தில், பெற்றோர் அல்லது பாதுகாவலர் மூலம் நிர்வாகத்திற்கு முன்கூட்டியே அறிவிக்க வேண்டும்.',
+      },
+      {
+        title: '3. வருகை',
+        desc: 'மாணவர்கள் நடைபெறும் அனைத்து வகுப்புகள், மீளாய்வு வகுப்புகள், மாதாந்திரத் தேர்வுகள் மற்றும் மாதிரிப் பரீட்சைகளில் தவறாமல் பங்கேற்க வேண்டும். வருகை தர முடியாத அல்லது தாமதமாக வரக்கூடிய சந்தர்ப்பங்களில், அதற்கான காரணத்தை பெற்றோர் அல்லது பாதுகாவலர் மூலம் நிர்வாகத்திற்கு அறிவிக்க வேண்டும்.',
+      },
+      {
+        title: '4. கைப்பேசி பயன்பாடு',
+        desc: 'வகுப்பறை மற்றும் பரீட்சை நடைபெறும் நேரங்களில் கைப்பேசி பயன்படுத்துவது முற்றிலும் தடைசெய்யப்பட்டுள்ளது. அவசர தேவைகளுக்காக மட்டுமே நிர்வாகத்தின் முன் அனுமதியுடன் பயன்படுத்தலாம்.',
+      },
+      {
+        title: '5. உடை மற்றும் தோற்றம்',
+        desc: 'மாணவர்கள் கல்வி நிறுவனத்தின் ஒழுக்கத்திற்கு ஏற்ற உடை, சிகை அலங்காரம் மற்றும் அணிகலன்களுடன் வர வேண்டும். சமயம் சார்ந்த உடைகள் மற்றும் எளிமையான அணிகலன்கள் அனுமதிக்கப்படும்.',
+      },
+      {
+        title: '6. நிறுவனச் சொத்துக்களை பாதுகாத்தல்',
+        desc: 'வகுப்பறைகள், மேசைகள், கதிரைகள் மற்றும் நிறுவனத்தின் அனைத்து சொத்துக்களையும் சுத்தமாகவும் பாதுகாப்பாகவும் பயன்படுத்த வேண்டும். வேண்டுமென்றே சேதப்படுத்துவது ஒழுக்க நடவடிக்கைக்கு உட்படுத்தப்படும்.',
+      },
+      {
+        title: '7. ஒழுக்கமான நடத்தை',
+        desc: 'மாணவர்கள் ஆசிரியர்கள், நிர்வாகத்தினர் மற்றும் சக மாணவர்களிடம் மரியாதையுடனும் ஒழுக்கத்துடனும் நடந்து கொண்டு, சிறந்த கற்றல் சூழலை பேண வேண்டும்.',
+      },
+      {
+        title: '8. பரீட்சை ஒழுங்குவிதிகள்',
+        desc: 'வகுப்புத் தேர்வுகள், மாதாந்திரத் தேர்வுகள் மற்றும் மாதிரிப் பரீட்சைகளின் போது முறைகேடுகளில் ஈடுபடுவது முற்றிலும் தடைசெய்யப்பட்டுள்ளது. மற்ற மாணவர்களின் விடைத்தாளைப் பார்த்து எழுதுதல், விடைத்தாளை பரிமாறுதல், மற்றவர்களிடம் கேட்டு எழுதுதல், குறிப்புகள், புத்தகங்கள், கைப்பேசிகள் அல்லது அனுமதியற்ற பொருட்களை பயன்படுத்துதல் ஆகியவை ஒழுக்க நடவடிக்கைக்கு உட்படுத்தப்படும்.',
+      },
+      {
+        title: '9. பெற்றோர் சந்திப்பு',
+        desc: 'நிறுவனத்தினால் ஏற்பாடு செய்யப்படும் பெற்றோர் சந்திப்புகள், கலந்துரையாடல்கள் மற்றும் முக்கிய அறிவிப்பு நிகழ்வுகளில் பெற்றோர் அல்லது பாதுகாவலர்கள் கட்டாயமாக பங்கேற்க வேண்டும்.',
+      },
+      {
+        title: '10. பிரச்சினைகளை அறிவித்தல்',
+        desc: 'பாடம், நிறுவனம் அல்லது மாணவர்களுக்கிடையில் ஏற்படும் ஏதேனும் பிரச்சினைகள் உடனடியாக நிர்வாகத்திற்கு அறிவிக்கப்பட வேண்டும்.',
+      },
+      {
+        title: '11. தனிப்பட்ட பொருட்கள்',
+        desc: 'மாணவர்கள் தங்களது தனிப்பட்ட பொருட்களுக்கு தாங்களே பொறுப்பானவர்கள். பொருட்கள் இழக்கப்படுதல் அல்லது சேதமடைவதற்கு நிறுவனம் பொறுப்பேற்காது.',
+      },
+      {
+        title: '12. பெற்றோர் தொடர்பு',
+        desc: 'மாணவர்களின் வருகை, ஒழுக்கம், கல்வி முன்னேற்றம் அல்லது கட்டண விடயங்கள் தொடர்பாக தேவையான சந்தர்ப்பங்களில் பெற்றோர் அல்லது பாதுகாவலர்களுடன் நிறுவனம் தொடர்பு கொள்ளும்.',
+      },
+      {
+        title: '13. நிறுவனத்தின் தீர்மானங்கள்',
+        desc: 'கல்வி நடவடிக்கைகள் சிறப்பாக நடைபெற நிறுவன நிர்வாகம் வழங்கும் அறிவுறுத்தல்கள் மற்றும் தீர்மானங்களை அனைத்து மாணவர்களும் கடைப்பிடிக்க வேண்டும்.',
+      },
+      {
+        title: '14. நிறுவனத்தின் நற்பெயர் மற்றும் சமூக ஊடகப் பொறுப்பு',
+        desc: 'மாணவர்கள் நிறுவனத்தின் நற்பெயர், ஒழுக்கம் மற்றும் மதிப்புகளை பாதிக்கும் எந்தவொரு செயலிலும், நேரடியாகவோ அல்லது சமூக ஊடகங்கள் மூலமாகவோ ஈடுபடக்கூடாது. நிறுவனத்தைப் பற்றிய தகவல்கள் அல்லது உள்ளடக்கங்களை பகிரும் போது பொறுப்புடனும் மரியாதையுடனும் செயல்பட வேண்டும்.',
+      },
+    ],
+    termsHeading: 'நிபந்தனைகள் (Terms & Conditions)',
+    terms: [
+      'தேவையான பதிவு மற்றும் கட்டண நடைமுறைகள் பூர்த்தி செய்யப்பட்ட பின்னரே மாணவர் சேர்க்கை உறுதிப்படுத்தப்படும்.',
+      'அனைத்து கட்டணங்களும் நிறுவனத்தினால் அறிவிக்கப்படும் கட்டண நடைமுறைகளுக்கு அமைவாக செலுத்தப்பட வேண்டும்.',
+      'தேவையெனில் வகுப்பு நேரங்கள், கால அட்டவணைகள், ஆசிரியர்கள், பாடத்திட்டங்கள் அல்லது கல்வி நடவடிக்கைகளில் மாற்றங்களை மேற்கொள்ளும் உரிமை நிறுவனத்திற்கு உண்டு.',
+      'மாணவர்கள் கல்விக் காலம் முழுவதும் நிறுவனத்தின் அனைத்து விதிமுறைகளையும் ஒழுங்குவிதிகளையும் கடைப்பிடிக்க வேண்டும்.',
+      'மாணவர்கள் கல்வி நடவடிக்கைகள், பரீட்சைகள் மற்றும் நிறுவன நிகழ்வுகளில் நிறுவனத்தின் வழிகாட்டுதல்களை முழுமையாகப் பின்பற்ற வேண்டும்.',
+      'கடுமையான ஒழுக்கக்கேடு அல்லது விதிமுறை மீறல்களில் ஈடுபடும் மாணவர்களுக்கு எதிராக எச்சரிக்கை, இடைநீக்கம் அல்லது மாணவர் சேர்க்கை ரத்து உள்ளிட்ட ஒழுக்க நடவடிக்கைகளை மேற்கொள்ளும் உரிமை நிறுவனத்திற்கு உண்டு.',
+      'தேவைக்கேற்ப இவ்விதிமுறைகள் மற்றும் நிபந்தனைகளை எந்த நேரத்திலும் மாற்றம் செய்யும் உரிமை நிறுவனத்திற்கு உண்டு. மாற்றங்கள் குறித்து மாணவர்களுக்கும் பெற்றோர் / பாதுகாவலர்களுக்கும் உரிய முறையில் அறிவிக்கப்படும்.',
+    ],
   },
-  {
-    icon: UserCheck,
-    title: 'Admissions and Registration',
-    description:
-      'Information submitted through the Register/Contact forms will be used solely for admissions and communication purposes related to our courses.',
+  en: {
+    heroTitle: 'Rules & Regulations',
+    heroDesc:
+      'Please read these Rules, Regulations, and Terms & Conditions carefully before using the Techna Technical Institute website or enrolling in our courses.',
+    rulesHeading: 'Rules & Regulations',
+    rules: [
+      {
+        title: '1. Student ID Card',
+        desc: "Students must carry their Student ID Card whenever they attend classes.",
+      },
+      {
+        title: '2. Course Fee Payment',
+        desc: "Students are required to pay course fees within the payment period announced by the institute. If payment cannot be made on time, the administration must be informed in advance through the student's parent or guardian.",
+      },
+      {
+        title: '3. Attendance',
+        desc: "Students must attend all scheduled classes, revision sessions, monthly tests, and model examinations. If a student is absent or arrives late, the administration must be informed through the student's parent or guardian with a valid reason.",
+      },
+      {
+        title: '4. Mobile Phone Policy',
+        desc: 'The use of mobile phones during classes and examinations is strictly prohibited. Mobile phones may only be used in emergency situations with prior permission from the administration.',
+      },
+      {
+        title: '5. Dress Code & Appearance',
+        desc: 'Students must maintain a neat and respectful appearance suitable for an educational environment. Religious attire and modest accessories are permitted.',
+      },
+      {
+        title: '6. Institute Property',
+        desc: 'Students must keep classrooms, desks, chairs, and all institute property clean and in good condition. Any intentional damage to institute property may result in disciplinary action.',
+      },
+      {
+        title: '7. Student Conduct',
+        desc: 'Students are expected to behave respectfully towards teachers, staff, and fellow students while maintaining a positive learning environment.',
+      },
+      {
+        title: '8. Examination Rules',
+        desc: "Cheating or any form of examination misconduct is strictly prohibited during class tests, monthly tests, and model examinations. Looking at another student's answer sheet, exchanging papers, copying answers, bringing notes, books, mobile phones, or any unauthorized materials into an examination is not permitted and may result in disciplinary action.",
+      },
+      {
+        title: '9. Parent Meetings',
+        desc: 'Parents or guardians are required to attend parent meetings, discussions, and important announcements organized by the institute.',
+      },
+      {
+        title: '10. Reporting Issues',
+        desc: 'Any academic, institute-related, or student-related concerns should be reported to the administration immediately.',
+      },
+      {
+        title: '11. Personal Belongings',
+        desc: 'Students are responsible for their personal belongings. The institute is not responsible for any loss or damage to personal items.',
+      },
+      {
+        title: '12. Parent Communication',
+        desc: 'The institute may contact parents or guardians regarding attendance, discipline, academic progress, or fee-related matters whenever necessary.',
+      },
+      {
+        title: '13. Institute Policies',
+        desc: 'Students must comply with all instructions, policies, and decisions issued by the institute management.',
+      },
+      {
+        title: '14. Institute Reputation & Social Media Responsibility',
+        desc: 'Students must not engage in any activity, either in person or through social media, that may harm the reputation, discipline, or values of the institute. Any content related to the institute should be shared responsibly and respectfully.',
+      },
+    ],
+    termsHeading: 'Terms & Conditions',
+    terms: [
+      'Student admission will be confirmed only after completing the required registration and payment procedures.',
+      'All fees must be paid according to the payment procedures announced by the institute.',
+      'The institute reserves the right to revise class schedules, timetables, lecturers, syllabi, or academic activities whenever necessary.',
+      'Students are required to comply with all institute rules and regulations throughout their period of study.',
+      'Students must follow all institute guidelines during academic activities, examinations, and institute events.',
+      "The institute reserves the right to issue warnings, suspend, or terminate a student's enrollment in cases of serious misconduct or repeated violations of institute rules.",
+      'The institute reserves the right to amend these Rules & Regulations and Terms & Conditions at any time. Students and parents/guardians will be informed of any significant changes.',
+    ],
   },
-  {
-    icon: ShieldCheck,
-    title: 'Intellectual Property',
-    description:
-      'All content on this website, including logos, text, and images, is the property of Techna Technical Institute unless otherwise stated.',
-  },
-  {
-    icon: RefreshCcw,
-    title: 'Changes to Terms',
-    description:
-      'We may update these terms from time to time. Continued use of the website indicates acceptance of any changes.',
-  },
-];
+};
 
 export default function TermsAndConditions() {
+  const [lang, setLang] = useState<Lang>('ta');
+  const t = content[lang];
+
   return (
     <main className="w-full">
       {/* Hero Banner */}
@@ -38,7 +180,6 @@ export default function TermsAndConditions() {
           background: 'linear-gradient(135deg, #0183CB 0%, #34BFF3 100%)',
         }}
       >
-        {/* decorative circles */}
         <div className="pointer-events-none absolute -left-10 -top-10 w-52 h-52 rounded-full border border-white/20" />
         <div className="pointer-events-none absolute right-10 top-8 w-72 h-72 rounded-full border border-white/10" />
 
@@ -47,73 +188,96 @@ export default function TermsAndConditions() {
           <div className="flex items-center justify-center gap-2 text-sm text-white/90 mb-6">
             <Link href="/" className="flex items-center gap-1 hover:text-white">
               <Home className="w-4 h-4" />
-              Home
+              {lang === 'ta' ? 'முகப்பு' : 'Home'}
             </Link>
             <ChevronRight className="w-4 h-4" />
-            <span className="font-semibold text-white">Terms and Conditions</span>
-          </div>
-
-          <h1 className="text-4xl sm:text-5xl font-extrabold text-white mb-4">
-            Terms and Conditions
-          </h1>
-
-          <p className="max-w-2xl mx-auto text-white/90 text-[15px] leading-relaxed">
-            Please read these terms carefully before using the Techna Technical Institute
-            website. By accessing our site, you agree to the conditions outlined below.
-          </p>
-        </div>
-      </section>
-
-      {/* Content */}
-      <section className="bg-gray-50 py-16">
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="mb-10 text-right">
-            <span className="text-sm font-medium" style={{ color: '#0183CB' }}>
-              {sections.length + 1} Sections
+            <span className="font-semibold text-white">
+              {lang === 'ta' ? 'விதிமுறைகள்' : 'Terms and Conditions'}
             </span>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {sections.map(({ icon: Icon, title, description }) => (
+          <h1 className="text-3xl sm:text-5xl font-extrabold text-white mb-4">
+            {t.heroTitle}
+          </h1>
+
+          <p className="max-w-2xl mx-auto text-white/90 text-[15px] leading-relaxed mb-8">
+            {t.heroDesc}
+          </p>
+
+          {/* Language toggle */}
+          <div className="inline-flex items-center gap-1 bg-white/15 backdrop-blur-sm rounded-full p-1 border border-white/30">
+            <button
+              onClick={() => setLang('ta')}
+              className={`px-5 py-2 rounded-full text-sm font-semibold transition-all flex items-center gap-2 ${
+                lang === 'ta' ? 'bg-white text-[#0183CB]' : 'text-white'
+              }`}
+            >
+              <Languages className="w-4 h-4" />
+              தமிழ்
+            </button>
+            <button
+              onClick={() => setLang('en')}
+              className={`px-5 py-2 rounded-full text-sm font-semibold transition-all flex items-center gap-2 ${
+                lang === 'en' ? 'bg-white text-[#0183CB]' : 'text-white'
+              }`}
+            >
+              <Languages className="w-4 h-4" />
+              English
+            </button>
+          </div>
+        </div>
+      </section>
+
+      {/* Rules & Regulations */}
+      <section className="bg-gray-50 py-16">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+          <h2
+            className="text-2xl font-bold mb-8 text-center"
+            style={{ color: '#0183CB' }}
+          >
+            {t.rulesHeading}
+          </h2>
+
+          <div className="space-y-4">
+            {t.rules.map(rule => (
               <div
-                key={title}
+                key={rule.title}
                 className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 hover:shadow-md transition-shadow"
               >
-                <div
-                  className="w-12 h-12 rounded-xl flex items-center justify-center mb-4"
-                  style={{ background: '#EAF6FD' }}
-                >
-                  <Icon className="w-6 h-6" style={{ color: '#0183CB' }} />
-                </div>
-                <h2 className="text-lg font-bold text-gray-900 mb-2">{title}</h2>
-                <p className="text-sm text-gray-600 leading-relaxed border-t border-gray-100 pt-3">
-                  {description}
-                </p>
+                <h3 className="font-bold text-gray-900 mb-2">{rule.title}</h3>
+                <p className="text-sm text-gray-600 leading-relaxed">{rule.desc}</p>
               </div>
             ))}
-
-            {/* Contact card spans full width */}
-            <div className="md:col-span-2 bg-white rounded-2xl border border-gray-100 shadow-sm p-6 hover:shadow-md transition-shadow">
-              <div
-                className="w-12 h-12 rounded-xl flex items-center justify-center mb-4"
-                style={{ background: '#EAF6FD' }}
-              >
-                <Mail className="w-6 h-6" style={{ color: '#0183CB' }} />
-              </div>
-              <h2 className="text-lg font-bold text-gray-900 mb-2">Contact Us</h2>
-              <p className="text-sm text-gray-600 leading-relaxed border-t border-gray-100 pt-3">
-                If you have any questions about these Terms and Conditions, contact us at{' '}
-                <a
-                  href="mailto:technatechnicalinstitute@gmail.com"
-                  className="underline"
-                  style={{ color: '#0183CB' }}
-                >
-                  technatechnicalinstitute@gmail.com
-                </a>
-                .
-              </p>
-            </div>
           </div>
+        </div>
+      </section>
+
+      {/* Terms & Conditions */}
+      <section className="bg-white py-16 border-t border-gray-100">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+          <h2
+            className="text-2xl font-bold mb-8 text-center"
+            style={{ color: '#0183CB' }}
+          >
+            {t.termsHeading}
+          </h2>
+
+          <ul className="space-y-4">
+            {t.terms.map((item, idx) => (
+              <li
+                key={idx}
+                className="flex items-start gap-4 bg-gray-50 rounded-xl p-5 border border-gray-100"
+              >
+                <span
+                  className="shrink-0 w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold text-white"
+                  style={{ background: '#0183CB' }}
+                >
+                  {idx + 1}
+                </span>
+                <p className="text-sm text-gray-700 leading-relaxed">{item}</p>
+              </li>
+            ))}
+          </ul>
         </div>
       </section>
     </main>
