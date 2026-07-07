@@ -13,7 +13,7 @@ import {
   ChevronRight,
 } from 'lucide-react';
 import api from '@/lib/axios';
-import { moduleIcons } from '@/lib/moduleIcons';
+import { sortModulesByConfig, getModuleIcon } from '@/lib/moduleIcons';
 
 interface ApiModule {
   _id: string;
@@ -45,9 +45,7 @@ function normalizeSubjects(raw: string | string[] | undefined): string[] {
 export default function ModulesSection() {
   const router = useRouter();
   const [modules, setModules] = useState<ApiModule[]>([]);
-  const [teacherBySubject, setTeacherBySubject] = useState<
-    Record<string, PublicTeacher>
-  >({});
+  const [teacherBySubject, setTeacherBySubject] = useState<Record<string, PublicTeacher>>({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -57,7 +55,10 @@ export default function ModulesSection() {
       api.get('/public/teachers') as unknown as Promise<PublicTeacher[]>,
     ])
       .then(([modulesData, teachersData]) => {
-        setModules(Array.isArray(modulesData) ? modulesData : []);
+        const sorted = sortModulesByConfig(
+          Array.isArray(modulesData) ? modulesData : []
+        );
+        setModules(sorted);
 
         const map: Record<string, PublicTeacher> = {};
         teachersData.forEach((teacher) => {
@@ -126,8 +127,8 @@ export default function ModulesSection() {
             </div>
 
             <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-              {modules.map((module, idx) => {
-                const Icon = moduleIcons[idx % moduleIcons.length];
+              {modules.map((module) => {
+                const Icon = getModuleIcon(module.name);
                 const matchedTeacher =
                   teacherBySubject[module.name.toLowerCase()];
                 const teacherId = matchedTeacher?._id ?? module.teacherId;
