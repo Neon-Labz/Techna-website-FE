@@ -53,8 +53,8 @@ export default function ModulesSection() {
 
   useEffect(() => {
     Promise.all([
-      api.get('/modules/public') as unknown as Promise<ApiModule[]>,
-      api.get('/public/teachers') as unknown as Promise<PublicTeacher[]>,
+      api.get('/modules') as unknown as Promise<ApiModule[]>,
+      api.get('/teachers') as unknown as Promise<PublicTeacher[]>,
     ])
       .then(([modulesData, teachersData]) => {
         setModules(Array.isArray(modulesData) ? modulesData : []);
@@ -126,7 +126,7 @@ export default function ModulesSection() {
             </div>
 
             <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-              {modules.map((module, idx) => {
+                  {modules.map((module, idx) => {
                 const Icon = moduleIcons[idx % moduleIcons.length];
                 const matchedTeacher =
                   teacherBySubject[module.name.toLowerCase()];
