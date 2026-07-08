@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { io, Socket } from 'socket.io-client';
+import { useAuthStore } from '@/store/authStore';
 import { notificationApi, type Notification, type NotificationQuery } from '@/api/notification.api';
 
 interface NotificationState {
@@ -20,6 +21,42 @@ interface NotificationState {
 }
 
 const SOCKET_URL = (process.env.NEXT_PUBLIC_SERVER_URL ?? 'http://localhost:4000/api').replace('/api', '');
+function belongsToCurrentStudent(notification: Notification): boolean {
+  try {
+    const isWelcomeType =
+      notification?.type === 'general' && /welcome/i.test(notification?.title ?? '');
+
+    
+    if (!isWelcomeType) return true;
+
+    const message = `${notification?.title ?? ''} ${notification?.message ?? ''}`;
+    const match = message.match(/STU\d+/i);
+
+    
+    if (!match) return true;
+
+    const mentionedId = match[0].toUpperCase();
+
+    const currentStudent = useAuthStore.getState()?.student as any;
+    const currentStudentId =
+      currentStudent?.studentId ??
+      currentStudent?.studentID ??
+      currentStudent?.id ??
+      currentStudent?._id;
+
+    
+    if (!currentStudentId) return true;
+
+    return mentionedId === String(currentStudentId).toUpperCase();
+  } catch (err) {
+    console.error('[Notifications] filter check failed, showing notification by default:', err);
+    return true; // never hide on error
+  }
+}
+
+function filterForCurrentStudent(notifications: Notification[]): Notification[] {
+  return notifications.filter(belongsToCurrentStudent);
+}
 
 export const useNotificationStore = create<NotificationState>((set, get) => ({
   notifications: [],
@@ -79,10 +116,13 @@ export const useNotificationStore = create<NotificationState>((set, get) => ({
     set({ loading: true });
     try {
       const response = await notificationApi.getMyNotifications(query);
+      const filtered = filterForCurrentStudent(response.notifications);
+      const unreadInFiltered = filtered.filter((n) => !n.isRead).length;
+
       set({
-        notifications: response.notifications,
-        total: response.total,
-        unreadCount: response.unreadCount,
+        notifications: filtered,
+        total: filtered.length,
+        unreadCount: unreadInFiltered,
       });
     } catch (error) {
       console.error('[Notifications] Failed to fetch:', error);
@@ -127,6 +167,8 @@ export const useNotificationStore = create<NotificationState>((set, get) => ({
   },
 
   addNotification: (notification: Notification) => {
+    if (!belongsToCurrentStudent(notification)) return; // skip other students' welcome pings
+
     set((state) => ({
       notifications: [{ ...notification, isRead: false }, ...state.notifications],
       unreadCount: state.unreadCount + 1,
