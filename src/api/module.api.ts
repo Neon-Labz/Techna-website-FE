@@ -45,7 +45,7 @@ function unwrapList(res: unknown): ModuleFromApi[] {
 
 export const moduleApi = {
   getAll(): Promise<ModuleFromApi[]> {
-    return api.get('/modules/public').then((res) => unwrapList(res.data ?? res));
+    return api.get('/modules').then((res) => unwrapList(res.data ?? res));
   },
 
   getById(id: string): Promise<ModuleFromApi> {
