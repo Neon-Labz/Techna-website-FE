@@ -141,10 +141,10 @@ export default function SubjectUnit() {
               <table className="w-full min-w-[640px] text-left text-xs sm:text-sm">
                 <thead>
                   <tr className="bg-[#0183CB]/10 text-[#1B1C1C]">
-                    <th className="w-32 whitespace-nowrap p-3 font-semibold sm:w-40 sm:p-4">
+                    <th className="w-32 whitespace-nowrap border-r border-[#E5E7EB] p-3 font-semibold sm:w-40 sm:p-4">
                       தவணை
                     </th>
-                    <th className="p-3 font-semibold sm:p-4">
+                    <th className="border-r border-[#E5E7EB] p-3 font-semibold sm:p-4">
                       தரம் 12 பாடத்திட்டம்
                     </th>
                     <th className="p-3 font-semibold sm:p-4">
@@ -163,12 +163,12 @@ export default function SubjectUnit() {
                         {i === 0 && (
                           <td
                             rowSpan={rowCount}
-                            className="p-3 align-top font-medium text-[#0183CB] sm:p-4"
+                            className="border-r border-[#E5E7EB] p-3 align-top font-medium text-[#0183CB] sm:p-4"
                           >
                             {term}
                           </td>
                         )}
-                        <td className="p-3 align-top sm:p-4">
+                          <td className="border-r border-[#E5E7EB] p-3 align-top sm:p-4">
                           {g12[i] && (
                             <>
                               <span className="mr-2 font-semibold text-gray-500">
@@ -178,7 +178,7 @@ export default function SubjectUnit() {
                             </>
                           )}
                         </td>
-                        <td className="p-3 align-top sm:p-4">
+                        <td className="border-r border-[#E5E7EB]  p-3 align-top sm:p-4">
                           {g13[i] && (
                             <>
                               <span className="mr-2 font-semibold text-gray-500">

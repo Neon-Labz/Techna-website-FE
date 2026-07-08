@@ -3,12 +3,14 @@ import FeaturedModulesSection from '../../components/website/FeaturedModulesSect
 import WhyUsSection from '../../components/website/WhyUsSection';
 import TestimonialsSection from '../../components/website/TestimonialsSection';
 import CTASection from '../../components/website/CTASection';
+import VisionMissionSection from '@/components/website/VisionMissionSection';
 
 export default function HomePage() {
   return (
     <>
       <HeroSection />
       <FeaturedModulesSection />
+      <VisionMissionSection />
       <WhyUsSection />
       <TestimonialsSection />
       <CTASection />
