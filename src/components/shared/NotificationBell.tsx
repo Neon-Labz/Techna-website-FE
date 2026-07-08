@@ -108,7 +108,11 @@ export default function NotificationBell() {
       {/* Bell Button */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="relative p-2 text-blue-200 hover:text-white hover:bg-white/10 rounded-lg transition-all"
+        className={`relative p-2 rounded-lg transition-all ${
+          isOpen
+            ? 'bg-sky-100 text-sky-600'
+            : 'text-[#0183CB] hover:bg-sky-50 hover:text-sky-600'
+        }`}
         aria-label={`Notifications${unreadCount > 0 ? ` (${unreadCount} unread)` : ''}`}
       >
         <Bell className="w-5 h-5" />
