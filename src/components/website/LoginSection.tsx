@@ -95,19 +95,21 @@ export default function LoginSection() {
       {/* Dark overlay so the white card stays readable over the photo */}
       <div className="absolute inset-0 bg-black/55" />
 
-      <div className="w-full max-w-md relative z-10">
-        <div className="bg-white rounded-3xl shadow-2xl p-4 sm:p-8">
-          <div className="text-center mb-3 sm:mb-8">
-            <Image
-              src="/techna-logo.png"
-              alt="Techna Logo"
-              width={150}
-              height={150}
-              className="mx-auto mb-1 rounded-full"
-            />
-            <h1 className="text-[30px] font-extrabold text-slate-800 leading-9">Welcome Back</h1>
+      <div className="w-full max-w-md relative z-10 mt-8 sm:mt-12">
+       <div className="bg-white rounded-3xl shadow-2xl px-4 pb-8 pt-0 sm:px-8 sm:pb-8 sm:pt-0">
+  <div className="flex flex-col items-center -mt-12">
+    <Image
+      src="/new.png"
+      alt="Techna Logo"
+      width={200}
+      height={200}
+      className="block w-[220px] h-auto object-contain -mb-10"
+    />
+            <h1 className="text-[30px] font-extrabold text-slate-800 leading-9 -mt-6">
+              Welcome Back
+            </h1>
             <p className="text-slate-500 text-base font-medium mt-2">
-              Sign in to your Techna LMS
+              Sign in to My Techna
             </p>
           </div>
 
