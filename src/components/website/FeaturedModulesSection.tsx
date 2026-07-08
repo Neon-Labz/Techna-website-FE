@@ -3,7 +3,7 @@ import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { ArrowRight } from 'lucide-react';
 import { moduleApi, ModuleFromApi } from '@/api/module.api';
-import { moduleIcons } from '@/lib/moduleIcons';
+import { sortModulesByConfig, getModuleIcon } from '@/lib/moduleIcons';
 
 export default function FeaturedModulesSection() {
   const router = useRouter();
@@ -13,7 +13,7 @@ export default function FeaturedModulesSection() {
   useEffect(() => {
     moduleApi.getAll()
       .then((data) => {
-        setModules(data.slice(0, 6));
+        setModules(sortModulesByConfig(data).slice(0, 6));
       })
       .catch((err: unknown) => console.error('Failed to fetch modules:', err))
       .finally(() => setLoading(false));
@@ -54,7 +54,6 @@ export default function FeaturedModulesSection() {
             {[...Array(6)].map((_, i) => (
               <div key={i} className="rounded-2xl overflow-hidden border border-[#e5e7eb] animate-pulse">
                 <div className="h-[140px] sm:h-[160px] bg-[#34BFF3]/20" />
-                <div className="px-6 py-4 bg-white h-[52px]" />
               </div>
             ))}
           </div>
@@ -63,13 +62,13 @@ export default function FeaturedModulesSection() {
         {/* Grid */}
         {!loading && modules.length > 0 && (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
-            {modules.map((module, idx) => {
-              const Icon = moduleIcons[idx % moduleIcons.length];
+            {modules.map((module) => {
+              const Icon = getModuleIcon(module.name);
               return (
                 <div
                   key={module._id}
                   className="group rounded-2xl overflow-hidden border border-[#e5e7eb] shadow-sm hover:shadow-lg transition-all duration-300 hover:-translate-y-1 cursor-pointer bg-white"
-                  onClick={() => router.push('/modules')}
+                  onClick={() => router.push(`/modules/${module._id}`)}
                 >
                   {/* Card Top */}
                   <div
@@ -87,19 +86,6 @@ export default function FeaturedModulesSection() {
                     <p className="text-white/80 text-[12px] sm:text-[13px] mt-2 leading-relaxed line-clamp-2 relative z-10">
                       {module.description}
                     </p>
-                  </div>
-
-                  {/* Card Bottom */}
-                  <div className="px-5 sm:px-6 py-3 sm:py-4 bg-white">
-                    <button
-                      className="flex items-center gap-1.5 text-[#34BFF3] text-[12px] sm:text-[13px] font-semibold hover:gap-3 transition-all duration-200"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        router.push(`/teachers/${module.teacherId}?subject=${encodeURIComponent(module.name)}`);
-                      }}
-                    >
-                      Visit Teacher <ArrowRight className="w-3.5 h-3.5" />
-                    </button>
                   </div>
                 </div>
               );
