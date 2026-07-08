@@ -24,20 +24,19 @@ export default function PublicHeader() {
         <div className="flex items-center justify-between h-20">
 
           {/* ✅ Mobile: ml-[-35px], Desktop: ml-[-60px] */}
-          <Link
-            href="/"
-            className="flex-shrink-0 ml-[-35px] md:ml-[-60px]"
-          >
-            <Image
-              src="/newlogo.png"
-              alt="Techna Logo"
-              width={220}
-              height={70}
-              className="object-contain"
-              priority
-            />
-          </Link>
-
+        <Link
+  href="/"
+  className="flex items-center h-full flex-shrink-0 ml-[-35px] md:ml-[-60px]"
+>
+  <Image
+    src="/new.png"
+    alt="Techna Logo"
+    width={220}
+    height={70}
+    className="block object-contain"
+    priority
+  />
+</Link>
           {/* Desktop Nav */}
           <nav className="hidden md:flex items-center gap-0">
             {navLinks.map(link => (
