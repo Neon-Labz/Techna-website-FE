@@ -9,11 +9,10 @@ import {
   ArrowRight,
   BookOpen,
   Loader2,
-  Home,
-  ChevronRight,
 } from 'lucide-react';
 import api from '@/lib/axios';
 import { moduleIcons } from '@/lib/moduleIcons';
+import PageHero from './PageHero';
 
 interface ApiModule {
   _id: string;
@@ -74,35 +73,11 @@ export default function ModulesSection() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <div
-        className="relative overflow-hidden py-16"
-        style={{ background: 'linear-gradient(90deg, #0183CB, #34BFF3)' }}
-      >
-        <div className="pointer-events-none absolute inset-0 opacity-10">
-          <div className="absolute left-1/4 top-8 h-32 w-32 rounded-full border-4 border-white" />
-          <div className="absolute bottom-4 right-1/3 h-48 w-48 rounded-full border-4 border-white" />
-        </div>
-
-        <div className="relative mx-auto max-w-7xl px-4 text-center sm:px-6 lg:px-8">
-          <nav className="mb-6 flex items-center justify-center gap-1.5 text-sm text-white/80">
-            <Home className="h-3.5 w-3.5" />
-            <Link href="/" className="transition-colors hover:text-white">
-              Home
-            </Link>
-            <ChevronRight className="h-3.5 w-3.5" />
-            <span className="font-medium text-white">Our Subject</span>
-          </nav>
-
-          <h1 className="text-4xl font-bold text-white md:text-5xl">
-            Our Subject
-          </h1>
-
-          <p className="mx-auto mt-3 max-w-2xl text-base leading-relaxed text-white/80">
-            Explore our wide range of industry-relevant subjects designed to
-            build skills, knowledge and shape your future.
-          </p>
-        </div>
-      </div>
+      <PageHero
+        title="Our Subject"
+        subtitle="Explore our wide range of industry-relevant subjects designed to build skills, knowledge and shape your future."
+        currentPage="Our Subject"
+      />
 
       <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
         {loading && (

@@ -2,6 +2,7 @@
 import { useState } from 'react';
 import { Phone, Mail, MapPin, Clock, Send, MessageCircle, Check } from 'lucide-react';
 import { sendContactMessage } from '../../api/contact.api';
+import PageHero from './PageHero';
 
 export default function ContactSection() {
   const [form, setForm] = useState({ name: '', email: '', phone: '', subject: '', message: '' });
@@ -106,30 +107,11 @@ export default function ContactSection() {
 
   return (
     <div className="min-h-screen bg-white">
-      {/* Hero Section */}
-      <div
-        className="relative overflow-hidden min-h-[220px] sm:min-h-[260px] lg:h-[294px] bg-cover bg-center bg-no-repeat py-10 sm:py-12 lg:py-0"
-        style={{
-          backgroundImage: "url('/contact_hero.png')",
-          backgroundColor: '#0183CB',
-        }}
-      >
-        {/* Content container */}
-        <div className="relative lg:absolute lg:left-1/2 lg:-translate-x-1/2 lg:top-[80px] w-full max-w-[896px] px-4 sm:px-6 mx-auto">
-          {/* GET IN TOUCH */}
-          <p className="text-center text-xs sm:text-sm font-semibold tracking-[1.4px] uppercase text-white leading-5">
-            GET IN TOUCH
-          </p>
-          {/* Contact Us */}
-          <h1 className="text-center text-[32px] sm:text-[40px] lg:text-[48px] font-bold text-white leading-[1.15] lg:leading-[48px] mt-3">
-            Contact Us
-          </h1>
-          {/* Subtitle */}
-          <p className="text-center text-sm sm:text-base lg:text-lg text-white opacity-90 leading-[1.6] lg:leading-[29px] mt-4 sm:mt-5 max-w-[685px] mx-auto">
-            Have questions about admissions, courses, or anything else? We&apos;re here to help!
-          </p>
-        </div>
-      </div>
+      <PageHero
+        title="Contact Us"
+        subtitle="Have questions about admissions, courses, or anything else? We're here to help!"
+        currentPage="Contact Us"
+      />
 
       {/* Main Content */}
       <div className="relative" style={{ background: 'rgba(1, 131, 203, 0.05)' }}>
