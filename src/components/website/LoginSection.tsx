@@ -109,7 +109,7 @@ export default function LoginSection() {
               Welcome Back
             </h1>
             <p className="text-slate-500 text-base font-medium mt-2">
-              Sign in to My Techna
+              Sign in to My Techna LMS
             </p>
           </div>
 

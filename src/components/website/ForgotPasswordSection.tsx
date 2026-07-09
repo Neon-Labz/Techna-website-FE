@@ -50,7 +50,7 @@ export default function ForgotPasswordSection() {
 
   return (
     <div
-      className="min-h-screen flex items-center justify-center px-4 relative overflow-hidden"
+      className="relative flex min-h-screen items-center justify-center overflow-hidden px-4 py-8"
       style={{
         backgroundImage: "url('/Back.jpeg')",
         backgroundSize: 'cover',
@@ -60,38 +60,40 @@ export default function ForgotPasswordSection() {
     >
       <div className="absolute inset-0 bg-black/55" />
 
-      <div className="w-full max-w-md relative z-10">
-        <div className="bg-white rounded-3xl shadow-2xl p-4 sm:p-8">
-          <div className="text-center mb-3 sm:mb-8">
-            <Image
-              src="/techna-logo.png"
-              alt="Techna Logo"
-              width={150}
-              height={150}
-              className="mx-auto mb-1 rounded-full"
-            />
+      <div className="w-full max-w-md relative z-10 mt-8 sm:mt-12">
+<div className="bg-white rounded-3xl shadow-2xl px-6 pb-8 pt-2 sm:px-8 sm:pb-8 sm:pt-2">
+<div className="flex flex-col items-center -mt-6">
+        <Image
+        src="/new.png"
+        alt="Techna Logo"
+        width={200}
+        height={200}
+        priority
+        className="block w-[220px] h-auto object-contain -mb-10"
+      />
 
-            <h1 className="text-[30px] font-extrabold text-slate-800 leading-9">
-              Forgot Password
-            </h1>
+      <h1 className="text-[30px] font-extrabold text-slate-800 leading-9 -mt-6">
+        Forgot Password
+      </h1>
 
-            <p className="text-slate-500 text-base font-medium mt-2">
-              Enter your registered email to receive a reset code
-            </p>
-          </div>
+     <p className="mt-2 mb-5 text-center text-base font-medium text-slate-500">
+       Enter your registered email to receive a reset code
+      </p>
+    </div>
 
           {sent ? (
-            <div className="text-center py-4">
-              <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <CheckCircle className="w-9 h-9 text-green-600" />
+            <div className="py-2 text-center">
+              <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-green-100">
+                <CheckCircle className="h-9 w-9 text-green-600" />
               </div>
 
-              <h2 className="text-lg font-semibold text-gray-900 mb-2">
+              <h2 className="mb-2 text-lg font-semibold text-gray-900">
                 Check your email
               </h2>
 
-              <p className="text-gray-500 text-sm mb-6 leading-6">
-                If <strong>{email}</strong> is registered, a 6-digit reset code has been sent to your inbox.
+              <p className="mb-6 text-sm leading-6 text-gray-500">
+                If <strong>{email}</strong> is registered, a 6-digit reset code has
+                been sent to your inbox.
               </p>
 
               <button
@@ -99,34 +101,34 @@ export default function ForgotPasswordSection() {
                 onClick={() =>
                   router.push(`/reset-password?email=${encodeURIComponent(email)}`)
                 }
-                className="w-full flex items-center justify-center gap-2 py-3.5 bg-gradient-to-r from-[#0183CB] to-[#34BFF3] hover:from-[#0175B5] hover:to-[#20AEE5] text-white font-semibold rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl"
+                className="flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-[#0183CB] to-[#34BFF3] py-3.5 font-semibold text-white shadow-lg transition-all duration-200 hover:from-[#0175B5] hover:to-[#20AEE5] hover:shadow-xl"
               >
-                Enter Reset Code <ArrowRight className="w-4 h-4" />
+                Enter Reset Code <ArrowRight className="h-4 w-4" />
               </button>
             </div>
           ) : (
             <>
               {error && (
-                <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl text-sm mb-5">
+                <div className="mb-5 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
                   {error}
                 </div>
               )}
 
-              <form onSubmit={handleSubmit} className="space-y-3 sm:space-y-5">
+              <form onSubmit={handleSubmit} className="space-y-5">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                  <label className="mb-1.5 block text-sm font-medium text-gray-700">
                     Email Address
                   </label>
 
                   <div className="relative">
-                    <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                    <Mail className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
                     <input
                       type="email"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       placeholder="student@techna.lk"
                       autoComplete="email"
-                      className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-gray-50 text-gray-900 placeholder-gray-400"
+                      className="w-full rounded-xl border border-gray-200 bg-gray-50 py-3 pl-10 pr-4 text-sm text-gray-900 placeholder-gray-400 focus:border-transparent focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
                   </div>
                 </div>
@@ -134,13 +136,13 @@ export default function ForgotPasswordSection() {
                 <button
                   type="submit"
                   disabled={loading}
-                  className="w-full flex items-center justify-center gap-2 py-3.5 bg-gradient-to-r from-[#0183CB] to-[#34BFF3] hover:from-[#0175B5] hover:to-[#20AEE5] text-white font-semibold rounded-xl transition-all duration-200 disabled:opacity-60 shadow-lg hover:shadow-xl"
+                  className="flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-[#0183CB] to-[#34BFF3] py-3.5 font-semibold text-white shadow-lg transition-all duration-200 hover:from-[#0175B5] hover:to-[#20AEE5] hover:shadow-xl disabled:opacity-60"
                 >
                   {loading ? (
-                    <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                    <div className="h-5 w-5 animate-spin rounded-full border-2 border-white/30 border-t-white" />
                   ) : (
                     <>
-                      Send Reset Code <ArrowRight className="w-4 h-4" />
+                      Send Reset Code <ArrowRight className="h-4 w-4" />
                     </>
                   )}
                 </button>
@@ -148,24 +150,24 @@ export default function ForgotPasswordSection() {
             </>
           )}
 
-          <div className="text-center mt-4 pt-4 sm:mt-6 sm:pt-6 border-t border-gray-100">
-            <p className="text-gray-500 text-sm">
+          <div className="mt-6 border-t border-gray-100 pt-5 text-center">
+            <p className="text-sm text-gray-500">
               Remember your password?{' '}
-              <Link href="/login" className="text-blue-700 font-semibold hover:underline">
+              <Link href="/login" className="font-semibold text-blue-700 hover:underline">
                 Sign In
               </Link>
             </p>
           </div>
 
-          <div className="mt-3 p-2 sm:mt-4 sm:p-3 bg-blue-50 rounded-xl text-xs text-blue-700 text-center">
+          <div className="mt-4 rounded-xl bg-blue-50 p-3 text-center text-xs text-blue-700">
             Use your registered student email to reset your password
           </div>
         </div>
 
-        <div className="text-center mt-6">
+        <div className="mt-5 text-center">
           <Link
             href="/"
-            className="inline-flex items-center gap-1.5 text-white text-sm font-medium bg-black/30 hover:bg-black/45 px-4 py-2 rounded-full backdrop-blur-sm transition-colors"
+            className="inline-flex items-center gap-1.5 rounded-full bg-black/30 px-4 py-2 text-sm font-medium text-white backdrop-blur-sm transition-colors hover:bg-black/45"
           >
             ← Back to Home
           </Link>

@@ -544,8 +544,8 @@ export default function RegisterSection() {
   </h1>
 
   <p className="text-slate-500 text-base font-medium mt-0">
-    Sign up to My Techna
-  </p>
+    Sign up to My Techna LMS
+  </p> 
 </div>
           <div className="mb-6">
             <h2 className="text-xl font-bold text-gray-900">{STEPS[step - 1].label}</h2>
