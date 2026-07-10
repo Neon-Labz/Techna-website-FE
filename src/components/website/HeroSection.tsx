@@ -5,8 +5,8 @@ import { ArrowRight, Building2, BookOpen, Users, Star } from "lucide-react";
 
 const stats = [
   { icon: Building2, value: "6+", label: "Years of Excellence" },
-  { icon: BookOpen, value: "9", label: "Core Subjects" },
-  { icon: Users, value: "1,500+", label: "Students Enrolled" },
+  { icon: BookOpen, value: "7", label: "Core Subjects" },
+  { icon: Users, value: "700+", label: "Students Enrolled" },
   { icon: Star, value: "98%", label: "Pass Rate" },
 ];
 
