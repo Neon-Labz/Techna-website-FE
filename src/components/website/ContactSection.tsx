@@ -146,7 +146,7 @@ export default function ContactSection() {
                   <div className="min-w-0">
                     <p className="text-xs font-bold uppercase tracking-[0.3px] text-[#1F2937]">PHONE</p>
                     <p className="text-lg font-bold text-[#1F2937] mt-0.5">0771703549</p>
-                    <p className="text-sm text-[#6B7280] mt-0.5">Mon-Sat, 8AM-6PM</p>
+                    <p className="text-sm text-[#6B7280] mt-0.5">Mon-Sun, 8AM-6PM</p>
                   </div>
                 </div>
               </div>

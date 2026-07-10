@@ -936,7 +936,19 @@ export default function RegisterSection() {
                   onChange={e => set('declarationRules', e.target.checked)}
                   className="text-blue-600 rounded mt-0.5 w-4 h-4"
                 />
-                <span className="text-sm text-gray-700">I agree to follow all institute rules and regulations.</span>
+                <span className="text-sm text-gray-700">
+                  I agree to follow all institute{' '}
+                  <Link
+                    href="/terms-and-conditions"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    onClick={e => e.stopPropagation()}
+                    className="text-blue-600 underline hover:text-blue-800"
+                  >
+                    Rules & Regulations
+                  </Link>
+                  .
+                </span>
               </label>
               <label className={`flex items-start gap-3 cursor-pointer p-3 rounded-xl border-2 ${errors.declaration ? 'border-red-300 bg-red-50' : 'border-gray-200 bg-gray-50'}`}>
                 <input
