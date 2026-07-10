@@ -247,7 +247,7 @@ export default function PaymentsSection() {
       <div className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm">
         <div className="flex flex-wrap items-center gap-4">
           <div className="flex items-center gap-2">
-            <Filter className="h-4 w-4 text-indigo-600" />
+            <Filter className="h-4 w-4 text-[#34BFF3]" />
             <span className="text-sm font-semibold text-gray-700">Filter:</span>
           </div>
 
@@ -289,7 +289,7 @@ export default function PaymentsSection() {
 
       <div className="overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm">
         <div className="flex items-center gap-2 border-b border-gray-100 p-5">
-          <Receipt className="h-5 w-5 text-indigo-600" />
+          <Receipt className="h-5 w-5 text-[#34BFF3]" />
           <h3 className="text-sm font-bold text-gray-900">Payment History</h3>
         </div>
 
@@ -338,7 +338,7 @@ export default function PaymentsSection() {
                       {payment.status === 'paid' && (
                         <button
                           onClick={() => generateReceipt(payment)}
-                          className="flex items-center gap-1.5 rounded-xl bg-blue-50 px-3 py-1.5 text-xs font-medium text-blue-700 hover:bg-blue-100"
+                          className="flex items-center gap-1.5 rounded-xl bg-[#F0F9FF] px-3 py-1.5 text-xs font-medium text-[#008AD8] hover:bg-blue-100"
                         >
                           <Download className="h-3.5 w-3.5" /> Receipt
                         </button>
@@ -388,8 +388,8 @@ export default function PaymentsSection() {
 
                         <td className="px-5 py-4">
                           <div className="flex items-center gap-2">
-                            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-indigo-50">
-                              <BookOpen className="h-4 w-4 text-indigo-600" />
+                            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-[#F0F9FF]">
+                              <BookOpen className="h-4 w-4 text-[#34BFF3]" />
                             </div>
                             <p className="text-sm font-medium text-gray-900">
                               {payment.moduleName || '-'}
@@ -426,7 +426,7 @@ export default function PaymentsSection() {
                           {payment.status === 'paid' ? (
                             <button
                               onClick={() => generateReceipt(payment)}
-                              className="flex items-center gap-1.5 rounded-xl bg-blue-50 px-3 py-1.5 text-xs font-medium text-blue-700 hover:bg-blue-100"
+                              className="flex items-center gap-1.5 rounded-xl bg-[#F0F9FF] px-3 py-1.5 text-xs font-medium text-[#008AD8] hover:bg-blue-100"
                             >
                               <Download className="h-3.5 w-3.5" /> Receipt
                             </button>
