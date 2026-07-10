@@ -12,7 +12,7 @@ import {
 } from 'lucide-react';
 import { useAuthStore } from '../../store/authStore';
 import { getSession } from '../../api/auth.api';
-import { getResultsByStudentId } from '../../api/exam.api';
+import { getResultsByStudentId } from '../../api/result.api';
 
 interface StudentProfile {
   _id?: string;
@@ -33,7 +33,11 @@ interface ResultRow {
   moduleName: string;
   examType?: string | null;
   batch?: string;
+
   date?: string | null;
+  createdAt?: string | null;
+  updatedAt?: string | null;
+
   semester?: string | null;
   marks?: number | null;
   maxMarks?: number | null;
@@ -61,6 +65,7 @@ const getPercent = (row: ResultRow) => {
 
 const formatDate = (value?: string | null) => {
   if (!value) return '-';
+  
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) return value;
   return date.toLocaleDateString('en-GB', {
@@ -69,6 +74,8 @@ const formatDate = (value?: string | null) => {
     year: 'numeric',
   });
 };
+const getResultDate = (row: ResultRow) =>
+  row.date || row.createdAt || row.updatedAt || null;
 
 const dateValue = (value?: string | null) => {
   if (!value) return null;
@@ -105,45 +112,128 @@ export default function ResultsSection() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [moduleFilter, setModuleFilter] = useState('all');
-  const [semesterFilter, setSemesterFilter] = useState('all');
   const [fromDate, setFromDate] = useState('');
   const [toDate, setToDate] = useState('');
 
-  useEffect(() => {
-    const loadAll = async () => {
-      setLoading(true);
-      setError(null);
+ useEffect(() => {
+  const loadAll = async () => {
+    setLoading(true);
+    setError(null);
 
-      try {
-        const token = useAuthStore.getState().token;
+    try {
+      const token = useAuthStore.getState().token;
 
-        if (!token) {
-          setError('Not authenticated');
-          return;
-        }
-
-        const session = await getSession(token);
-        const studentId = session?.studentId || session?._id;
-
-        if (!studentId) {
-          setError('Student ID not found');
-          return;
-        }
-
-        const data = await getResultsByStudentId(studentId, token);
-
-        setStudent((data?.student as unknown as StudentProfile) || null);
-        setResults((data?.results as unknown as ResultRow[]) || []);
-      } catch (err) {
-        console.error('Failed to load:', err);
-        setError('Failed to load results');
-      } finally {
-        setLoading(false);
+      if (!token) {
+        setError('Not authenticated');
+        return;
       }
-    };
 
-    loadAll();
-  }, []);
+      const session: any = await getSession(token);
+
+      const studentId =
+        session?.studentId ??
+        session?.student?.studentId ??
+        session?.data?.studentId ??
+        session?.data?.student?.studentId;
+
+      if (!studentId) {
+        setError('Student ID not found');
+        return;
+      }
+
+      console.log('LOGIN STUDENT ID:', studentId);
+
+      const response: any = await getResultsByStudentId(studentId, token);
+
+      console.log('RESULT FUNCTION RESPONSE:', response);
+
+      /*
+       * எல்லா possible API response shapes-ஐயும் support பண்ணும்:
+       *
+       * 1. { results: [...] }
+       * 2. { data: [...] }
+       * 3. { data: { results: [...] } }
+       * 4. Direct array [...]
+       */
+      const resultList: any[] = Array.isArray(response)
+        ? response
+        : Array.isArray(response?.results)
+          ? response.results
+          : Array.isArray(response?.data)
+            ? response.data
+            : Array.isArray(response?.data?.results)
+              ? response.data.results
+              : [];
+
+      console.log('RESULT LIST:', resultList);
+
+      const normalizedResults: ResultRow[] = resultList.flatMap(
+        (result: any, resultIndex: number) => {
+          if (!Array.isArray(result?.modules)) {
+            return [];
+          }
+
+          return result.modules.map((module: any, moduleIndex: number) => ({
+            _id:
+              module?._id ??
+              `${result?._id ?? result?.studentId ?? resultIndex}-${
+                module?.moduleName ?? 'module'
+              }-${moduleIndex}`,
+
+            title: result?.title ?? null,
+            moduleId: module?.moduleId ?? null,
+            moduleName: module?.moduleName?.trim() || 'Unknown Module',
+            examType: module?.examType ?? null,
+
+            marks:
+              module?.marks !== null && module?.marks !== undefined
+                ? Number(module.marks)
+                : null,
+
+            maxMarks:
+              module?.maxMarks !== null && module?.maxMarks !== undefined
+                ? Number(module.maxMarks)
+                : 100,
+
+            grade: module?.grade ?? null,
+            result: module?.result ?? null,
+            hasResult: module?.hasResult,
+
+            batch: result?.batch ?? '',
+            semester: result?.semester ?? null,
+
+            date:
+              result?.date ??
+              result?.createdAt ??
+              result?.updatedAt ??
+              null,
+
+            createdAt: result?.createdAt ?? null,
+            updatedAt: result?.updatedAt ?? null,
+          }));
+        },
+      );
+
+      console.log('NORMALIZED RESULTS:', normalizedResults);
+
+      setStudent(
+        response?.student
+          ? (response.student as StudentProfile)
+          : (session as StudentProfile),
+      );
+
+      setResults(normalizedResults);
+    } catch (err) {
+      console.error('Failed to load results:', err);
+      setResults([]);
+      setError('Failed to load results');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  void loadAll();
+}, []);
 
   const modules = useMemo(
     () => [...new Set(results.map((r) => r.moduleName).filter(Boolean))],
@@ -159,10 +249,7 @@ export default function ResultsSection() {
     return map;
   }, [modules, results]);
 
-  const semesters = useMemo(
-    () => [...new Set(results.map((r) => r.semester).filter(Boolean))] as string[],
-    [results],
-  );
+  
 
   const filtered = useMemo(() => {
     const from = fromDate ? new Date(`${fromDate}T00:00:00`).getTime() : null;
@@ -170,15 +257,13 @@ export default function ResultsSection() {
 
     return results.filter((row) => {
       if (moduleFilter !== 'all' && row.moduleName !== moduleFilter) return false;
-      if (semesterFilter !== 'all' && row.semester !== semesterFilter) return false;
 
-      const current = dateValue(row.date);
-      if (from !== null && (current === null || current < from)) return false;
+const current = dateValue(getResultDate(row));      if (from !== null && (current === null || current < from)) return false;
       if (to !== null && (current === null || current > to)) return false;
 
       return true;
     });
-  }, [fromDate, moduleFilter, results, semesterFilter, toDate]);
+  }, [fromDate, moduleFilter, results, toDate]);
 
   const rows: ResultWithCode[] = useMemo(
     () =>
@@ -220,7 +305,6 @@ export default function ResultsSection() {
 
   const handleClearFilters = () => {
     setModuleFilter('all');
-    setSemesterFilter('all');
     setFromDate('');
     setToDate('');
   };
@@ -233,7 +317,7 @@ export default function ResultsSection() {
       row.examType || '',
       row.marks != null ? `${row.marks}/${row.maxMarks ?? 100}` : '',
       row.grade || '',
-      formatDate(row.date),
+formatDate(getResultDate(row)),
       row.semester || '',
     ]);
 
@@ -309,7 +393,7 @@ export default function ResultsSection() {
           <h2 className="text-sm font-semibold text-[#101828]">Filter Results</h2>
         </div>
 
-        <div className="grid grid-cols-1 gap-3 md:grid-cols-4">
+        <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
           <div>
             <label className="mb-1.5 block text-[11px] font-medium text-[#667085]">
               Module
@@ -328,23 +412,7 @@ export default function ResultsSection() {
             </select>
           </div>
 
-          <div>
-            <label className="mb-1.5 block text-[11px] font-medium text-[#667085]">
-              Semester
-            </label>
-            <select
-              value={semesterFilter}
-              onChange={(event) => setSemesterFilter(event.target.value)}
-              className={inputCls}
-            >
-              <option value="all">All Semesters</option>
-              {semesters.map((semester) => (
-                <option key={semester} value={semester}>
-                  {semester}
-                </option>
-              ))}
-            </select>
-          </div>
+        
 
           <div>
             <label className="mb-1.5 block text-[11px] font-medium text-[#667085]">
@@ -369,13 +437,14 @@ export default function ResultsSection() {
               className={inputCls}
             />
           </div>
+           
         </div>
+        
 
         <div className="mt-4 flex flex-col gap-3 border-t border-[#F2F4F7] pt-4 sm:flex-row sm:items-center sm:justify-between">
           <p className="text-xs text-[#98A2B3]">
             {rows.length} result{rows.length === 1 ? '' : 's'} found
           </p>
-
           <div className="grid grid-cols-2 gap-2 sm:flex sm:flex-wrap">
             <button
               type="button"
@@ -384,14 +453,7 @@ export default function ResultsSection() {
             >
               Clear Filters
             </button>
-            <button
-              type="button"
-              onClick={handleDownloadCSV}
-              className="inline-flex h-8 items-center justify-center gap-1.5 rounded-lg bg-[#008AD8] px-3 text-xs font-semibold text-white transition hover:bg-[#0078BC] sm:px-4"
-            >
-              <Download className="h-3.5 w-3.5" />
-              Download CSV
-            </button>
+           
           </div>
         </div>
       </section>
@@ -522,14 +584,7 @@ export default function ResultsSection() {
                       </p>
                       <p className="mt-1 text-[#667085]">{formatDate(row.date)}</p>
                     </div>
-                    <div>
-                      <p className="text-[10px] font-semibold uppercase text-[#98A2B3]">
-                        Semester
-                      </p>
-                      <span className="mt-1 inline-flex rounded-full bg-blue-50 px-2.5 py-1 text-[11px] font-semibold text-[#2E90FA]">
-                        {row.semester || 'Semester'}
-                      </span>
-                    </div>
+                    
                   </div>
                 </article>
               ))}
@@ -545,7 +600,6 @@ export default function ResultsSection() {
                     <th className="px-3 py-3 font-semibold lg:px-5">Marks</th>
                     <th className="px-3 py-3 font-semibold lg:px-5">Grade</th>
                     <th className="px-3 py-3 font-semibold lg:px-5">Date</th>
-                    <th className="px-3 py-3 font-semibold lg:px-5">Semester</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-[#F2F4F7]">
@@ -590,11 +644,7 @@ export default function ResultsSection() {
                       <td className="px-3 py-4 text-xs text-[#667085] lg:px-5">
                         {formatDate(row.date)}
                       </td>
-                      <td className="px-3 py-4 lg:px-5">
-                        <span className="inline-flex rounded-full bg-blue-50 px-2.5 py-1 text-[11px] font-semibold text-[#2E90FA]">
-                          {row.semester || 'Semester'}
-                        </span>
-                      </td>
+                     
                     </tr>
                   ))}
                 </tbody>

@@ -22,8 +22,7 @@ const api = axios.create({
 const readStoredToken = (): string | null => {
   if (typeof window === 'undefined') return null;
 
-  // In-memory token first. This covers the "Remember me" OFF case where the
-  // token lives only in the zustand store and is not written to storage.
+
   const stateToken = useAuthStore.getState().token;
   if (stateToken) return stateToken;
 
