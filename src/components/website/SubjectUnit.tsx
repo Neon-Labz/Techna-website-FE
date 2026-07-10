@@ -2,10 +2,10 @@
 
 import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import Link from 'next/link';
-import { Clock, Calendar, Loader2, Home, ChevronRight, ArrowLeft } from 'lucide-react';
+import { Clock, Calendar, Loader2, ArrowLeft } from 'lucide-react';
 import api from '@/lib/axios';
 import { subjectUnitsByName, SubjectUnitDetail } from '@/data/subjectUnits';
+import PageHero from './PageHero';
 
 interface ApiModule {
   _id: string;
@@ -77,47 +77,30 @@ export default function SubjectUnit() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <div
-        className="relative overflow-hidden py-12 sm:py-16"
-        style={{ background: 'linear-gradient(90deg, #0183CB, #34BFF3)' }}
+      <PageHero
+        title={module.name}
+        subtitle={module.description}
+        breadcrumb={[
+          { label: 'Home', href: '/' },
+          { label: 'Subjects', href: '/modules' },
+        ]}
+        currentPage={module.name}
       >
-        <div className="relative mx-auto flex max-w-7xl flex-col items-center px-4 text-center sm:px-6 lg:px-8">
-          <nav className="mb-5 flex flex-wrap items-center justify-center gap-1.5 text-xs text-white/80 sm:mb-6 sm:text-sm">
-            <Home className="h-3.5 w-3.5" />
-            <Link href="/" className="transition-colors hover:text-white">
-              Home
-            </Link>
-            <ChevronRight className="h-3.5 w-3.5" />
-            <Link href="/modules" className="transition-colors hover:text-white">
-              Subjects
-            </Link>
-            <ChevronRight className="h-3.5 w-3.5" />
-            <span className="font-medium text-white">{module.name}</span>
-          </nav>
-
-          <h1 className="text-3xl font-bold text-white sm:text-4xl md:text-5xl">
-            {module.name}
-          </h1>
-          <p className="mx-auto mt-3 max-w-2xl text-sm leading-relaxed text-white/80 sm:text-base">
-            {module.description}
-          </p>
-
-          <div className="mt-5 flex flex-wrap justify-center gap-3 text-xs text-white/90 sm:gap-5 sm:text-sm">
-            {module.duration && (
-              <span className="flex items-center gap-1.5">
-                <Clock className="h-4 w-4" />
-                {module.duration}
-              </span>
-            )}
-            {module.term && (
-              <span className="flex items-center gap-1.5">
-                <Calendar className="h-4 w-4" />
-                {module.term}
-              </span>
-            )}
-          </div>
+        <div className="mt-5 flex flex-wrap justify-center gap-3 text-xs text-white/90 sm:gap-5 sm:text-sm">
+          {module.duration && (
+            <span className="flex items-center gap-1.5">
+              <Clock className="h-4 w-4" />
+              {module.duration}
+            </span>
+          )}
+          {module.term && (
+            <span className="flex items-center gap-1.5">
+              <Calendar className="h-4 w-4" />
+              {module.term}
+            </span>
+          )}
         </div>
-      </div>
+      </PageHero>
 
       <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 sm:py-12 lg:px-8">
         <button
@@ -141,10 +124,10 @@ export default function SubjectUnit() {
               <table className="w-full min-w-[640px] text-left text-xs sm:text-sm">
                 <thead>
                   <tr className="bg-[#0183CB]/10 text-[#1B1C1C]">
-                    <th className="w-32 whitespace-nowrap p-3 font-semibold sm:w-40 sm:p-4">
+                    <th className="w-32 whitespace-nowrap border-r border-[#E5E7EB] p-3 font-semibold sm:w-40 sm:p-4">
                       தவணை
                     </th>
-                    <th className="p-3 font-semibold sm:p-4">
+                    <th className="border-r border-[#E5E7EB] p-3 font-semibold sm:p-4">
                       தரம் 12 பாடத்திட்டம்
                     </th>
                     <th className="p-3 font-semibold sm:p-4">
@@ -163,12 +146,12 @@ export default function SubjectUnit() {
                         {i === 0 && (
                           <td
                             rowSpan={rowCount}
-                            className="p-3 align-top font-medium text-[#0183CB] sm:p-4"
+                            className="border-r border-[#E5E7EB] p-3 align-top font-medium text-[#0183CB] sm:p-4"
                           >
                             {term}
                           </td>
                         )}
-                        <td className="p-3 align-top sm:p-4">
+                          <td className="border-r border-[#E5E7EB] p-3 align-top sm:p-4">
                           {g12[i] && (
                             <>
                               <span className="mr-2 font-semibold text-gray-500">
@@ -178,7 +161,7 @@ export default function SubjectUnit() {
                             </>
                           )}
                         </td>
-                        <td className="p-3 align-top sm:p-4">
+                        <td className="border-r border-[#E5E7EB]  p-3 align-top sm:p-4">
                           {g13[i] && (
                             <>
                               <span className="mr-2 font-semibold text-gray-500">

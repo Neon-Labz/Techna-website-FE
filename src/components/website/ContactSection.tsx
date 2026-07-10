@@ -2,6 +2,7 @@
 import { useState } from 'react';
 import { Phone, Mail, MapPin, Clock, Send, MessageCircle, Check } from 'lucide-react';
 import { sendContactMessage } from '../../api/contact.api';
+import PageHero from './PageHero';
 
 export default function ContactSection() {
   const [form, setForm] = useState({ name: '', email: '', phone: '', subject: '', message: '' });
@@ -106,30 +107,11 @@ export default function ContactSection() {
 
   return (
     <div className="min-h-screen bg-white">
-      {/* Hero Section */}
-      <div
-        className="relative overflow-hidden min-h-[220px] sm:min-h-[260px] lg:h-[294px] bg-cover bg-center bg-no-repeat py-10 sm:py-12 lg:py-0"
-        style={{
-          backgroundImage: "url('/contact_hero.png')",
-          backgroundColor: '#0183CB',
-        }}
-      >
-        {/* Content container */}
-        <div className="relative lg:absolute lg:left-1/2 lg:-translate-x-1/2 lg:top-[80px] w-full max-w-[896px] px-4 sm:px-6 mx-auto">
-          {/* GET IN TOUCH */}
-          <p className="text-center text-xs sm:text-sm font-semibold tracking-[1.4px] uppercase text-white leading-5">
-            GET IN TOUCH
-          </p>
-          {/* Contact Us */}
-          <h1 className="text-center text-[32px] sm:text-[40px] lg:text-[48px] font-bold text-white leading-[1.15] lg:leading-[48px] mt-3">
-            Contact Us
-          </h1>
-          {/* Subtitle */}
-          <p className="text-center text-sm sm:text-base lg:text-lg text-white opacity-90 leading-[1.6] lg:leading-[29px] mt-4 sm:mt-5 max-w-[685px] mx-auto">
-            Have questions about admissions, courses, or anything else? We&apos;re here to help!
-          </p>
-        </div>
-      </div>
+      <PageHero
+        title="Contact Us"
+        subtitle="Have questions about admissions, courses, or anything else? We're here to help!"
+        currentPage="Contact Us"
+      />
 
       {/* Main Content */}
       <div className="relative" style={{ background: 'rgba(1, 131, 203, 0.05)' }}>
@@ -173,7 +155,7 @@ export default function ContactSection() {
                   </div>
                   <div className="min-w-0">
                     <p className="text-xs font-bold uppercase tracking-[0.3px] text-[#1F2937]">ADDRESS</p>
-                    <p className="text-lg font-bold text-[#1F2937] mt-0.5">Verasigam Hall 3rd floor, Jaffna</p>
+                    <p className="text-lg font-bold text-[#1F2937] mt-0.5">Veerasingam Hall, 3rd Floor, Jaffna</p>
                     <p className="text-sm text-[#6B7280] mt-0.5">Sri Lanka</p>
                   </div>
                 </div>
@@ -214,7 +196,7 @@ export default function ContactSection() {
               {/* Location Mini Block */}
               <div className="bg-white border border-[#F3F4F6] rounded-2xl p-6 shadow-[0px_1px_3px_rgba(0,0,0,0.1),0px_1px_2px_-1px_rgba(0,0,0,0.1)] flex flex-col items-center justify-center">
                 <MapPin className="w-8 h-8 text-[#34BFF3] mb-2" strokeWidth={2.67} />
-                <p className="text-sm font-medium text-[#99A1AF] text-center">Verasigam Hall 3rd floor</p>
+                <p className="text-sm font-medium text-[#99A1AF] text-center">Veerasingam Hall, 3rd Floor</p>
                 <p className="text-xs text-[#99A1AF] text-center">Jaffna, Sri Lanka</p>
               </div>
             </div>
