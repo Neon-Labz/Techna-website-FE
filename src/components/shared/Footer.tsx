@@ -1,6 +1,12 @@
 import Link from 'next/link';
 import { Phone, Mail, MapPin } from 'lucide-react';
 import Image from 'next/image';
+import {
+  FaFacebookF,
+  FaYoutube,
+  FaLinkedinIn,
+  FaInstagram,
+} from 'react-icons/fa';
 
 export default function Footer() {
   return (
@@ -29,59 +35,44 @@ export default function Footer() {
                 Build Your Dreams with Technology
               </p>
 
-              <div className="flex gap-3">
-                <a
-                  href="#"
-                  className="w-10 h-10 rounded-xl flex items-center justify-center transition-all"
-                  style={{ background: '#0183CB' }}
-                >
-                  <svg width="18" height="18" fill="white" viewBox="0 0 24 24">
-                    <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z" />
-                  </svg>
-                </a>
+            <div className="flex gap-3">
+  <a
+    href="https://www.facebook.com/share/1BmffY511q/"
+    target="_blank"
+    rel="noopener noreferrer"
+    className="w-10 h-10 rounded-xl bg-[#1877F2] hover:opacity-90 flex items-center justify-center transition"
+  >
+    <FaFacebookF className="text-white text-lg" />
+  </a>
 
-                <a
-                  href="#"
-                  className="w-10 h-10 rounded-xl flex items-center justify-center transition-all"
-                  style={{ background: '#0183CB' }}
-                >
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                    <path d="M10 8L16 12L10 16V8Z" fill="white" />
-                  </svg>
-                </a>
+  <a
+    href="https://www.youtube.com/@techna"
+    target="_blank"
+    rel="noopener noreferrer"
+    className="w-10 h-10 rounded-xl bg-[#FF0000] hover:opacity-90 flex items-center justify-center transition"
+  >
+    <FaYoutube className="text-white text-lg" />
+  </a>
 
-                <a
-                  href="#"
-                  className="w-10 h-10 rounded-xl flex items-center justify-center transition-all"
-                  style={{ background: '#0183CB' }}
-                >
-                  <svg width="18" height="18" fill="white" viewBox="0 0 24 24">
-                    <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z" />
-                    <rect x="2" y="9" width="4" height="12" />
-                    <circle cx="4" cy="4" r="2" />
-                  </svg>
-                </a>
+  <a
+    href="https://www.linkedin.com/company/techna"
+    target="_blank"
+    rel="noopener noreferrer"
+    className="w-10 h-10 rounded-xl bg-[#0A66C2] hover:opacity-90 flex items-center justify-center transition"
+  >
+    <FaLinkedinIn className="text-white text-lg" />
+  </a>
 
-                <a
-                  href="#"
-                  className="w-10 h-10 rounded-xl flex items-center justify-center transition-all"
-                  style={{ background: '#0183CB' }}
-                >
-                  <svg
-                    width="18"
-                    height="18"
-                    fill="none"
-                    stroke="white"
-                    strokeWidth="2"
-                    viewBox="0 0 24 24"
-                  >
-                    <rect x="2" y="2" width="20" height="20" rx="5" ry="5" />
-                    <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" />
-                    <line x1="17.5" y1="6.5" x2="17.51" y2="6.5" />
-                  </svg>
-                </a>
-              </div>
-            </div>
+  <a
+    href="https://www.instagram.com/techna_technical_institute?igsh=N2lmaTVqMG12eXVu"
+    target="_blank"
+    rel="noopener noreferrer"
+    className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#F58529] via-[#DD2A7B] to-[#8134AF] hover:opacity-90 flex items-center justify-center transition"
+  >
+    <FaInstagram className="text-white text-lg" />
+  </a>
+</div>
+</div>
 
             {/* Quick Links */}
             <div>
