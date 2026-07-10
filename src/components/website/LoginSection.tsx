@@ -103,13 +103,13 @@ export default function LoginSection() {
       alt="Techna Logo"
       width={200}
       height={200}
-      className="block w-[220px] h-auto object-contain -mb-10"
+      className="block w-[220px] h-[180px] object-contain -mb-10"
     />
             <h1 className="text-[30px] font-extrabold text-slate-800 leading-9 -mt-6">
               Welcome Back
             </h1>
             <p className="text-slate-500 text-base font-medium mt-2">
-              Sign in to My Techna LMS
+              Sign in to My Techna 
             </p>
           </div>
 

@@ -544,7 +544,7 @@ export default function RegisterSection() {
   </h1>
 
   <p className="text-slate-500 text-base font-medium mt-0">
-    Sign up to My Techna LMS
+    Sign up to My Techna 
   </p> 
 </div>
           <div className="mb-6">

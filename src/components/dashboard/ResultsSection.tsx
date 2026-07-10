@@ -12,7 +12,7 @@ import {
 } from 'lucide-react';
 import { useAuthStore } from '../../store/authStore';
 import { getSession } from '../../api/auth.api';
-import { getResultsByStudentId } from '../../api/exam.api';
+import { getResultsByStudentId } from '../../api/result.api';
 
 interface StudentProfile {
   _id?: string;
@@ -33,7 +33,11 @@ interface ResultRow {
   moduleName: string;
   examType?: string | null;
   batch?: string;
+
   date?: string | null;
+  createdAt?: string | null;
+  updatedAt?: string | null;
+
   semester?: string | null;
   marks?: number | null;
   maxMarks?: number | null;
@@ -61,6 +65,7 @@ const getPercent = (row: ResultRow) => {
 
 const formatDate = (value?: string | null) => {
   if (!value) return '-';
+  
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) return value;
   return date.toLocaleDateString('en-GB', {
@@ -69,6 +74,8 @@ const formatDate = (value?: string | null) => {
     year: 'numeric',
   });
 };
+const getResultDate = (row: ResultRow) =>
+  row.date || row.createdAt || row.updatedAt || null;
 
 const dateValue = (value?: string | null) => {
   if (!value) return null;
@@ -108,41 +115,125 @@ export default function ResultsSection() {
   const [fromDate, setFromDate] = useState('');
   const [toDate, setToDate] = useState('');
 
-  useEffect(() => {
-    const loadAll = async () => {
-      setLoading(true);
-      setError(null);
+ useEffect(() => {
+  const loadAll = async () => {
+    setLoading(true);
+    setError(null);
 
-      try {
-        const token = useAuthStore.getState().token;
+    try {
+      const token = useAuthStore.getState().token;
 
-        if (!token) {
-          setError('Not authenticated');
-          return;
-        }
-
-        const session = await getSession(token);
-        const studentId = session?.studentId || session?._id;
-
-        if (!studentId) {
-          setError('Student ID not found');
-          return;
-        }
-
-        const data = await getResultsByStudentId(studentId, token);
-
-        setStudent((data?.student as unknown as StudentProfile) || null);
-        setResults((data?.results as unknown as ResultRow[]) || []);
-      } catch (err) {
-        console.error('Failed to load:', err);
-        setError('Failed to load results');
-      } finally {
-        setLoading(false);
+      if (!token) {
+        setError('Not authenticated');
+        return;
       }
-    };
 
-    loadAll();
-  }, []);
+      const session: any = await getSession(token);
+
+      const studentId =
+        session?.studentId ??
+        session?.student?.studentId ??
+        session?.data?.studentId ??
+        session?.data?.student?.studentId;
+
+      if (!studentId) {
+        setError('Student ID not found');
+        return;
+      }
+
+      console.log('LOGIN STUDENT ID:', studentId);
+
+      const response: any = await getResultsByStudentId(studentId, token);
+
+      console.log('RESULT FUNCTION RESPONSE:', response);
+
+      /*
+       * எல்லா possible API response shapes-ஐயும் support பண்ணும்:
+       *
+       * 1. { results: [...] }
+       * 2. { data: [...] }
+       * 3. { data: { results: [...] } }
+       * 4. Direct array [...]
+       */
+      const resultList: any[] = Array.isArray(response)
+        ? response
+        : Array.isArray(response?.results)
+          ? response.results
+          : Array.isArray(response?.data)
+            ? response.data
+            : Array.isArray(response?.data?.results)
+              ? response.data.results
+              : [];
+
+      console.log('RESULT LIST:', resultList);
+
+      const normalizedResults: ResultRow[] = resultList.flatMap(
+        (result: any, resultIndex: number) => {
+          if (!Array.isArray(result?.modules)) {
+            return [];
+          }
+
+          return result.modules.map((module: any, moduleIndex: number) => ({
+            _id:
+              module?._id ??
+              `${result?._id ?? result?.studentId ?? resultIndex}-${
+                module?.moduleName ?? 'module'
+              }-${moduleIndex}`,
+
+            title: result?.title ?? null,
+            moduleId: module?.moduleId ?? null,
+            moduleName: module?.moduleName?.trim() || 'Unknown Module',
+            examType: module?.examType ?? null,
+
+            marks:
+              module?.marks !== null && module?.marks !== undefined
+                ? Number(module.marks)
+                : null,
+
+            maxMarks:
+              module?.maxMarks !== null && module?.maxMarks !== undefined
+                ? Number(module.maxMarks)
+                : 100,
+
+            grade: module?.grade ?? null,
+            result: module?.result ?? null,
+            hasResult: module?.hasResult,
+
+            batch: result?.batch ?? '',
+            semester: result?.semester ?? null,
+
+            date:
+              result?.date ??
+              result?.createdAt ??
+              result?.updatedAt ??
+              null,
+
+            createdAt: result?.createdAt ?? null,
+            updatedAt: result?.updatedAt ?? null,
+          }));
+        },
+      );
+
+      console.log('NORMALIZED RESULTS:', normalizedResults);
+
+      setStudent(
+        response?.student
+          ? (response.student as StudentProfile)
+          : (session as StudentProfile),
+      );
+
+      setResults(normalizedResults);
+    } catch (err) {
+      console.error('Failed to load results:', err);
+      setResults([]);
+      setError('Failed to load results');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  void loadAll();
+}, []);
 
   const modules = useMemo(
     () => [...new Set(results.map((r) => r.moduleName).filter(Boolean))],
@@ -167,8 +258,7 @@ export default function ResultsSection() {
     return results.filter((row) => {
       if (moduleFilter !== 'all' && row.moduleName !== moduleFilter) return false;
 
-      const current = dateValue(row.date);
-      if (from !== null && (current === null || current < from)) return false;
+const current = dateValue(getResultDate(row));      if (from !== null && (current === null || current < from)) return false;
       if (to !== null && (current === null || current > to)) return false;
 
       return true;
@@ -227,7 +317,7 @@ export default function ResultsSection() {
       row.examType || '',
       row.marks != null ? `${row.marks}/${row.maxMarks ?? 100}` : '',
       row.grade || '',
-      formatDate(row.date),
+formatDate(getResultDate(row)),
       row.semester || '',
     ]);
 
