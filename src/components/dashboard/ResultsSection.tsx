@@ -130,6 +130,7 @@ export default function ResultsSection() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [moduleFilter, setModuleFilter] = useState('all');
+  const [semesterFilter, setSemesterFilter] = useState('all');
   const [fromDate, setFromDate] = useState('');
   const [toDate, setToDate] = useState('');
 
@@ -258,6 +259,15 @@ export default function ResultsSection() {
     [results],
   );
 
+  const semesters = useMemo(
+    () => [
+      ...new Set(
+        results.map((r) => r.semester).filter((s): s is string => Boolean(s)),
+      ),
+    ],
+    [results],
+  );
+
   const moduleCodeMap = useMemo(() => {
     const map = new Map<string, string>();
     modules.forEach((moduleName, index) => {
@@ -275,13 +285,15 @@ export default function ResultsSection() {
 
     return results.filter((row) => {
       if (moduleFilter !== 'all' && row.moduleName !== moduleFilter) return false;
+      if (semesterFilter !== 'all' && row.semester !== semesterFilter) return false;
 
-const current = dateValue(getResultDate(row));      if (from !== null && (current === null || current < from)) return false;
+      const current = dateValue(getResultDate(row));
+      if (from !== null && (current === null || current < from)) return false;
       if (to !== null && (current === null || current > to)) return false;
 
       return true;
     });
-  }, [fromDate, moduleFilter, results, toDate]);
+  }, [fromDate, moduleFilter, semesterFilter, results, toDate]);
 
   const rows: ResultWithCode[] = useMemo(
     () =>
@@ -323,6 +335,7 @@ const current = dateValue(getResultDate(row));      if (from !== null && (curren
 
   const handleClearFilters = () => {
     setModuleFilter('all');
+    setSemesterFilter('all');
     setFromDate('');
     setToDate('');
   };
