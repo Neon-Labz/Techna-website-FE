@@ -117,65 +117,146 @@ export default function PaymentsSection() {
     .reduce((a, p) => a + (p.amount ?? 0), 0);
 
   const generateReceipt = (payment: PaymentRecord) => {
-    const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
-    const pageW = 210;
+    const drawReceipt = (logoDataUrl?: string) => {
+      const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+      const pageW = doc.internal.pageSize.getWidth();
+      const pageH = doc.internal.pageSize.getHeight();
+      const blue = { r: 0, g: 174, b: 219 };
+      const darkBlue = { r: 0, g: 122, b: 204 };
 
-    doc.setFont('helvetica', 'bold');
-    doc.setFontSize(28);
-    doc.text('TECHNA', pageW / 2, 25, { align: 'center' });
+      // Header strip
+      doc.setFillColor(blue.r, blue.g, blue.b);
+      doc.rect(0, 0, pageW, 8, 'F');
 
-    doc.setFontSize(13);
-    doc.text('PAYMENT RECEIPT', pageW / 2, 42, { align: 'center' });
+      // Center logo above email
+      if (logoDataUrl) {
+        try {
+          const imgProps = doc.getImageProperties(logoDataUrl);
+          const logoW = 50;
+          const logoH = (imgProps.height * logoW) / imgProps.width;
+          doc.addImage(logoDataUrl, 'PNG', (pageW - logoW) / 2, 2, logoW, logoH);
+        } catch (err) {
+          console.warn('Logo could not be added to receipt:', err);
+        }
+      }
 
-    doc.setLineWidth(0.5);
-    doc.line(14, 50, pageW - 14, 50);
+      // Contact details
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(8.5);
+      doc.setTextColor(80, 80, 80);
+      doc.text(
+        'Email: technatechnicalinstitute@gmail.com  |  Contact: +94 77 170 3549',
+        pageW / 2,
+        36,
+        { align: 'center' },
+      );
 
-    let y = 65;
-
-    const row = (label: string, value?: string) => {
+      // Title
       doc.setFont('helvetica', 'bold');
-      doc.setFontSize(10);
-      doc.text(label, 20, y);
+      doc.setFontSize(14);
+      doc.setTextColor(darkBlue.r, darkBlue.g, darkBlue.b);
+      doc.text('PAYMENT RECEIPT', pageW / 2, 52, { align: 'center' });
+
+      doc.setDrawColor(blue.r, blue.g, blue.b);
+      doc.setLineWidth(0.6);
+      doc.line(14, 60, pageW - 14, 60);
+
+      let y = 74;
+
+      const sectionTitle = (title: string) => {
+        doc.setFillColor(blue.r, blue.g, blue.b);
+        doc.rect(16, y - 5, 3, 8, 'F');
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(9);
+        doc.setTextColor(darkBlue.r, darkBlue.g, darkBlue.b);
+        doc.text(title, 23, y + 1);
+        y += 12;
+      };
+
+      const row = (label: string, value?: string, shade = false) => {
+        if (shade) {
+          doc.setFillColor(240, 250, 255);
+          doc.roundedRect(16, y - 5, pageW - 32, 9, 2, 2, 'F');
+        }
+
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(8.8);
+        doc.setTextColor(90, 100, 120);
+        doc.text(label, 20, y);
+
+        doc.setFont('helvetica', 'normal');
+        doc.setTextColor(35, 35, 35);
+        doc.text(String(value || '-'), 75, y);
+        y += 10;
+      };
+
+      sectionTitle('STUDENT INFORMATION');
+      row('Student Name', studentInfo.name, true);
+      row('Admission No', studentInfo.admissionNumber);
+      row('Batch', studentInfo.batch, true);
+
+      y += 6;
+      sectionTitle('PAYMENT DETAILS');
+      row('Receipt No', payment.receiptNo, true);
+      row('Subject', payment.moduleName);
+      row('Amount', `LKR ${(payment.amount ?? 0).toLocaleString()}.00`, true);
+      row('Method', payment.method);
+      row('Date', formatDate(payment.paidDate), true);
+      row('Status', (payment.status ?? '-').toUpperCase());
+      row('Notes', payment.notes ?? '-', true);
+
+      y += 10;
+      doc.setFillColor(blue.r, blue.g, blue.b);
+      doc.roundedRect(16, y, pageW - 32, 24, 5, 5, 'F');
 
       doc.setFont('helvetica', 'normal');
-      doc.text(value || '-', 75, y);
-      y += 9;
+      doc.setFontSize(9);
+      doc.setTextColor(210, 240, 255);
+      doc.text('TOTAL AMOUNT PAID', pageW / 2, y + 8, { align: 'center' });
+
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(18);
+      doc.setTextColor(255, 255, 255);
+      doc.text(
+        `LKR ${(payment.amount ?? 0).toLocaleString()}.00`,
+        pageW / 2,
+        y + 18,
+        { align: 'center' },
+      );
+
+      // Footer strip
+      doc.setFillColor(blue.r, blue.g, blue.b);
+      doc.rect(0, pageH - 12, pageW, 12, 'F');
+
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(7);
+      doc.setTextColor(255, 255, 255);
+      doc.text(
+        'This is a computer-generated receipt. No signature required.',
+        pageW / 2,
+        pageH - 5,
+        { align: 'center' },
+      );
+
+      doc.save(`${payment.receiptNo || 'receipt'}.pdf`);
     };
 
-    row('Student Name', studentInfo.name);
-    row('Admission No', studentInfo.admissionNumber);
-    row('Batch', studentInfo.batch);
-
-    y += 5;
-
-    row('Receipt No', payment.receiptNo);
-    row('Subject', payment.moduleName);
-    row('Amount', `LKR ${(payment.amount ?? 0).toLocaleString()}.00`);
-    row('Method', payment.method);
-    row('Date', formatDate(payment.paidDate));
-    row('Status', (payment.status ?? '-').toUpperCase());
-    row('Notes', payment.notes ?? '-');
-
-    y += 15;
-
-    doc.setFont('helvetica', 'bold');
-    doc.setFontSize(18);
-    doc.text(`TOTAL: LKR ${(payment.amount ?? 0).toLocaleString()}.00`, pageW / 2, y, {
-      align: 'center',
-    });
-
-    y += 20;
-
-    doc.setFont('helvetica', 'italic');
-    doc.setFontSize(8);
-    doc.text(
-      'This is a computer-generated receipt. No signature required.',
-      pageW / 2,
-      y,
-      { align: 'center' },
-    );
-
-    doc.save(`${payment.receiptNo || 'receipt'}.pdf`);
+    fetch('/new.png')
+      .then((res) => {
+        if (!res.ok) throw new Error('Logo not found');
+        return res.blob();
+      })
+      .then(
+        (blob) =>
+          new Promise<string>((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onloadend = () => resolve(reader.result as string);
+            reader.onerror = reject;
+            reader.readAsDataURL(blob);
+          }),
+      )
+      .then((dataUrl) => drawReceipt(dataUrl))
+      .catch(() => drawReceipt());
   };
 
   if (loading) {

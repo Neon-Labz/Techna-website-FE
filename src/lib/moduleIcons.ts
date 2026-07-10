@@ -23,30 +23,32 @@ export const subjectsConfig: { name: string; icon: LucideIcon; order: number }[]
 
 const DEFAULT_ICON: LucideIcon = BookOpen;
 
-/** Returns the fixed icon for a subject name. Falls back to BookOpen if not found. */
+
+function normalize(name: string): string {
+  return name
+    .trim()
+    .toLowerCase()
+    .replace(/\s*\([^)]*\)\s*$/, '')
+    .trim();
+}
 export function getModuleIcon(name: string): LucideIcon {
-  const match = subjectsConfig.find(
-    (s) => s.name.trim().toLowerCase() === name.trim().toLowerCase()
-  );
+  const target = normalize(name);
+  const match = subjectsConfig.find((s) => normalize(s.name) === target);
 
   if (!match && process.env.NODE_ENV !== 'production') {
     console.warn(
-      `[moduleIcons] No icon mapping found for subject "${name}". Falling back to default icon. Check subjectsConfig in src/lib/moduleIcons.ts for a name mismatch.`
+      `[moduleIcons] No icon mapping found for subject "${name}" (normalized: "${target}"). Falling back to default icon. Check subjectsConfig in src/lib/moduleIcons.ts.`
     );
   }
 
   return match?.icon ?? DEFAULT_ICON;
 }
-
-/** Sorts any array of modules (from API) into the fixed order above. Unknown subjects go last, in original relative order. */
 export function sortModulesByConfig<T extends { name: string }>(modules: T[]): T[] {
-  const orderMap = new Map(
-    subjectsConfig.map((s) => [s.name.trim().toLowerCase(), s.order])
-  );
+  const orderMap = new Map(subjectsConfig.map((s) => [normalize(s.name), s.order]));
 
   return [...modules].sort((a, b) => {
-    const orderA = orderMap.get(a.name.trim().toLowerCase()) ?? 999;
-    const orderB = orderMap.get(b.name.trim().toLowerCase()) ?? 999;
+    const orderA = orderMap.get(normalize(a.name)) ?? 999;
+    const orderB = orderMap.get(normalize(b.name)) ?? 999;
     return orderA - orderB;
   });
 }
