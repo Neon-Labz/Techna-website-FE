@@ -482,7 +482,7 @@ export default function RegisterSection() {
       <div className="absolute inset-0 bg-black/55" />
 
       <div className="relative max-w-3xl mx-auto w-full">
-        <div className="flex items-center justify-between mb-8 px-2 pt-6">
+        <div className="flex items-center justify-between mb-12 px-2 pt-6">
           {STEPS.map((s, i) => {
             const Icon = s.icon;
             const active = step === s.id;
@@ -528,12 +528,25 @@ export default function RegisterSection() {
           })}
         </div>
 
-        <div className="bg-white rounded-3xl shadow-2xl p-6 md:p-10">
-          <div className="text-center mb-5">
-            <Image src="/techna-logo.png" alt="Techna Logo" width={150} height={150} className="mx-auto rounded-full" />
-            <h1 className="text-[30px] font-extrabold text-slate-800 leading-9 mt-1">Techna Technical Institute</h1>
-            <p className="text-slate-500 text-base font-medium mt-2">Sign up to your Techna LMS</p>
-          </div>
+       <div className="bg-white rounded-3xl shadow-2xl px-6 pt-0 pb-10 md:px-10 md:pt-0 md:pb-10">
+
+<div className="text-center -mt-6 mb-0">
+  <Image
+    src="/new.png"
+    alt="Techna Logo"
+    width={220}
+    height={220}
+    className="mx-auto w-[220px] h-auto object-contain -mb-14"
+  />
+
+  <h1 className="text-[30px] font-extrabold text-slate-800 leading-9 -mt-10">
+    Techna Technical Institute
+  </h1>
+
+  <p className="text-slate-500 text-base font-medium mt-0">
+    Sign up to My Techna
+  </p>
+</div>
           <div className="mb-6">
             <h2 className="text-xl font-bold text-gray-900">{STEPS[step - 1].label}</h2>
             <p className="text-gray-500 text-sm">{STEPS[step - 1].desc}</p>
