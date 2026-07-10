@@ -115,19 +115,16 @@ export default function TeacherProfileSection() {
   return (
     <div className="min-h-screen bg-[#FCF8FF]">
 
-      {/* ── Hero Banner ── */}
       <section
         className="py-16 relative overflow-hidden"
         style={{ background: 'linear-gradient(90deg, #0183CB 25%, #34BFF3 95%)' }}
       >
-        {/* decorative circles */}
         <div className="absolute inset-0 opacity-10 pointer-events-none">
           <div className="absolute top-8 left-1/4 w-32 h-32 rounded-full border-4 border-white" />
           <div className="absolute bottom-4 right-1/3 w-48 h-48 rounded-full border-4 border-white" />
         </div>
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative">
-          {/* Breadcrumb — Home > Subjects > Teacher Details */}
           <nav className="flex items-center justify-center flex-wrap gap-1.5 mb-6"
             style={{ color: '#DAD7FF', fontSize: '11px', fontWeight: 500 }}
           >
@@ -139,7 +136,6 @@ export default function TeacherProfileSection() {
             <span>Teacher Details</span>
           </nav>
 
-          {/* Subject / page title — 30px, #DAD7FF, Inter 700 */}
           <h1
             className="font-bold"
             style={{ fontSize: '30px', lineHeight: '38px', letterSpacing: '-0.6px', color: '#DAD7FF' }}
@@ -147,7 +143,6 @@ export default function TeacherProfileSection() {
             {breadcrumbSubject || 'Teacher Profile'}
           </h1>
 
-          {/* Subtitle — 14px, #DAD7FF, Inter 400 */}
           <p
             className="mt-3 mx-auto text-center"
             style={{ fontSize: '14px', lineHeight: '20px', color: '#DAD7FF', maxWidth: '612px' }}
@@ -159,10 +154,8 @@ export default function TeacherProfileSection() {
         </div>
       </section>
 
-      {/* ── Body ── */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
 
-        {/* Back to Subjects — 12px, #34BFF3, tracking 0.6px, weight 600 */}
         <Link
           href="/modules"
           className="inline-flex items-center gap-2 font-semibold hover:opacity-80 transition-opacity mb-8"
@@ -171,13 +164,10 @@ export default function TeacherProfileSection() {
           <ArrowLeft className="w-4 h-4" /> Back to Subjects
         </Link>
 
-        {/* 3-col grid: left sidebar (1 col) + details canvas (2 cols) */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
 
-          {/* ─────── LEFT COLUMN ─────── */}
           <div className="lg:col-span-1 space-y-5">
 
-            {/* Photo card */}
             <div className="bg-white rounded-3xl shadow-xl overflow-hidden p-2">
               <div
                 className="relative rounded-2xl overflow-hidden bg-[#E4E1EE]"
@@ -196,14 +186,12 @@ export default function TeacherProfileSection() {
                     </span>
                   </div>
                 )}
-                {/* Verified badge — bottom-right, #34BFF3, rounded-2xl */}
                 <div className="absolute bottom-2 right-2 w-14 h-14 bg-[#34BFF3] rounded-2xl flex items-center justify-center shadow-lg">
                   <CheckCircle2 className="text-white w-8 h-8" />
                 </div>
               </div>
             </div>
 
-            {/* Academic Qualifications card */}
             {hasCredentials && (
               <div
                 className="border border-[#E2E8F0] rounded-xl p-8"
@@ -213,7 +201,6 @@ export default function TeacherProfileSection() {
                   backdropFilter: 'blur(5px)',
                 }}
               >
-                {/* Card heading */}
                 <div className="flex items-center gap-2 mb-6">
                   <GraduationCap className="w-6 h-6 shrink-0" style={{ color: '#0059BB' }} />
                   <h3
@@ -224,7 +211,6 @@ export default function TeacherProfileSection() {
                   </h3>
                 </div>
 
-                {/* Degree entries — pill left strip */}
                 <div className="space-y-5">
                   {degreeEntries.map((deg, i) => (
                     <div key={i} className="flex gap-5 items-stretch min-h-[44px]">
@@ -269,7 +255,6 @@ export default function TeacherProfileSection() {
               </div>
             )}
 
-            {/* Awards & Honors card */}
             {hasAwards && (
               <div
                 className="border border-[#E2E8F0] rounded-xl p-8"
@@ -278,7 +263,6 @@ export default function TeacherProfileSection() {
                   boxShadow: '0px 4px 20px rgba(0,0,0,0.05)',
                 }}
               >
-                {/* Card heading */}
                 <div className="flex items-center gap-2 mb-6">
                   <Award className="w-6 h-6 shrink-0" style={{ color: '#9E3D00' }} />
                   <h3
@@ -289,7 +273,6 @@ export default function TeacherProfileSection() {
                   </h3>
                 </div>
 
-                {/* Award items */}
                 <div className="space-y-3">
                   {teacher.awards!.map((award, i) => (
                     <div
@@ -301,7 +284,6 @@ export default function TeacherProfileSection() {
                         borderRadius: '8px',
                       }}
                     >
-                      {/* Trophy icon — dark brown/orange per Figma */}
                       <div className="shrink-0 mt-0.5">
                         <Award className="w-5 h-5" style={{ color: '#9E3D00' }} />
                       </div>
@@ -318,7 +300,6 @@ export default function TeacherProfileSection() {
             )}
           </div>
 
-          {/* ─────── RIGHT COLUMN (Details Canvas) ─────── */}
           <div className="lg:col-span-2">
             <div
               className="bg-white rounded-3xl p-8 md:p-10"
@@ -328,12 +309,10 @@ export default function TeacherProfileSection() {
                 borderRadius: '24px',
               }}
             >
-              {/* Faculty badge + Name + experience + qualification */}
               <div
                 className="pb-8 mb-8"
                 style={{ borderBottom: '1px solid rgba(199, 196, 216, 0.2)' }}
               >
-                {/* "Faculty Member" badge */}
                 <span
                   className="inline-block px-3 mb-4"
                   style={{
@@ -349,7 +328,6 @@ export default function TeacherProfileSection() {
                   Faculty Member
                 </span>
 
-                {/* Teacher name — Inter 30px 700 #1B1B24 */}
                 <div className="flex flex-wrap items-baseline gap-x-2 gap-y-1">
                   <h2
                     className="font-bold text-[#1B1B24]"
@@ -367,7 +345,6 @@ export default function TeacherProfileSection() {
                   )}
                 </div>
 
-                {/* Qualification below name — Inter 16px 400 #464555 */}
                 {teacher.qualification && (
                   <p
                     className="mt-1 text-[#464555]"
@@ -378,7 +355,6 @@ export default function TeacherProfileSection() {
                 )}
               </div>
 
-              {/* Subjects Teaching + Areas of Specialization (side-by-side) */}
               {(subjects.length > 0 || hasSpecializations) && (
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
 
@@ -394,7 +370,6 @@ export default function TeacherProfileSection() {
                         boxShadow: '0px 4px 20px rgba(0,0,0,0.05)',
                       }}
                     >
-                      {/* Subjects Teaching heading */}
                       <h3
                         className="font-semibold text-[#1B1C1C] mb-5"
                         style={{ ...MONTSERRAT, fontSize: '24px', lineHeight: '32px' }}
@@ -429,7 +404,6 @@ export default function TeacherProfileSection() {
                         boxShadow: '0px 4px 20px rgba(0,0,0,0.05)',
                       }}
                     >
-                      {/* Areas of Specialization heading */}
                       <h3
                         className="font-semibold text-[#1B1C1C] mb-5"
                         style={{ ...MONTSERRAT, fontSize: '24px', lineHeight: '32px' }}
@@ -458,10 +432,8 @@ export default function TeacherProfileSection() {
                 </div>
               )}
 
-              {/* Professional Biography — shown only if bio exists */}
               {biography && (
                 <div className="mb-8">
-                  {/* Heading — Montserrat 32px 700 #0183CB */}
                   <h2
                     className="font-bold text-[#0183CB] mb-5 flex items-center gap-3"
                     style={{ ...MONTSERRAT, fontSize: '32px', lineHeight: '40px' }}
@@ -470,7 +442,6 @@ export default function TeacherProfileSection() {
                     Professional Biography
                   </h2>
 
-                  {/* Body text — Inter 18px 400 #414754 line-height 29px */}
                   <p
                     className="text-[#414754]"
                     style={{ fontSize: '18px', lineHeight: '29px' }}
@@ -480,7 +451,6 @@ export default function TeacherProfileSection() {
                 </div>
               )}
 
-              {/* Contact row */}
               <div
                 className="flex flex-col sm:flex-row gap-4 pt-6"
                 style={{ borderTop: '1px solid rgba(199, 196, 216, 0.2)', fontSize: '14px' }}

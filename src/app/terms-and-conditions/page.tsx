@@ -173,7 +173,6 @@ export default function TermsAndConditions() {
 
   return (
     <main className="w-full">
-      {/* Hero Banner */}
       <section
         className="relative w-full overflow-hidden"
         style={{
@@ -184,7 +183,6 @@ export default function TermsAndConditions() {
         <div className="pointer-events-none absolute right-10 top-8 w-72 h-72 rounded-full border border-white/10" />
 
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 text-center">
-          {/* Breadcrumb */}
           <div className="flex items-center justify-center gap-2 text-sm text-white/90 mb-6">
             <Link href="/" className="flex items-center gap-1 hover:text-white">
               <Home className="w-4 h-4" />
@@ -204,7 +202,6 @@ export default function TermsAndConditions() {
             {t.heroDesc}
           </p>
 
-          {/* Language toggle */}
           <div className="inline-flex items-center gap-1 bg-white/15 backdrop-blur-sm rounded-full p-1 border border-white/30">
             <button
               onClick={() => setLang('ta')}
@@ -228,7 +225,6 @@ export default function TermsAndConditions() {
         </div>
       </section>
 
-      {/* Rules & Regulations */}
       <section className="bg-gray-50 py-16">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <h2
@@ -252,7 +248,6 @@ export default function TermsAndConditions() {
         </div>
       </section>
 
-      {/* Terms & Conditions */}
       <section className="bg-white py-16 border-t border-gray-100">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <h2

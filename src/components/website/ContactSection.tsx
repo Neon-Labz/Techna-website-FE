@@ -63,7 +63,6 @@ export default function ContactSection() {
 
   const updateField = (key: keyof typeof form, value: string) => {
     setForm(f => ({ ...f, [key]: value }));
-    // Clear the field error as the user corrects it
     setFieldErrors(prev => {
       if (!prev[key]) return prev;
       const next = { ...prev };
@@ -113,13 +112,10 @@ export default function ContactSection() {
         currentPage="Contact Us"
       />
 
-      {/* Main Content */}
       <div className="relative" style={{ background: 'rgba(1, 131, 203, 0.05)' }}>
         <div className="max-w-7xl mx-auto px-4 sm:px-5 lg:px-4 py-8 sm:py-12">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8">
-            {/* Left Column - Contact Details */}
             <div className="lg:col-span-5 space-y-4">
-              {/* Phone Card */}
               <div className="bg-white border border-[#F3F4F6] rounded-xl p-6 shadow-[0px_4px_20px_rgba(0,0,0,0.05)]">
                 <div className="flex items-start gap-4">
                   <div className="w-12 h-12 bg-[#F0F9FF] rounded-lg flex items-center justify-center shrink-0">
@@ -133,7 +129,6 @@ export default function ContactSection() {
                 </div>
               </div>
 
-              {/* Email Card */}
               <div className="bg-white border border-[#F3F4F6] rounded-xl p-6 shadow-[0px_4px_20px_rgba(0,0,0,0.05)]">
                 <div className="flex items-start gap-4">
                   <div className="w-12 h-12 bg-[#F0F9FF] rounded-lg flex items-center justify-center shrink-0">
@@ -147,7 +142,6 @@ export default function ContactSection() {
                 </div>
               </div>
 
-              {/* Address Card */}
               <div className="bg-white border border-[#F3F4F6] rounded-xl p-6 shadow-[0px_4px_20px_rgba(0,0,0,0.05)]">
                 <div className="flex items-start gap-4">
                   <div className="w-12 h-12 bg-[#F0F9FF] rounded-lg flex items-center justify-center shrink-0">
@@ -161,7 +155,6 @@ export default function ContactSection() {
                 </div>
               </div>
 
-              {/* Office Hours Card */}
               <div className="bg-white border border-[#F3F4F6] rounded-xl p-6 shadow-[0px_4px_20px_rgba(0,0,0,0.05)]">
                 <div className="flex items-start gap-4">
                   <div className="w-12 h-12 bg-[#F0F9FF] rounded-lg flex items-center justify-center shrink-0">
@@ -175,7 +168,6 @@ export default function ContactSection() {
                 </div>
               </div>
 
-              {/* WhatsApp Button */}
               <a
                 href={whatsappUrl}
                 target="_blank"
@@ -193,7 +185,6 @@ export default function ContactSection() {
                 </div>
               </a>
 
-              {/* Location Mini Block */}
               <div className="bg-white border border-[#F3F4F6] rounded-2xl p-6 shadow-[0px_1px_3px_rgba(0,0,0,0.1),0px_1px_2px_-1px_rgba(0,0,0,0.1)] flex flex-col items-center justify-center">
                 <MapPin className="w-8 h-8 text-[#34BFF3] mb-2" strokeWidth={2.67} />
                 <p className="text-sm font-medium text-[#99A1AF] text-center">Veerasingam Hall, 3rd Floor</p>
@@ -201,7 +192,6 @@ export default function ContactSection() {
               </div>
             </div>
 
-            {/* Right Column - Contact Form */}
             <div className="lg:col-span-7">
               <div className="bg-white border border-[#F3F4F6] rounded-2xl p-5 sm:p-8 lg:p-12 shadow-[0px_4px_20px_rgba(0,0,0,0.05)]">
                 {sent ? (

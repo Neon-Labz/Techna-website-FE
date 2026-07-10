@@ -52,8 +52,7 @@ export default function NoticesSection({
       try {
         const data = await announcementApi.getAll();
         if (isMounted) setAnnouncements(Array.isArray(data) ? data : []);
-      } catch (error) {
-        console.log('Announcements load error:', error);
+      } catch {
         if (isMounted) setAnnouncements([]);
       } finally {
         if (isMounted) setLoading(false);

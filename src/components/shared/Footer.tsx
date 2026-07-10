@@ -14,7 +14,6 @@ export default function Footer() {
       <div className="w-full border-t border-gray-200 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10">
-            {/* Brand */}
             <div className="flex flex-col items-start text-left">
               <div className="w-[240px] h-[72px] flex items-start justify-start overflow-hidden">
                 <Image
@@ -74,7 +73,6 @@ export default function Footer() {
 </div>
 </div>
 
-            {/* Quick Links */}
             <div>
               <h4
                 className="font-bold mb-5 text-[18px] uppercase"
@@ -103,7 +101,6 @@ export default function Footer() {
               </ul>
             </div>
 
-            {/* Subjects */}
             <div>
               <h4
                 className="font-bold mb-5 text-[18px] uppercase"
@@ -132,7 +129,6 @@ export default function Footer() {
               </ul>
             </div>
 
-            {/* Contact */}
             <div>
               <h4
                 className="font-bold mb-5 text-[18px] uppercase"

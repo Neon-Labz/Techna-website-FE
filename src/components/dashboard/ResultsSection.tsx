@@ -160,20 +160,8 @@ export default function ResultsSection() {
         return;
       }
 
-      console.log('LOGIN STUDENT ID:', studentId);
-
       const response: any = await getResultsByStudentId(studentId, token);
 
-      console.log('RESULT FUNCTION RESPONSE:', response);
-
-      /*
-       * எல்லா possible API response shapes-ஐயும் support பண்ணும்:
-       *
-       * 1. { results: [...] }
-       * 2. { data: [...] }
-       * 3. { data: { results: [...] } }
-       * 4. Direct array [...]
-       */
       const resultList: any[] = Array.isArray(response)
         ? response
         : Array.isArray(response?.results)
@@ -183,8 +171,6 @@ export default function ResultsSection() {
             : Array.isArray(response?.data?.results)
               ? response.data.results
               : [];
-
-      console.log('RESULT LIST:', resultList);
 
       const normalizedResults: ResultRow[] = resultList.flatMap(
         (result: any, resultIndex: number) => {
@@ -232,8 +218,6 @@ export default function ResultsSection() {
           }));
         },
       );
-
-      console.log('NORMALIZED RESULTS:', normalizedResults);
 
       setStudent(
         response?.student
@@ -344,11 +328,9 @@ export default function ResultsSection() {
     const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
     const pageWidth = pdf.internal.pageSize.getWidth();
 
-    // Header background
     pdf.setFillColor(0, 138, 216);
     pdf.rect(0, 0, pageWidth, 32, 'F');
 
-    // Header text
     pdf.setTextColor(255, 255, 255);
     pdf.setFont('helvetica', 'bold');
     pdf.setFontSize(18);
@@ -358,7 +340,6 @@ export default function ResultsSection() {
     pdf.setFontSize(10);
     pdf.text('Techna - School Management System', pageWidth / 2, 22, { align: 'center' });
 
-    // Student info section
     let yPos = 40;
     pdf.setTextColor(31, 41, 55);
     pdf.setFont('helvetica', 'bold');
@@ -382,14 +363,12 @@ export default function ResultsSection() {
       yPos += 6;
     }
 
-    // Summary stats
     pdf.text(`Total Exams: ${rows.length}`, pageWidth - 60, 48);
     pdf.text(`Overall Average: ${averageScore}%`, pageWidth - 60, 54);
     pdf.text(`Generated: ${new Date().toLocaleDateString('en-GB')}`, pageWidth - 60, 60);
 
     yPos += 6;
 
-    // Results table
     const tableHeaders = [['Module', 'Code', 'Exam Type', 'Marks', 'Grade', 'Date', 'Semester']];
     const tableBody = rows.map((row) => [
       row.moduleName,
@@ -431,7 +410,6 @@ export default function ResultsSection() {
       margin: { left: 14, right: 14 },
     });
 
-    // Footer
     const finalY = (pdf as any).lastAutoTable?.finalY ?? yPos + 20;
     pdf.setFontSize(8);
     pdf.setTextColor(150, 150, 150);

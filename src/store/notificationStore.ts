@@ -10,7 +10,6 @@ interface NotificationState {
   loading: boolean;
   socket: Socket | null;
 
-  // Actions
   connect: (token: string, batch?: string) => void;
   disconnect: () => void;
   fetchNotifications: (query?: NotificationQuery) => Promise<void>;
@@ -69,7 +68,6 @@ export const useNotificationStore = create<NotificationState>((set, get) => ({
     const existing = get().socket;
     if (existing?.connected) return;
 
-    // Disconnect any stale socket
     existing?.disconnect();
 
     const socket = io(`${SOCKET_URL}/notifications`, {
@@ -81,9 +79,6 @@ export const useNotificationStore = create<NotificationState>((set, get) => ({
     });
 
     socket.on('connect', () => {
-      console.log('[Notifications] WebSocket connected');
-
-      // Join batch room if student has a batch
       if (batch) {
         socket.emit('join-batch', { batch });
       }
@@ -91,10 +86,6 @@ export const useNotificationStore = create<NotificationState>((set, get) => ({
 
     socket.on('notification', (notification: Notification) => {
       get().addNotification(notification);
-    });
-
-    socket.on('disconnect', (reason: string) => {
-      console.log('[Notifications] WebSocket disconnected:', reason);
     });
 
     socket.on('connect_error', (err: Error) => {

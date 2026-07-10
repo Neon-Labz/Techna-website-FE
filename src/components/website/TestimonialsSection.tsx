@@ -59,7 +59,6 @@ export default function TestimonialsSection() {
   const [page, setPage] = useState(0);
   const [itemsPerPage, setItemsPerPage] = useState(3);
 
-  // Update items per page on resize
   if (typeof window !== 'undefined') {
     // eslint-disable-next-line react-hooks/rules-of-hooks
     const { useEffect } = require('react');
@@ -82,7 +81,6 @@ export default function TestimonialsSection() {
     <section className="py-10 sm:py-14 lg:py-20 bg-white overflow-hidden">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
-        {/* Header */}
         <div className="text-center mb-8 sm:mb-10 lg:mb-12">
           <span className="text-[#34BFF3] font-semibold text-[11px] sm:text-[12px] uppercase tracking-[0.12em]">
             WHAT OUR STUDENTS SAY
@@ -92,27 +90,22 @@ export default function TestimonialsSection() {
           </h2>
         </div>
 
-        {/* Cards */}
-        {/* iPhone SE: 1 col | iPad Air: 2 cols | Desktop: 3 cols */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5 lg:gap-6">
           {visible.map((t) => (
             <div
               key={t.name}
               className="bg-white border border-[#e5e7eb] rounded-2xl p-4 sm:p-5 lg:p-6 shadow-sm hover:shadow-md transition-all duration-300 flex flex-col gap-3 sm:gap-4"
             >
-              {/* Stars */}
               <div className="flex items-center gap-0.5">
                 {[...Array(t.rating)].map((_, i) => (
                   <Star key={i} className="w-[15px] h-[15px] sm:w-[16px] sm:h-[16px] lg:w-[18px] lg:h-[18px] fill-[#FBBF24] text-[#FBBF24]" />
                 ))}
               </div>
 
-              {/* Quote */}
               <p className="text-[#374151] text-[13px] sm:text-[13.5px] lg:text-[14px] leading-relaxed flex-1">
                 {t.text}
               </p>
 
-              {/* Avatar + Name */}
               <div className="flex items-center gap-3 mt-1 sm:mt-2">
                 <div className="w-[38px] h-[38px] sm:w-[40px] sm:h-[40px] lg:w-[44px] lg:h-[44px] rounded-full bg-[#e5e7eb] overflow-hidden shrink-0">
                   <img
@@ -134,7 +127,6 @@ export default function TestimonialsSection() {
           ))}
         </div>
 
-        {/* Dots */}
         <div className="flex items-center justify-center gap-2 mt-8 sm:mt-10">
           {[...Array(totalPages)].map((_, i) => (
             <button

@@ -92,7 +92,6 @@ export default function LoginSection() {
         backgroundRepeat: 'no-repeat',
       }}
     >
-      {/* Dark overlay so the white card stays readable over the photo */}
       <div className="absolute inset-0 bg-black/55" />
 
       <div className="w-full max-w-md relative z-10 mt-8 sm:mt-12">

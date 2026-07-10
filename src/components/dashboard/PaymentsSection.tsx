@@ -124,11 +124,9 @@ export default function PaymentsSection() {
       const blue = { r: 0, g: 174, b: 219 };
       const darkBlue = { r: 0, g: 122, b: 204 };
 
-      // Header strip
       doc.setFillColor(blue.r, blue.g, blue.b);
       doc.rect(0, 0, pageW, 8, 'F');
 
-      // Center logo above email
       if (logoDataUrl) {
         try {
           const imgProps = doc.getImageProperties(logoDataUrl);
@@ -140,7 +138,6 @@ export default function PaymentsSection() {
         }
       }
 
-      // Contact details
       doc.setFont('helvetica', 'normal');
       doc.setFontSize(8.5);
       doc.setTextColor(80, 80, 80);
@@ -151,7 +148,6 @@ export default function PaymentsSection() {
         { align: 'center' },
       );
 
-      // Title
       doc.setFont('helvetica', 'bold');
       doc.setFontSize(14);
       doc.setTextColor(darkBlue.r, darkBlue.g, darkBlue.b);
@@ -224,7 +220,6 @@ export default function PaymentsSection() {
         { align: 'center' },
       );
 
-      // Footer strip
       doc.setFillColor(blue.r, blue.g, blue.b);
       doc.rect(0, pageH - 12, pageW, 12, 'F');
 

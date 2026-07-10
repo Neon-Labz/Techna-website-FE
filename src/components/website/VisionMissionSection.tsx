@@ -7,7 +7,6 @@ export default function VisionMissionSection() {
     <section className="bg-white py-20">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="grid items-center gap-16 lg:grid-cols-[500px_1fr]">
-        {/* Left Image */}
         <div className="relative aspect-square w-full max-w-[500px] overflow-hidden rounded-2xl shadow-xl">
             <Image
                 src="/vision.jpeg"
@@ -17,7 +16,6 @@ export default function VisionMissionSection() {
             />
             </div>
 
-        {/* Right Content */}
         <div>
           <p className="mb-2 text-xs font-bold uppercase tracking-[4px] text-[#34BFF3]">
             STRATEGIC FRAMEWORK

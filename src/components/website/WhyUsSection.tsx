@@ -45,7 +45,6 @@ export default function WhyUsSection() {
     <section className="py-10 sm:py-14 lg:py-20 bg-[#EEF6FB]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
-        {/* Header */}
         <div className="text-center mb-8 sm:mb-10 lg:mb-14">
           <span className="text-[#34BFF3] font-semibold text-[11px] sm:text-[12px] uppercase tracking-[0.12em]">
             WHY CHOOSE US
@@ -56,8 +55,6 @@ export default function WhyUsSection() {
           <div className="w-12 h-[3px] bg-[#34BFF3] rounded-full mx-auto mt-4" />
         </div>
 
-        {/* Features Grid */}
-        {/* iPhone SE: 2 cols | iPad Air: 3 cols | Desktop: 6 cols */}
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4 sm:gap-5 lg:gap-6">
           {features.map((f) => {
             const Icon = f.icon;
@@ -66,7 +63,6 @@ export default function WhyUsSection() {
                 key={f.title}
                 className="flex flex-col items-center text-center group"
               >
-                {/* Icon Circle */}
                 <div className="w-[64px] h-[64px] sm:w-[72px] sm:h-[72px] lg:w-[80px] lg:h-[80px] rounded-full bg-white shadow-sm flex items-center justify-center mb-3 sm:mb-4 lg:mb-5 group-hover:shadow-md transition-shadow duration-200">
                   <Icon
                     style={{ color: '#0183CB' }}
@@ -74,12 +70,10 @@ export default function WhyUsSection() {
                   />
                 </div>
 
-                {/* Title */}
                 <h3 className="text-[#0a0a0f] font-bold text-[12px] sm:text-[13px] lg:text-[14px] mb-1 sm:mb-2">
                   {f.title}
                 </h3>
 
-                {/* Description */}
                 <p className="text-[#6b7280] text-[11px] sm:text-[12px] leading-relaxed">
                   {f.desc}
                 </p>

@@ -23,7 +23,6 @@ export default function PublicHeader() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-20">
 
-          {/* ✅ Mobile: ml-[-35px], Desktop: ml-[-60px] */}
         <Link
   href="/"
   className="flex items-center h-full flex-shrink-0 ml-[-35px] md:ml-[-60px]"
@@ -37,7 +36,6 @@ export default function PublicHeader() {
     priority
   />
 </Link>
-          {/* Desktop Nav */}
           <nav className="hidden md:flex items-center gap-0">
             {navLinks.map(link => (
               <Link
@@ -54,7 +52,6 @@ export default function PublicHeader() {
             ))}
           </nav>
 
-          {/* Auth Buttons */}
           <div className="hidden md:flex items-center gap-4">
             <button
               onClick={() => router.push('/login')}
@@ -70,7 +67,6 @@ export default function PublicHeader() {
             </button>
           </div>
 
-          {/* Mobile Toggle */}
           <button
             className="md:hidden p-2 rounded-lg text-gray-700 hover:bg-gray-100"
             onClick={() => setMenuOpen(!menuOpen)}
@@ -80,7 +76,6 @@ export default function PublicHeader() {
           </button>
         </div>
 
-        {/* Mobile Menu */}
         {menuOpen && (
           <div className="md:hidden pb-4 border-t border-gray-100">
             <div className="flex flex-col gap-1 pt-3">

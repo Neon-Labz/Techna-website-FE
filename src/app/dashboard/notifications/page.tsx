@@ -70,7 +70,6 @@ export default function NotificationsPage() {
 
   return (
     <div className="max-w-3xl mx-auto">
-      {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Notifications</h1>
@@ -91,7 +90,6 @@ export default function NotificationsPage() {
         )}
       </div>
 
-      {/* Notification List */}
       <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
         {loading && notifications.length === 0 ? (
           <div className="p-12 text-center">
@@ -160,7 +158,6 @@ export default function NotificationsPage() {
         )}
       </div>
 
-      {/* Footer count */}
       {total > notifications.length && (
         <p className="text-center text-sm text-gray-400 mt-4">
           Showing {notifications.length} of {total} notifications

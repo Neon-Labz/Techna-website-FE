@@ -982,7 +982,6 @@ export default function RegisterSection() {
             </div>
           )}
 
-          {/* Navigation Buttons */}
           <div className="mt-8 pt-6 border-t border-gray-100 space-y-3">
             <div className="text-center">
               <span className="text-xs text-gray-400">Step {step} of {STEPS.length}</span>

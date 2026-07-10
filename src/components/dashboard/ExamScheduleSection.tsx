@@ -118,7 +118,6 @@ export default function ExamScheduleSection() {
 
   return (
     <div className="space-y-6">
-      {/* Header Banner */}
       <div className="bg-gradient-to-r from-blue-950 to-blue-800 rounded-3xl p-6 text-white relative overflow-hidden">
         <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/4" />
         <div className="relative flex items-center justify-between flex-wrap gap-4">
@@ -145,7 +144,6 @@ export default function ExamScheduleSection() {
         </div>
       </div>
 
-      {/* Filters */}
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5">
         <div className="flex items-center gap-2 mb-4">
           <Filter className="w-4 h-4 text-blue-700" />
@@ -187,14 +185,12 @@ export default function ExamScheduleSection() {
         )}
       </div>
 
-      {/* Loading */}
       {loading && (
         <div className="flex items-center justify-center py-16">
           <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-700" />
         </div>
       )}
 
-      {/* Error */}
       {!loading && error && (
         <div className="bg-red-50 border border-red-200 rounded-2xl p-6 flex items-center gap-3 text-red-700">
           <AlertCircle className="w-5 h-5 shrink-0" />
@@ -202,7 +198,6 @@ export default function ExamScheduleSection() {
         </div>
       )}
 
-      {/* Empty State */}
       {!loading && !error && filtered.length === 0 && (
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 py-16 text-center">
           <ClipboardList className="w-12 h-12 mx-auto text-gray-300 mb-3" />
@@ -211,7 +206,6 @@ export default function ExamScheduleSection() {
         </div>
       )}
 
-      {/* Upcoming Exams */}
       {!loading && !error && upcoming.length > 0 && (
         <div>
           <h2 className="text-sm font-bold text-gray-700 flex items-center gap-2 mb-3">
@@ -224,7 +218,6 @@ export default function ExamScheduleSection() {
         </div>
       )}
 
-      {/* Past Exams */}
       {!loading && !error && past.length > 0 && (
         <div>
           <h2 className="text-sm font-bold text-gray-700 flex items-center gap-2 mb-3">

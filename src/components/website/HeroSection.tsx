@@ -31,7 +31,6 @@ export default function HeroSection() {
   return (
     <section className="relative w-full flex items-center overflow-hidden bg-[#0a0a0f] h-[520px] sm:h-[580px] lg:h-[640px]">
 
-      {/* Background image carousel */}
       <div className="absolute inset-0 overflow-hidden" style={{ opacity: 0.32 }}>
         {heroImages.map((img, index) => (
           <div
@@ -49,20 +48,15 @@ export default function HeroSection() {
         ))}
       </div>
 
-      {/* Dark overlay gradient */}
       <div className="absolute inset-0 [background:linear-gradient(90deg,rgba(10,10,15,0.88)_0%,rgba(10,10,15,0.5)_55%,rgba(10,10,15,0.1)_100%)]" />
 
-      {/* Grid texture */}
       <div className="absolute inset-0 pointer-events-none [background-image:linear-gradient(rgba(244,241,235,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(244,241,235,0.03)_1px,transparent_1px)] [background-size:64px_44px]" />
 
-      {/* Top accent bar */}
       <div className="absolute top-0 left-0 right-0 h-[3px] [background:linear-gradient(90deg,transparent,rgba(217,217,217,0.7),transparent)]" />
 
-      {/* Glow blobs */}
       <div className="absolute rounded-full pointer-events-none -left-[6%] top-[8%] w-[200px] h-[200px] sm:w-[300px] sm:h-[300px] lg:w-[380px] lg:h-[380px] bg-[rgba(232,184,75,0.06)] blur-[100px]" />
       <div className="absolute rounded-full pointer-events-none right-[20%] bottom-[10%] w-[140px] h-[140px] sm:w-[200px] sm:h-[200px] lg:w-[240px] lg:h-[240px] bg-[rgba(42,93,224,0.06)] blur-[90px]" />
 
-      {/* Background word — hidden on mobile */}
       <div
         className="hidden sm:block absolute top-1/2 -translate-y-1/2 right-[-1%] select-none pointer-events-none leading-none whitespace-nowrap"
         style={{
@@ -75,15 +69,12 @@ export default function HeroSection() {
         TECHNA
       </div>
 
-      {/* Corner marks */}
       <div className="absolute top-4 right-4 w-7 h-7 border-t-[1.5px] border-r-[1.5px] border-[rgba(232,184,75,0.35)] opacity-60" />
       <div className="absolute bottom-4 left-4 w-7 h-7 border-b-[1.5px] border-l-[1.5px] border-[rgba(232,184,75,0.35)] opacity-60" />
 
-      {/* MAIN CONTENT */}
       <div className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6">
         <div className="flex flex-col max-w-[520px]">
 
-          {/* Headline */}
           <h1
             className="mb-3 sm:mb-4 lg:mb-5 leading-[0.92]"
             style={{
@@ -103,7 +94,6 @@ export default function HeroSection() {
             <span className="block text-[#34BFF3]">Technology</span>
           </h1>
 
-          {/* Description */}
           <p
             className="text-white font-medium mb-5 sm:mb-6 lg:mb-7 leading-relaxed text-[12.5px] sm:text-[13.5px] lg:text-[14.5px]"
             style={{ maxWidth: "360px" }}
@@ -115,7 +105,6 @@ export default function HeroSection() {
             innovation and excellence.
           </p>
 
-          {/* CTA Button */}
           <div className="mb-5 sm:mb-6">
             <button
               onClick={() => router.push("/register")}
@@ -132,8 +121,6 @@ export default function HeroSection() {
             </button>
           </div>
 
-          {/* Stats Bar */}
-          {/* iPhone SE: 2x2 grid | iPad Air + Desktop: single row */}
           <div
             className="bg-white rounded-[12px]"
             style={{
@@ -142,7 +129,6 @@ export default function HeroSection() {
               boxShadow: "0 8px 24px rgba(0,0,0,0.08)",
             }}
           >
-            {/* Mobile (iPhone SE) — 2x2 grid */}
             <div className="grid grid-cols-2 sm:hidden px-3 py-2 gap-y-1">
               {stats.map(({ icon: Icon, value, label }, index) => (
                 <div
@@ -170,7 +156,6 @@ export default function HeroSection() {
               ))}
             </div>
 
-            {/* iPad Air + Desktop — single row */}
             <div className="hidden sm:inline-flex items-center px-4 gap-0" style={{ height: "54px" }}>
               {stats.map(({ icon: Icon, value, label }, index) => (
                 <div key={label} className="flex items-center">
@@ -204,7 +189,6 @@ export default function HeroSection() {
         </div>
       </div>
 
-      {/* Side accent — hidden on mobile */}
       <div className="hidden sm:flex absolute right-10 bottom-10 flex-col items-center gap-2 z-10">
         <span
           className="uppercase text-[rgba(244,241,235,0.18)] tracking-[0.15em]"

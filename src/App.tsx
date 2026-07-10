@@ -15,18 +15,15 @@ export default function App() {
   return (
     <BrowserRouter>
       <Routes>
-        {/* Public Routes */}
         <Route element={<PublicLayout />}>
           <Route path="/" element={<HomePage />} />
           <Route path="/modules" element={<ModulesPage />} />
           <Route path="/contact" element={<ContactPage />} />
         </Route>
 
-        {/* Auth Routes (no layout) */}
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
 
-        {/* Private Dashboard Routes */}
         <Route path="/dashboard" element={<PrivateLayout />}>
           <Route index element={<DashboardHome />} />
           <Route path="profile" element={<ProfilePage />} />
@@ -34,7 +31,6 @@ export default function App() {
           <Route path="payments" element={<PaymentsPage />} />
         </Route>
 
-        {/* Fallback */}
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </BrowserRouter>

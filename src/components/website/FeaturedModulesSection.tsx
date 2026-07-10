@@ -29,7 +29,6 @@ export default function FeaturedModulesSection() {
     <section className="py-10 sm:py-14 lg:py-20 bg-[#F8FAFC] overflow-hidden">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
-        {/* Header */}
         <div className="mb-8 sm:mb-10">
           <span className="text-[#34BFF3] font-semibold text-[11px] sm:text-[12px] uppercase tracking-[0.1em]">
             OUR PROGRAMS
@@ -43,7 +42,6 @@ export default function FeaturedModulesSection() {
           </p>
         </div>
 
-        {/* Loading Skeleton */}
         {loading && (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
             {[...Array(3)].map((_, i) => (
@@ -54,7 +52,6 @@ export default function FeaturedModulesSection() {
           </div>
         )}
 
-        {/* Grid */}
         {!loading && visibleModules.length > 0 && (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
             {visibleModules.map((module) => {
@@ -65,7 +62,6 @@ export default function FeaturedModulesSection() {
                   className="group rounded-2xl overflow-hidden border border-[#e5e7eb] shadow-sm hover:shadow-lg transition-all duration-300 hover:-translate-y-1 cursor-pointer bg-white"
                   onClick={() => router.push(`/modules/${module._id}`)}
                 >
-                  {/* Card Top */}
                   <div
                     className="p-5 sm:p-6 relative overflow-hidden"
                     style={{
@@ -88,7 +84,6 @@ export default function FeaturedModulesSection() {
           </div>
         )}
 
-        {/* Show More / Show Less Button */}
         {!loading && hasMore && (
           <div className="flex justify-center mt-8 sm:mt-10">
             <button
@@ -110,7 +105,6 @@ export default function FeaturedModulesSection() {
           </div>
         )}
 
-        {/* Empty State */}
         {!loading && modules.length === 0 && (
           <p className="text-center text-[#6b7280] text-[14px] py-10">
             No programs found.

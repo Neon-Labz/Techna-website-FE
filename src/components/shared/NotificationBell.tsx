@@ -61,7 +61,6 @@ export default function NotificationBell() {
     markAllAsRead,
   } = useNotificationStore();
 
-  // Connect WebSocket when authenticated
   useEffect(() => {
     if (token) {
       connect(token, (student as any)?.batch);
@@ -73,14 +72,12 @@ export default function NotificationBell() {
     };
   }, [token]);
 
-  // Fetch notifications when dropdown opens
   useEffect(() => {
     if (isOpen) {
       fetchNotifications({ limit: 20 });
     }
   }, [isOpen]);
 
-  // Close dropdown on outside click
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
@@ -105,7 +102,6 @@ export default function NotificationBell() {
 
   return (
     <div className="relative" ref={dropdownRef}>
-      {/* Bell Button */}
       <button
         onClick={() => setIsOpen(!isOpen)}
         className={`relative p-2 rounded-lg transition-all ${
@@ -123,10 +119,8 @@ export default function NotificationBell() {
         )}
       </button>
 
-      {/* Dropdown */}
       {isOpen && (
         <div className="absolute right-0 top-full mt-2 w-80 sm:w-96 bg-white rounded-xl shadow-xl border border-gray-200 z-50 overflow-hidden">
-          {/* Header */}
           <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100 bg-gray-50">
             <h3 className="text-sm font-semibold text-gray-900">Notifications</h3>
             <div className="flex items-center gap-2">
@@ -149,7 +143,6 @@ export default function NotificationBell() {
             </div>
           </div>
 
-          {/* Notification List */}
           <div className="max-h-[400px] overflow-y-auto">
             {loading && notifications.length === 0 ? (
               <div className="p-6 text-center text-sm text-gray-500">
@@ -199,7 +192,6 @@ export default function NotificationBell() {
             )}
           </div>
 
-          {/* Footer */}
           {notifications.length > 0 && (
             <div className="px-4 py-2 border-t border-gray-100 bg-gray-50 text-center">
               <span className="text-xs text-gray-500">
