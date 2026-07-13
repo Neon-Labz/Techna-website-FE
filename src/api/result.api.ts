@@ -17,12 +17,8 @@ export const getResultsByStudentId = async (
     },
   );
 
-  console.log('RESULT AXIOS RESPONSE:', response);
 
-  /*
-   * Axios interceptor response.data return பண்ணினாலும்,
-   * normal AxiosResponse return பண்ணினாலும் work ஆகும்.
-   */
+ 
   const body = response?.data ?? response;
 
   const payload =
