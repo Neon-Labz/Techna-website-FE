@@ -21,21 +21,38 @@ interface NotificationState {
 }
 
 const SOCKET_URL = (process.env.NEXT_PUBLIC_SERVER_URL ?? 'http://localhost:4000/api').replace('/api', '');
+
+/**
+ * Some "Welcome to Techna" notifications are meant for ONE specific student only
+ * (e.g. "Welcome SANJEEVAN SARMILAN! Your Student ID is STU142..." or
+ * "Welcome SUREKA APPATHURI! Your Student ID is ESM-2026-008...") but the backend
+ * currently broadcasts them to everyone. Until that's fixed server-side, we detect
+ * the Student ID mentioned inside the message (whatever prefix/format it uses)
+ * and hide it if it doesn't belong to the logged-in student.
+ *
+ * IMPORTANT: This check ONLY applies to that specific "welcome" notification type.
+ * All other notification types (payment_confirmed, payment_reminder, exam_notice,
+ * attendance, timetable, result_published, registration_approved, etc.) always
+ * pass through untouched, even if their message happens to mention a Student ID.
+ */
 function belongsToCurrentStudent(notification: Notification): boolean {
   try {
     const isWelcomeType =
       notification?.type === 'general' && /welcome/i.test(notification?.title ?? '');
 
-    
+    // Not the "welcome" broadcast type -> never filter it out
     if (!isWelcomeType) return true;
 
     const message = `${notification?.title ?? ''} ${notification?.message ?? ''}`;
-    const match = message.match(/STU\d+/i);
 
-    
+    // Generic: grabs whatever ID format comes after "Student ID is"
+    // (works for STU142, ESM-2026-008, ESG-2026-002, or any future prefix)
+    const match = message.match(/Student ID is\s+([A-Za-z0-9\-]+)/i);
+
+    // No student-ID pattern found in the welcome message -> show it
     if (!match) return true;
 
-    const mentionedId = match[0].toUpperCase();
+    const mentionedId = match[1].toUpperCase();
 
     const currentStudent = useAuthStore.getState()?.student as any;
     const currentStudentId =
@@ -44,7 +61,7 @@ function belongsToCurrentStudent(notification: Notification): boolean {
       currentStudent?.id ??
       currentStudent?._id;
 
-    
+    // Can't verify current student yet -> don't hide
     if (!currentStudentId) return true;
 
     return mentionedId === String(currentStudentId).toUpperCase();
