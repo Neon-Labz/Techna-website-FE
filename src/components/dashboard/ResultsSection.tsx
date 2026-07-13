@@ -160,20 +160,10 @@ export default function ResultsSection() {
         return;
       }
 
-      console.log('LOGIN STUDENT ID:', studentId);
 
       const response: any = await getResultsByStudentId(studentId, token);
 
-      console.log('RESULT FUNCTION RESPONSE:', response);
 
-      /*
-       * எல்லா possible API response shapes-ஐயும் support பண்ணும்:
-       *
-       * 1. { results: [...] }
-       * 2. { data: [...] }
-       * 3. { data: { results: [...] } }
-       * 4. Direct array [...]
-       */
       const resultList: any[] = Array.isArray(response)
         ? response
         : Array.isArray(response?.results)
@@ -184,7 +174,6 @@ export default function ResultsSection() {
               ? response.data.results
               : [];
 
-      console.log('RESULT LIST:', resultList);
 
       const normalizedResults: ResultRow[] = resultList.flatMap(
         (result: any, resultIndex: number) => {
@@ -233,7 +222,6 @@ export default function ResultsSection() {
         },
       );
 
-      console.log('NORMALIZED RESULTS:', normalizedResults);
 
       setStudent(
         response?.student
@@ -529,7 +517,7 @@ formatDate(getResultDate(row)),
           <h2 className="text-sm font-semibold text-[#101828]">Filter Results</h2>
         </div>
 
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-4">
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
           <div>
             <label className="mb-2 block text-xs font-medium text-[#344054]">
               Module
@@ -543,24 +531,6 @@ formatDate(getResultDate(row)),
               {modules.map((moduleName) => (
                 <option key={moduleName} value={moduleName}>
                   {moduleName}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          <div>
-            <label className="mb-2 block text-xs font-medium text-[#344054]">
-              Semester
-            </label>
-            <select
-              value={semesterFilter}
-              onChange={(event) => setSemesterFilter(event.target.value)}
-              className={inputCls}
-            >
-              <option value="all">All Semesters</option>
-              {semesters.map((semester) => (
-                <option key={semester} value={semester}>
-                  {semester}
                 </option>
               ))}
             </select>
@@ -597,7 +567,7 @@ formatDate(getResultDate(row)),
             {rows.length} result{rows.length === 1 ? '' : 's'} found
           </p>
 
-          <div className="flex flex-wrap gap-2">
+          <div className="flex flex-wrap gap-1">
             <button
               type="button"
               onClick={handleClearFilters}
@@ -605,14 +575,7 @@ formatDate(getResultDate(row)),
             >
               Clear Filters
             </button>
-            <button
-              type="button"
-              onClick={handleDownloadCSV}
-              className="inline-flex h-8 items-center justify-center gap-1.5 rounded-lg bg-[#008AD8] px-4 text-xs font-semibold text-white transition hover:bg-[#0078BC]"
-            >
-              <Download className="h-3.5 w-3.5" />
-              Download CSV
-            </button>
+            
           </div>
         </div>
       </section>
@@ -625,59 +588,79 @@ formatDate(getResultDate(row)),
           </h2>
         </div>
 
-        <div className="h-[240px] w-full min-w-0">
-          {chartData.length > 0 ? (
-            <div className="grid h-full min-w-0 grid-cols-[34px_minmax(0,1fr)] gap-3">
-              <div className="flex h-[200px] flex-col justify-between text-right text-[10px] text-[#98A2B3]">
-                <span>100</span>
-                <span>75</span>
-                <span>50</span>
-                <span>25</span>
-                <span>0</span>
-              </div>
-              <div className="relative h-full min-w-0 overflow-hidden">
-                <div className="absolute inset-x-0 top-0 h-[200px]">
-                  {[0, 1, 2, 3, 4].map((line) => (
-                    <div
-                      key={line}
-                      className="absolute left-0 right-0 border-t border-dashed border-[#EEF2F6]"
-                      style={{ top: `${line * 25}%` }}
-                    />
-                  ))}
+   <div className="h-[220px] w-full min-w-0">
+  {chartData.length > 0 ? (
+    <div className="grid h-full grid-cols-[42px_minmax(0,1fr)] gap-3">
+      <div className="flex h-[180px] flex-col justify-between pb-1 text-right text-xs text-slate-400">
+        <span>100</span>
+        <span>75</span>
+        <span>50</span>
+        <span>25</span>
+        <span>0</span>
+      </div>
+
+      <div className="relative min-w-0 overflow-visible">
+        <div className="pointer-events-none absolute inset-x-0 top-0 h-[210px]">
+          {[0, 1, 2, 3, 4].map((line) => (
+            <div
+              key={line}
+              className="absolute left-0 right-0 border-t border-dashed border-slate-200"
+              style={{
+                top: `${line * 25}%`,
+              }}
+            />
+          ))}
+        </div>
+
+        <div
+          className="relative grid h-[210px] items-end gap-4"
+          style={{
+            gridTemplateColumns: `repeat(${chartData.length}, minmax(0, 1fr))`,
+          }}
+        >
+          {chartData.map((item) => {
+            const value = Math.min(Math.max(item.average, 0), 100);
+
+            return (
+              <div
+                key={item.code}
+                className="flex h-full min-w-0 flex-col justify-end"
+              >
+                <div className="relative flex h-[210px] w-full items-end">
+                  <span
+                    className="absolute left-1/2 z-10 -translate-x-1/2 text-xs font-semibold text-slate-700"
+                    style={{
+                      bottom: `calc(${value}% + 8px)`,
+                    }}
+                  >
+                    {Math.round(value)}%
+                  </span>
+
+                  <div
+                    title={`${item.code}: ${Math.round(value)}%`}
+                    className="mx-auto w-[85%] rounded-t-lg bg-[#008AD8] shadow-sm transition-all duration-300 hover:bg-[#0078BC]"
+                    style={{
+                      height: `${value}%`,
+                      minHeight: value > 0 ? '6px' : '0px',
+                    }}
+                  />
                 </div>
 
-                <div
-                  className="relative grid h-[230px] min-w-0 gap-4 overflow-hidden pb-1 sm:gap-6"
-                  style={{
-                    gridTemplateColumns: `repeat(${chartData.length}, minmax(0, 1fr))`,
-                  }}
-                >
-                  {chartData.map((item) => (
-                    <div
-                      key={item.code}
-                      className="flex min-w-0 flex-col justify-end"
-                    >
-                      <div className="flex h-[200px] items-end justify-center px-2">
-                        <div
-                          title={`${item.code}: ${item.average}%`}
-                          className="w-full max-w-[48px] min-h-1 rounded-t-md bg-[#008AD8] transition hover:bg-[#0078BC]"
-                          style={{ height: `${Math.min(item.average, 100)}%` }}
-                        />
-                      </div>
-                      <span className="mt-2 truncate text-center text-[10px] text-[#667085]">
-                        {item.code}
-                      </span>
-                    </div>
-                  ))}
-                </div>
+                <span className="mt-3 w-full truncate text-center text-xs font-medium text-slate-600">
+                  {item.code}
+                </span>
               </div>
-            </div>
-          ) : (
-            <div className="flex h-full items-center justify-center text-sm text-[#98A2B3]">
-              No performance data available.
-            </div>
-          )}
+            );
+          })}
         </div>
+      </div>
+    </div>
+  ) : (
+    <div className="flex h-full items-center justify-center text-sm text-slate-400">
+      No performance data available.
+    </div>
+  )}
+</div>
       </section>
 
       <section className="min-w-0 overflow-hidden rounded-xl border border-[#E5E7EB] bg-white shadow-sm">
