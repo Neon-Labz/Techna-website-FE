@@ -141,20 +141,10 @@ export default function ResultsSection() {
         return;
       }
 
-      console.log('LOGIN STUDENT ID:', studentId);
 
       const response: any = await getResultsByStudentId(studentId, token);
 
-      console.log('RESULT FUNCTION RESPONSE:', response);
 
-      /*
-       * எல்லா possible API response shapes-ஐயும் support பண்ணும்:
-       *
-       * 1. { results: [...] }
-       * 2. { data: [...] }
-       * 3. { data: { results: [...] } }
-       * 4. Direct array [...]
-       */
       const resultList: any[] = Array.isArray(response)
         ? response
         : Array.isArray(response?.results)
@@ -165,7 +155,6 @@ export default function ResultsSection() {
               ? response.data.results
               : [];
 
-      console.log('RESULT LIST:', resultList);
 
       const normalizedResults: ResultRow[] = resultList.flatMap(
         (result: any, resultIndex: number) => {
@@ -214,7 +203,6 @@ export default function ResultsSection() {
         },
       );
 
-      console.log('NORMALIZED RESULTS:', normalizedResults);
 
       setStudent(
         response?.student
