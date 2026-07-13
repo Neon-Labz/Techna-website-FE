@@ -2,14 +2,14 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import {
-  CreditCard,
   Download,
   CheckCircle,
   Clock,
   AlertCircle,
   Filter,
   Receipt,
-  DollarSign,
+  BookOpen,
+  Wallet,
 } from 'lucide-react';
 import jsPDF from 'jspdf';
 import { paymentApi, type PaymentRecord } from '@/api/payment.api';
@@ -17,19 +17,19 @@ import { useAuthStore } from '@/store/authStore';
 
 const statusConfig = {
   paid: {
-    label: 'Paid',
-    color: 'bg-green-100 text-green-700 border-green-200',
+    label: 'PAID',
+    color: 'bg-emerald-100 text-emerald-700 border-emerald-200',
     icon: CheckCircle,
-    dot: 'bg-green-500',
+    dot: 'bg-emerald-500',
   },
   pending: {
-    label: 'Pending',
-    color: 'bg-yellow-100 text-yellow-700 border-yellow-200',
+    label: 'PENDING',
+    color: 'bg-amber-100 text-amber-700 border-amber-200',
     icon: Clock,
-    dot: 'bg-yellow-500',
+    dot: 'bg-amber-500',
   },
   overdue: {
-    label: 'Overdue',
+    label: 'OVERDUE',
     color: 'bg-red-100 text-red-700 border-red-200',
     icon: AlertCircle,
     dot: 'bg-red-500',
@@ -280,14 +280,14 @@ export default function PaymentsSection() {
             label: 'Total Paid',
             value: totalPaid,
             icon: CheckCircle,
-            color: 'text-green-600 bg-green-50',
+            color: 'text-emerald-600 bg-emerald-50',
             count: payments.filter((p) => p.status === 'paid').length,
           },
           {
             label: 'Pending Payments',
             value: totalPending,
             icon: Clock,
-            color: 'text-yellow-600 bg-yellow-50',
+            color: 'text-amber-600 bg-amber-50',
             count: payments.filter((p) => p.status === 'pending').length,
           },
           {
@@ -328,7 +328,7 @@ export default function PaymentsSection() {
       <div className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm">
         <div className="flex flex-wrap items-center gap-4">
           <div className="flex items-center gap-2">
-            <Filter className="h-4 w-4 text-blue-700" />
+            <Filter className="h-4 w-4 text-[#34BFF3]" />
             <span className="text-sm font-semibold text-gray-700">Filter:</span>
           </div>
 
@@ -340,9 +340,9 @@ export default function PaymentsSection() {
               className="rounded-xl border border-gray-200 bg-gray-50 px-3 py-2 text-sm text-gray-700 outline-none focus:ring-2 focus:ring-blue-500"
             >
               <option value="all">All Status</option>
-              <option value="paid">Paid</option>
-              <option value="pending">Pending</option>
-              <option value="overdue">Overdue</option>
+              <option value="paid">PAID</option>
+              <option value="pending">PENDING</option>
+              <option value="overdue">OVERDUE</option>
             </select>
           </div>
 
@@ -370,13 +370,13 @@ export default function PaymentsSection() {
 
       <div className="overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm">
         <div className="flex items-center gap-2 border-b border-gray-100 p-5">
-          <Receipt className="h-5 w-5 text-blue-700" />
+          <Receipt className="h-5 w-5 text-[#34BFF3]" />
           <h3 className="text-sm font-bold text-gray-900">Payment History</h3>
         </div>
 
         {filtered.length === 0 ? (
           <div className="py-12 text-center text-gray-400">
-            <CreditCard className="mx-auto mb-3 h-10 w-10 opacity-30" />
+            <Receipt className="mx-auto mb-3 h-10 w-10 opacity-30" />
             <p>No payments found.</p>
           </div>
         ) : (
@@ -419,7 +419,7 @@ export default function PaymentsSection() {
                       {payment.status === 'paid' && (
                         <button
                           onClick={() => generateReceipt(payment)}
-                          className="flex items-center gap-1.5 rounded-xl bg-blue-50 px-3 py-1.5 text-xs font-medium text-blue-700 hover:bg-blue-100"
+                          className="flex items-center gap-1.5 rounded-xl bg-[#F0F9FF] px-3 py-1.5 text-xs font-medium text-[#008AD8] hover:bg-blue-100"
                         >
                           <Download className="h-3.5 w-3.5" /> Receipt
                         </button>
@@ -469,8 +469,8 @@ export default function PaymentsSection() {
 
                         <td className="px-5 py-4">
                           <div className="flex items-center gap-2">
-                            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-blue-50">
-                              <DollarSign className="h-4 w-4 text-blue-700" />
+                            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-[#F0F9FF]">
+                              <BookOpen className="h-4 w-4 text-[#34BFF3]" />
                             </div>
                             <p className="text-sm font-medium text-gray-900">
                               {payment.moduleName || '-'}
@@ -507,13 +507,13 @@ export default function PaymentsSection() {
                           {payment.status === 'paid' ? (
                             <button
                               onClick={() => generateReceipt(payment)}
-                              className="flex items-center gap-1.5 rounded-xl bg-blue-50 px-3 py-1.5 text-xs font-medium text-blue-700 hover:bg-blue-100"
+                              className="flex items-center gap-1.5 rounded-xl bg-[#F0F9FF] px-3 py-1.5 text-xs font-medium text-[#008AD8] hover:bg-blue-100"
                             >
                               <Download className="h-3.5 w-3.5" /> Receipt
                             </button>
                           ) : (
-                            <button className="flex items-center gap-1.5 rounded-xl bg-yellow-50 px-3 py-1.5 text-xs font-medium text-yellow-700 hover:bg-yellow-100">
-                              <CreditCard className="h-3.5 w-3.5" /> Pay Now
+                            <button className="flex items-center gap-1.5 rounded-xl bg-amber-50 px-3 py-1.5 text-xs font-medium text-amber-700 hover:bg-amber-100">
+                              <Wallet className="h-3.5 w-3.5" /> Pay Now
                             </button>
                           )}
                         </td>
