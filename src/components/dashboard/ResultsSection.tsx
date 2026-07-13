@@ -591,7 +591,6 @@ formatDate(getResultDate(row)),
    <div className="h-[220px] w-full min-w-0">
   {chartData.length > 0 ? (
     <div className="grid h-full grid-cols-[42px_minmax(0,1fr)] gap-3">
-      {/* Y Axis */}
       <div className="flex h-[180px] flex-col justify-between pb-1 text-right text-xs text-slate-400">
         <span>100</span>
         <span>75</span>
@@ -600,9 +599,7 @@ formatDate(getResultDate(row)),
         <span>0</span>
       </div>
 
-      {/* Chart Area */}
       <div className="relative min-w-0 overflow-visible">
-        {/* Grid Lines */}
         <div className="pointer-events-none absolute inset-x-0 top-0 h-[210px]">
           {[0, 1, 2, 3, 4].map((line) => (
             <div
@@ -615,7 +612,6 @@ formatDate(getResultDate(row)),
           ))}
         </div>
 
-        {/* Bars */}
         <div
           className="relative grid h-[210px] items-end gap-4"
           style={{
@@ -631,7 +627,6 @@ formatDate(getResultDate(row)),
                 className="flex h-full min-w-0 flex-col justify-end"
               >
                 <div className="relative flex h-[210px] w-full items-end">
-                  {/* Percentage */}
                   <span
                     className="absolute left-1/2 z-10 -translate-x-1/2 text-xs font-semibold text-slate-700"
                     style={{
@@ -641,7 +636,6 @@ formatDate(getResultDate(row)),
                     {Math.round(value)}%
                   </span>
 
-                  {/* Full-width Bar */}
                   <div
                     title={`${item.code}: ${Math.round(value)}%`}
                     className="mx-auto w-[85%] rounded-t-lg bg-[#008AD8] shadow-sm transition-all duration-300 hover:bg-[#0078BC]"
@@ -652,7 +646,6 @@ formatDate(getResultDate(row)),
                   />
                 </div>
 
-                {/* Module Code */}
                 <span className="mt-3 w-full truncate text-center text-xs font-medium text-slate-600">
                   {item.code}
                 </span>
