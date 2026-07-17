@@ -52,7 +52,7 @@ export default function ForgotPasswordSection() {
     <div
       className="relative flex min-h-screen items-center justify-center overflow-hidden px-4 py-8"
       style={{
-        backgroundImage: "url('/Back.jpeg')",
+        backgroundImage: "url('/techna-promo.jpg')",
         backgroundSize: 'cover',
         backgroundPosition: 'center',
         backgroundRepeat: 'no-repeat',
