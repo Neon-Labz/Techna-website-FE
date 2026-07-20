@@ -344,7 +344,7 @@ export default function ResultsSection() {
 
     pdf.setFont('helvetica', 'normal');
     pdf.setFontSize(10);
-    pdf.text('Techna - School Management System', pageWidth / 2, 22, { align: 'center' });
+    pdf.text('Techna -Management System', pageWidth / 2, 22, { align: 'center' });
 
     // Student info section
     let yPos = 40;
