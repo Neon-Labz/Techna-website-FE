@@ -6,10 +6,11 @@ import { ChevronDown } from 'lucide-react';
 
 const TOTAL_RESULTS = 6;
 const RESULT_EXT = 'jpeg';
+const R2_BASE_URL = 'https://pub-e43a8535a35b41a89a5cbb89981d3df2.r2.dev';
 
 const resultImages = Array.from({ length: TOTAL_RESULTS }, (_, i) => ({
   index: i + 1,
-  src: `/result/img${i + 1}.${RESULT_EXT}`,
+  src: `${R2_BASE_URL}/result/img${i + 1}.${RESULT_EXT}`,
 }))
   // order by the number in the name (img1 first, then img2, ...)
   .sort((a, b) => a.index - b.index);
