@@ -131,6 +131,10 @@ export default function NoticesSection({
                     className="flex min-h-[220px] flex-col rounded-md border border-gray-200 bg-white p-5 shadow-sm"
                   >
 
+                  <h3 className="mb-2 text-base font-bold leading-snug text-gray-900">
+                    {notice.title || 'Untitled'}
+                  </h3>
+
                   <p className="mb-4 text-[11px] font-bold uppercase tracking-wider text-[#0183CB]">
                     {formatDateUpper(notice.date)}
                   </p>
