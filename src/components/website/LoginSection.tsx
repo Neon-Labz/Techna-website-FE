@@ -86,7 +86,7 @@ export default function LoginSection() {
     <div
       className="min-h-screen flex items-center justify-center px-4 relative overflow-hidden"
       style={{
-        backgroundImage: "url('/Back.jpeg')",
+        backgroundImage: "url('/techna-promo.jpg')",
         backgroundSize: 'cover',
         backgroundPosition: 'center',
         backgroundRepeat: 'no-repeat',

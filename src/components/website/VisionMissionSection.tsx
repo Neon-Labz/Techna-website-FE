@@ -1,20 +1,41 @@
 'use client';
 
 import Image from 'next/image';
+import { useState, useEffect } from 'react';
+
+const images = [
+  'https://pub-e43a8535a35b41a89a5cbb89981d3df2.r2.dev/home/Exam01.jpeg',
+  'https://pub-e43a8535a35b41a89a5cbb89981d3df2.r2.dev/home/Exam02.jpeg',
+];
 
 export default function VisionMissionSection() {
+  const [currentIndex, setCurrentIndex] = useState(0);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentIndex((prev) => (prev + 1) % images.length);
+    }, 3000);
+
+    return () => clearInterval(interval);
+  }, []);
+
   return (
     <section className="bg-white py-20">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="grid items-center gap-16 lg:grid-cols-[500px_1fr]">
         {/* Left Image */}
         <div className="relative aspect-square w-full max-w-[500px] overflow-hidden rounded-2xl shadow-xl">
-            <Image
-                src="/vision.jpeg"
+            {images.map((src, index) => (
+              <Image
+                key={src}
+                src={src}
                 alt="Vision and Mission"
                 fill
-                className="object-cover"
-            />
+                className={`object-cover transition-opacity duration-1000 ease-in-out ${
+                  index === currentIndex ? 'opacity-100' : 'opacity-0'
+                }`}
+              />
+            ))}
             </div>
 
         {/* Right Content */}

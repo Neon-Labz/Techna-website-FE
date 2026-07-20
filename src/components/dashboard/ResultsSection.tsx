@@ -378,7 +378,7 @@ export default function ResultsSection() {
     yPos += 6;
 
     // Results table
-    const tableHeaders = [['Module', 'Code', 'Exam Type', 'Marks', 'Grade', 'Date', 'Semester']];
+    const tableHeaders = [['Module', 'Code', 'Exam Type', 'Marks', 'Grade', 'Date']];
     const tableBody = rows.map((row) => [
       row.moduleName,
       row.code,
@@ -386,7 +386,6 @@ export default function ResultsSection() {
       row.marks != null ? `${row.marks}/${row.maxMarks ?? 100} (${row.percent}%)` : '-',
       row.grade || '-',
       formatDate(row.date),
-      row.semester || '-',
     ]);
 
     autoTable(pdf, {
@@ -414,7 +413,6 @@ export default function ResultsSection() {
         3: { halign: 'center' },
         4: { halign: 'center', fontStyle: 'bold' },
         5: { halign: 'center' },
-        6: { halign: 'center' },
       },
       margin: { left: 14, right: 14 },
     });
@@ -434,15 +432,14 @@ export default function ResultsSection() {
   };
 
   const handleDownloadCSV = () => {
-    const header = ['Module', 'Code', 'Exam Type', 'Marks', 'Grade', 'Date', 'Semester'];
+    const header = ['Module', 'Code', 'Exam Type', 'Marks', 'Grade', 'Date'];
     const body = rows.map((row) => [
       row.moduleName,
       row.code,
       row.examType || '',
       row.marks != null ? `${row.marks}/${row.maxMarks ?? 100}` : '',
       row.grade || '',
-formatDate(getResultDate(row)),
-      row.semester || '',
+      formatDate(getResultDate(row)),
     ]);
 
     const csv = [header, ...body]

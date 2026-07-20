@@ -418,7 +418,7 @@ export default function RegisterSection() {
       <div
         className="relative min-h-screen overflow-hidden flex items-center justify-center px-4 py-12"
         style={{
-          backgroundImage: "url('/Back.jpeg')",
+          backgroundImage: "url('/techna-promo.jpg')",
           backgroundSize: 'cover',
           backgroundPosition: 'center',
           backgroundRepeat: 'no-repeat',
@@ -472,7 +472,7 @@ export default function RegisterSection() {
     <div
       className="relative min-h-screen py-10 px-4 flex items-center"
       style={{
-        backgroundImage: "url('/Back.jpeg')",
+        backgroundImage: "url('/techna-promo.jpg')",
         backgroundSize: 'cover',
         backgroundPosition: 'center',
         backgroundRepeat: 'no-repeat',
