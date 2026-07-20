@@ -183,13 +183,13 @@ export default function Footer() {
             </p>
 
             <a
-              href="https://www.theneonlabz.com"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-xs text-white underline underline-offset-2 hover:text-gray-200 md:justify-self-center"
-            >
-              Developed by NeonLabz
-            </a>
+  href="https://www.theneonlabz.com"
+  target="_blank"
+  rel="noopener noreferrer"
+  className="text-xs text-white no-underline hover:no-underline hover:text-gray-200 md:justify-self-center"
+>
+  Developed by NeonLabz (Pvt) Ltd.
+</a>
 
             <Link
               href="/terms-and-conditions"
