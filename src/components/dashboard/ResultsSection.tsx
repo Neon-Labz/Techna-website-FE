@@ -422,7 +422,7 @@ export default function ResultsSection() {
     pdf.setFontSize(8);
     pdf.setTextColor(150, 150, 150);
     pdf.text(
-      'This is a system-generated document from Techna School Management System.',
+      'This is a system-generated document from Techna.',
       pageWidth / 2,
       finalY + 12,
       { align: 'center' },

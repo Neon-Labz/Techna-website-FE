@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { Check, ChevronRight, ChevronLeft, User, MapPin, BookOpen, FileText, Plus, Trash2, Upload, GraduationCap, X } from 'lucide-react';
+import { Check, ChevronRight, ChevronLeft, User, MapPin, BookOpen, FileText, Plus, Trash2, Upload, GraduationCap, X, Eye, EyeOff } from 'lucide-react';
 import { authApi } from '@/api/auth.api';
 import { dashboardApi } from '@/api/dashboard.api';
 import type { RegisterStudentPayload } from '@/api/auth.api';
@@ -54,6 +54,7 @@ type RegistrationModule = {
 const clean = (value: string) => value.trim();
 
 const PHONE_REGEX = /^(?:\+94|0094|0)[0-9]{9}$/;
+const PASSWORD_REGEX = /^(?=.*[A-Za-z])(?=.*\d).{6,}$/;
 const NIC_REGEX = /^(?:[0-9]{9}[vVxX]|[0-9]{12})$/;
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -200,6 +201,8 @@ const getApiErrorMessage = (error: unknown, fallback: string) => {
 export default function RegisterSection() {
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [submitMessage, setSubmitMessage] = useState('');
   const [submitError, setSubmitError] = useState('');
@@ -308,7 +311,7 @@ export default function RegisterSection() {
       else if (!EMAIL_REGEX.test(clean(form.email))) e.email = 'Enter a valid email address';
 
       if (!form.password) e.password = 'Password is required';
-      else if (form.password.length < 6) e.password = 'Password must be at least 6 characters';
+      else if (!PASSWORD_REGEX.test(form.password)) e.password = 'Password must be at least 6 characters and include a letter & a number';
 
       if (!form.confirmPassword) e.confirmPassword = 'Please confirm your password';
       else if (form.password !== form.confirmPassword) e.confirmPassword = 'Passwords do not match';
@@ -344,6 +347,7 @@ export default function RegisterSection() {
 
     if (targetStep === 5) {
       if (!clean(form.batch)) e.batch = 'Batch is required';
+      else if (!/^\d{4}$/.test(clean(form.batch))) e.batch = 'Enter a valid 4-digit batch year';
 
       const mainSelected = form.subjects.filter(s => MAIN_SUBJECTS.includes(s));
       const basketSelected = form.subjects.filter(s => BASKET_SUBJECTS.includes(s));
@@ -633,12 +637,46 @@ export default function RegisterSection() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">Password <span className="text-red-500">*</span></label>
-                  <input type="password" value={form.password} onChange={e => set('password', e.target.value)} placeholder="Create a password" autoComplete="new-password" className={inputCls(errors.password)} />
+                  <div className="relative">
+                    <input
+                      type={showPassword ? 'text' : 'password'}
+                      value={form.password}
+                      onChange={e => set('password', e.target.value)}
+                      placeholder="Create a password"
+                      autoComplete="new-password"
+                      className={inputCls(errors.password) + ' pr-10'}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(p => !p)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                      tabIndex={-1}
+                    >
+                      {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                    </button>
+                  </div>
                   {errors.password && <p className="text-red-500 text-xs mt-1">{errors.password}</p>}
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">Confirm Password <span className="text-red-500">*</span></label>
-                  <input type="password" value={form.confirmPassword} onChange={e => set('confirmPassword', e.target.value)} placeholder="Confirm password" autoComplete="new-password" className={inputCls(errors.confirmPassword)} />
+                  <div className="relative">
+                    <input
+                      type={showConfirmPassword ? 'text' : 'password'}
+                      value={form.confirmPassword}
+                      onChange={e => set('confirmPassword', e.target.value)}
+                      placeholder="Confirm password"
+                      autoComplete="new-password"
+                      className={inputCls(errors.confirmPassword) + ' pr-10'}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowConfirmPassword(p => !p)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                      tabIndex={-1}
+                    >
+                      {showConfirmPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                    </button>
+                  </div>
                   {errors.confirmPassword && <p className="text-red-500 text-xs mt-1">{errors.confirmPassword}</p>}
                 </div>
               </div>
@@ -853,13 +891,15 @@ export default function RegisterSection() {
                 <label className="block text-sm font-semibold text-gray-800 mb-2">Batch <span className="text-red-500">*</span></label>
                 <input
                   value={form.batch}
-                  onChange={e => set('batch', e.target.value)}
-                  placeholder="Enter selected batch"
+                  onChange={e => set('batch', e.target.value.replace(/\D/g, '').slice(0, 4))}
+                  inputMode="numeric"
+                  pattern="[0-9]*"
+                  maxLength={4}
+                  placeholder="2026"
                   className={inputCls(errors.batch)}
                 />
                 {errors.batch && <p className="text-red-500 text-xs mt-1">{errors.batch}</p>}
               </div>
-
               <div>
                 <label className="block text-sm font-semibold text-gray-800 mb-1">
                   Main Subjects <span className="text-red-500">*</span>
