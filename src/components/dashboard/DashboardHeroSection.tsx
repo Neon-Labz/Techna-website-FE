@@ -27,7 +27,7 @@ export default function DashboardHeroSection() {
   const studentFullName =
     student?.fullNameEnglish?.trim() || student?.name?.trim() || 'Student';
 
-  const studentFirstName = studentFullName?.split(' ')?.[0] || 'Student';
+  // const studentFirstName = studentFullName?.split(' ')?.[0] || 'Student';
   const admissionNo = student?.studentId?.trim() || '-';
 
   const profileImage =
@@ -202,7 +202,7 @@ export default function DashboardHeroSection() {
 
             <div className="flex-1">
               <h1 className="text-2xl font-extrabold tracking-wide md:text-3xl">
-                {studentFirstName?.toUpperCase() || 'STUDENT'}! 👋
+                {studentFullName?.toUpperCase() || 'STUDENT'}! 👋
               </h1>
 
               <p className="mt-1 text-xs text-white/85 md:text-sm">
