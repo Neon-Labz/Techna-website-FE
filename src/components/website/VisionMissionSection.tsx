@@ -73,15 +73,7 @@ export default function VisionMissionSection() {
               and community.
             </p>
           </div>
-
-          <p className="leading-8 text-gray-600">
-            At TECHNA, we believe that education is the catalyst for global
-            progress. Our framework drives every initiative, ensuring our
-            graduates are prepared for the challenges of the fourth industrial
-            revolution.
-          </p>
         </div>
-
       </div>
       </div>
     </section>
