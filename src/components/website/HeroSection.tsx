@@ -210,7 +210,7 @@ export default function HeroSection() {
           className="uppercase text-[rgba(244,241,235,0.18)] tracking-[0.15em]"
           style={{ fontSize: "8.5px", writingMode: "vertical-rl" }}
         >
-          Techna Institute · 2024
+          Techna Institute
         </span>
         <div className="w-px h-11 [background:linear-gradient(180deg,transparent,rgba(232,184,75,0.4))]" />
       </div>

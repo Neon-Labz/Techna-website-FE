@@ -6,8 +6,8 @@ import { MdOutlineArrowBack } from 'react-icons/md';
 const testimonials = [
   {
     name: 'Selvan Vinusikan',
-    achievement: 'District 1st Rank (2A, 1B)',
-    course: 'G.C.E. A/L ENGINEERING TECHNOLOGY – 2025 BATCH',
+    achievement: 'District Rank - 1 (2A B)',
+    course: 'ENGINEERING TECHNOLOGY – A/L 2025 BATCH',
     rating: 5,
     quote:
       'Techna Technical Institute gave me the guidance, confidence, and support I needed throughout my G.C.E. Advanced Level Engineering Technology journey. The dedicated lecturers, regular examinations, practical sessions, and well-structured learning environment helped me achieve 2A, 1B and secure the District 1st Rank in 2025. I am truly grateful to the entire Techna team and highly recommend Techna Technical Institute to every A/L Technology student.',
@@ -15,8 +15,8 @@ const testimonials = [
   },
   {
     name: 'Calistus Antony Anpuchelvan',
-    achievement: 'District Rank 3 | Island Rank 106',
-    course: 'G.C.E. A/L ENGINEERING TECHNOLOGY (TAMIL MEDIUM) – 2025 BATCH',
+    achievement: 'District Rank - 3 (2A B)',
+    course: 'ENGINEERING TECHNOLOGY – A/L 2025 BATCH',
     rating: 5,
     quote:
       'Techna Technical Institute provided me with the guidance, confidence, and support I needed throughout my A/L Engineering Technology journey. The dedicated lecturers, regular examinations, and structured learning environment helped me achieve District Rank 3 and Island Rank 106 in the G.C.E. Advanced Level Examination – 2025. I sincerely thank the entire Techna team and highly recommend Techna to every A/L Technology student.',
@@ -24,8 +24,8 @@ const testimonials = [
   },
   {
     name: 'Thanuja Vijayakumar',
-    achievement: 'District Rank 7',
-    course: 'G.C.E. A/L TECHNOLOGY STREAM – 2025 BATCH',
+    achievement: 'District Rank - 7 (A B C)',
+    course: 'ENGINEERING TECHNOLOGY – A/L 2025 BATCH',
     rating: 5,
     quote:
       'Techna Technical Institute gave me the guidance, confidence, and support I needed throughout my G.C.E. Advanced Level Technology journey. The dedicated lecturers, structured learning environment, and continuous encouragement helped me achieve District Rank 7 in the G.C.E. Advanced Level Technology Stream Examination – 2025. I sincerely thank the entire Techna team and highly recommend Techna Technical Institute to every A/L Technology student.',
