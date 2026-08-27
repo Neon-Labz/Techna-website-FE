@@ -130,12 +130,14 @@ export default function Footer() {
                   "Mathematics",
                   "Geography",
                 ].map((subject) => (
-                  <li
-                    key={subject}
-                    className="text-[14px]"
-                    style={{ color: "#34BFF3" }}
-                  >
-                    {subject}
+                  <li key={subject}>
+                    <Link
+                      href="https://www.techna.lk/modules"
+                      className="text-[14px]"
+                      style={{ color: "#34BFF3" }}
+                    >
+                      {subject}
+                    </Link>
                   </li>
                 ))}
               </ul>
