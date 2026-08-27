@@ -12,7 +12,7 @@ const content: Record<
     heroTitle: string;
     heroDesc: string;
     rulesHeading: string;
-    rules: { title: string; desc: string }[];
+    rules: { title: string; desc: React.ReactNode; }[];
     termsHeading: string;
     terms: string[];
   }
@@ -32,55 +32,75 @@ const content: Record<
         desc: 'மாணவர்கள் நிறுவனத்தினால் அறிவிக்கப்படும் கால எல்லைக்குள் பாடக் கட்டணங்களை செலுத்த வேண்டும். குறிப்பிட்ட காலத்திற்குள் கட்டணம் செலுத்த முடியாத பட்சத்தில், பெற்றோர் அல்லது பாதுகாவலர் மூலம் நிர்வாகத்திற்கு முன்கூட்டியே அறிவிக்க வேண்டும்.',
       },
       {
-        title: '3. வருகை',
-        desc: 'மாணவர்கள் நடைபெறும் அனைத்து வகுப்புகள், மீளாய்வு வகுப்புகள், மாதாந்திரத் தேர்வுகள் மற்றும் மாதிரிப் பரீட்சைகளில் தவறாமல் பங்கேற்க வேண்டும். வருகை தர முடியாத அல்லது தாமதமாக வரக்கூடிய சந்தர்ப்பங்களில், அதற்கான காரணத்தை பெற்றோர் அல்லது பாதுகாவலர் மூலம் நிர்வாகத்திற்கு அறிவிக்க வேண்டும்.',
+        title: '3. வரவு',
+        desc: 'மாணவர்கள் நடைபெறும் அனைத்து வகுப்புகள், மீளாய்வு வகுப்புகள், மாதாந்தத் தேர்வுகள் மற்றும் மாதிரிப் பரீட்சைகளில் தவறாமல் பங்கேற்க வேண்டும். வருகை தர முடியாத அல்லது தாமதமாக வரக்கூடிய சந்தர்ப்பங்களில், அதற்கான காரணத்தை பெற்றோர் அல்லது பாதுகாவலர் மூலம் நிர்வாகத்திற்கு அறிவிக்க வேண்டும்.',
       },
       {
-        title: '4. கைப்பேசி பயன்பாடு',
+        title: '4. வருகை மற்றும் அனுமதி நிலை',
+        desc: (
+          <>
+            <p className="mb-4">
+              மாணவர்கள் நீண்ட காலத்திற்கு வகுப்புகளுக்கு வருகை தராமல், அது தொடர்பாக
+              நிறுவன நிர்வாகத்திற்கு முறையாக அறிவிக்காத பட்சத்தில், அவர்கள் இறுதியாக
+              வகுப்பிற்கு வருகை தந்த நாளிலிருந்து{' '}
+              <strong>3 மாதங்களுக்குப் பின்னர் அவர்களின் அனுமதி (Admission) இரத்து செய்யப்படும்.</strong>
+            </p>
+
+            <p>
+              நீண்ட காலத்திற்கு வகுப்புகளுக்கு வருகை தர முடியாத சூழ்நிலை ஏற்பட்டால்,
+              மாணவர்கள் முன்கூட்டியே நிறுவன நிர்வாகத்திற்கு அறிவித்து அனுமதி பெற்றிருந்தால்,
+              நிறுவனத்தின் விதிமுறைகள் மற்றும் நிபந்தனைகளுக்கு உட்பட்டு அவர்களின் அனுமதி
+              தொடர அனுமதிக்கப்படலாம்.
+            </p>
+          </>
+        ),
+      },
+      {
+        title: '5. கைப்பேசி பயன்பாடு',
         desc: 'வகுப்பறை மற்றும் பரீட்சை நடைபெறும் நேரங்களில் கைப்பேசி பயன்படுத்துவது முற்றிலும் தடைசெய்யப்பட்டுள்ளது. அவசர தேவைகளுக்காக மட்டுமே நிர்வாகத்தின் முன் அனுமதியுடன் பயன்படுத்தலாம்.',
       },
       {
-        title: '5. மாணவர்களின் வாகனப் பாவனைக் கொள்கை',
+        title: '6. மாணவர்களின் வாகனப் பாவனைக் கொள்கை',
         desc: 'சைக்கிளைத் தவிர வேறு எந்த மோட்டார் வாகனத்தையும் மாணவர்கள் தாங்களே ஓட்டி வகுப்புகளுக்கு வர அனுமதிக்கப்படமாட்டார்கள். அவசர சூழ்நிலைகளில் மட்டும், பெற்றோர்/பாதுகாவலர் நிறுவன நிர்வாகத்துடன் தொடர்புகொண்டு முன் அனுமதி பெற்ற பின்னரே மாணவர்கள் மோட்டார் வாகனத்தில் வரலாம். தொடர்ச்சியாக மோட்டார் வாகனத்தை கொண்டு வர வேண்டியிருந்தால், நிறுவன நிர்வாகத்தின் முன் அனுமதியுடனும், நிறுவனத்தின் விதிமுறைகள் மற்றும் நிபந்தனைகளை ஏற்றுக்கொண்ட பின்னரே அனுமதி வழங்கப்படும்.',
       },
       {
-        title: '6. உடை மற்றும் தோற்றம்',
-        desc: 'மாணவர்கள் கல்வி நிறுவனத்தின் ஒழுக்கத்திற்கு ஏற்ற உடை, சிகை அலங்காரம் மற்றும் அணிகலன்களுடன் வர வேண்டும். சமயம் சார்ந்த உடைகள் மற்றும் எளிமையான அணிகலன்கள் அனுமதிக்கப்படும்.',
+        title: '7. உடை மற்றும் தோற்றம்',
+        desc: 'மாணவர்கள் கல்வி நிறுவனத்தின் ஒழுக்கத்திற்கு ஏற்ற உடை, சிகை அலங்காரம் மற்றும் அணிகலன்களுடன் வர வேண்டும். சமயம் சார்ந்த அணிகலன்கள் மற்றும் தங்க ஆபரணங்கள் அனுமதிக்கப்படும்.',
       },
       {
-        title: '7. நிறுவனச் சொத்துக்களை பாதுகாத்தல்',
+        title: '8. நிறுவனச் சொத்துக்களை பாதுகாத்தல்',
         desc: 'வகுப்பறைகள், மேசைகள், கதிரைகள் மற்றும் நிறுவனத்தின் அனைத்து சொத்துக்களையும் சுத்தமாகவும் பாதுகாப்பாகவும் பயன்படுத்த வேண்டும். வேண்டுமென்றே சேதப்படுத்துவது ஒழுக்க நடவடிக்கைக்கு உட்படுத்தப்படும்.',
       },
       {
-        title: '8. ஒழுக்கமான நடத்தை',
+        title: '9. ஒழுக்கமான நடத்தை',
         desc: 'மாணவர்கள் ஆசிரியர்கள், நிர்வாகத்தினர் மற்றும் சக மாணவர்களிடம் மரியாதையுடனும் ஒழுக்கத்துடனும் நடந்து கொண்டு, சிறந்த கற்றல் சூழலை பேண வேண்டும்.',
       },
       {
-        title: '9. பரீட்சை ஒழுங்குவிதிகள்',
+        title: '10. பரீட்சை ஒழுங்குவிதிகள்',
         desc: 'வகுப்புத் தேர்வுகள், மாதாந்திரத் தேர்வுகள் மற்றும் மாதிரிப் பரீட்சைகளின் போது முறைகேடுகளில் ஈடுபடுவது முற்றிலும் தடைசெய்யப்பட்டுள்ளது. மற்ற மாணவர்களின் விடைத்தாளைப் பார்த்து எழுதுதல், விடைத்தாளை பரிமாறுதல், மற்றவர்களிடம் கேட்டு எழுதுதல், குறிப்புகள், புத்தகங்கள், கைப்பேசிகள் அல்லது அனுமதியற்ற பொருட்களை பயன்படுத்துதல் ஆகியவை ஒழுக்க நடவடிக்கைக்கு உட்படுத்தப்படும்.',
       },
       {
-        title: '10. பெற்றோர் சந்திப்பு',
+        title: '11. பெற்றோர் சந்திப்பு',
         desc: 'நிறுவனத்தினால் ஏற்பாடு செய்யப்படும் பெற்றோர் சந்திப்புகள், கலந்துரையாடல்கள் மற்றும் முக்கிய அறிவிப்பு நிகழ்வுகளில் பெற்றோர் அல்லது பாதுகாவலர்கள் கட்டாயமாக பங்கேற்க வேண்டும்.',
       },
       {
-        title: '11. பிரச்சினைகளை அறிவித்தல்',
+        title: '12. பிரச்சினைகளை அறிவித்தல்',
         desc: 'பாடம், நிறுவனம் அல்லது மாணவர்களுக்கிடையில் ஏற்படும் ஏதேனும் பிரச்சினைகள் உடனடியாக நிர்வாகத்திற்கு அறிவிக்கப்பட வேண்டும்.',
       },
       {
-        title: '12. தனிப்பட்ட பொருட்கள்',
+        title: '13. தனிப்பட்ட பொருட்கள்',
         desc: 'மாணவர்கள் தங்களது தனிப்பட்ட பொருட்களுக்கு தாங்களே பொறுப்பானவர்கள். பொருட்கள் இழக்கப்படுதல் அல்லது சேதமடைவதற்கு நிறுவனம் பொறுப்பேற்காது.',
       },
       {
-        title: '13. பெற்றோர் தொடர்பு',
+        title: '14. பெற்றோர் தொடர்பு',
         desc: 'மாணவர்களின் வருகை, ஒழுக்கம், கல்வி முன்னேற்றம் அல்லது கட்டண விடயங்கள் தொடர்பாக தேவையான சந்தர்ப்பங்களில் பெற்றோர் அல்லது பாதுகாவலர்களுடன் நிறுவனம் தொடர்பு கொள்ளும்.',
       },
       {
-        title: '14. நிறுவனத்தின் தீர்மானங்கள்',
+        title: '15. நிறுவனத்தின் தீர்மானங்கள்',
         desc: 'கல்வி நடவடிக்கைகள் சிறப்பாக நடைபெற நிறுவன நிர்வாகம் வழங்கும் அறிவுறுத்தல்கள் மற்றும் தீர்மானங்களை அனைத்து மாணவர்களும் கடைப்பிடிக்க வேண்டும்.',
       },
       {
-        title: '15. நிறுவனத்தின் நற்பெயர் மற்றும் சமூக ஊடகப் பொறுப்பு',
+        title: '16. நிறுவனத்தின் நற்பெயர் மற்றும் சமூக ஊடகப் பொறுப்பு',
         desc: 'மாணவர்கள் நிறுவனத்தின் நற்பெயர், ஒழுக்கம் மற்றும் மதிப்புகளை பாதிக்கும் எந்தவொரு செயலிலும், நேரடியாகவோ அல்லது சமூக ஊடகங்கள் மூலமாகவோ ஈடுபடக்கூடாது. நிறுவனத்தைப் பற்றிய தகவல்கள் அல்லது உள்ளடக்கங்களை பகிரும் போது பொறுப்புடனும் மரியாதையுடனும் செயல்பட வேண்டும்.',
       },
     ],
@@ -114,51 +134,69 @@ const content: Record<
         desc: "Students must attend all scheduled classes, revision sessions, monthly tests, and model examinations. If a student is absent or arrives late, the administration must be informed through the student's parent or guardian with a valid reason.",
       },
       {
-        title: '4. Mobile Phone Policy',
+        title: '4. Student Attendance & Admission Status',
+        desc: (
+          <>
+            <p className="mb-4">
+              Students who discontinue attending classes for a prolonged period without
+              informing the institute administration will have their{' '}
+              <strong>admission cancelled after three months from their last attended class.</strong>
+            </p>
+
+            <p>
+              If a student is unable to attend classes for an extended period and has
+              informed the institute administration in advance and received approval,
+              their admission may remain active subject to the institute's rules and regulations.
+            </p>
+          </>
+        ),
+      },
+      {
+        title: '5. Mobile Phone Policy',
         desc: 'The use of mobile phones during classes and examinations is strictly prohibited. Mobile phones may only be used in emergency situations with prior permission from the administration.',
       },
       {
-        title: '5. Student Vehicle Policy',
+        title: '6. Student Vehicle Policy',
         desc: 'Students are not permitted to drive or bring any motor vehicle (except bicycles) to the institute. In emergency situations, students may bring a motor vehicle only with prior approval from the institute administration through their parent or guardian. If a student needs to bring a motor vehicle on a regular basis, permission will be granted only with prior approval from the institute administration and upon agreeing to comply with the institute\'s rules and regulations.',
       },
       {
-        title: '6. Dress Code & Appearance',
+        title: '7. Dress Code & Appearance',
         desc: 'Students must maintain a neat and respectful appearance suitable for an educational environment. Religious attire and modest accessories are permitted.',
       },
       {
-        title: '7. Institute Property',
+        title: '8. Institute Property',
         desc: 'Students must keep classrooms, desks, chairs, and all institute property clean and in good condition. Any intentional damage to institute property may result in disciplinary action.',
       },
       {
-        title: '8. Student Conduct',
+        title: '9. Student Conduct',
         desc: 'Students are expected to behave respectfully towards teachers, staff, and fellow students while maintaining a positive learning environment.',
       },
       {
-        title: '9. Examination Rules',
+        title: '10. Examination Rules',
         desc: "Cheating or any form of examination misconduct is strictly prohibited during class tests, monthly tests, and model examinations. Looking at another student's answer sheet, exchanging papers, copying answers, bringing notes, books, mobile phones, or any unauthorized materials into an examination is not permitted and may result in disciplinary action.",
       },
       {
-        title: '10. Parent Meetings',
+        title: '11. Parent Meetings',
         desc: 'Parents or guardians are required to attend parent meetings, discussions, and important announcements organized by the institute.',
       },
       {
-        title: '11. Reporting Issues',
+        title: '12. Reporting Issues',
         desc: 'Any academic, institute-related, or student-related concerns should be reported to the administration immediately.',
       },
       {
-        title: '12. Personal Belongings',
+        title: '13. Personal Belongings',
         desc: 'Students are responsible for their personal belongings. The institute is not responsible for any loss or damage to personal items.',
       },
       {
-        title: '13. Parent Communication',
+        title: '14. Parent Communication',
         desc: 'The institute may contact parents or guardians regarding attendance, discipline, academic progress, or fee-related matters whenever necessary.',
       },
       {
-        title: '14. Institute Policies',
+        title: '15. Institute Policies',
         desc: 'Students must comply with all instructions, policies, and decisions issued by the institute management.',
       },
       {
-        title: '15. Institute Reputation & Social Media Responsibility',
+        title: '16. Institute Reputation & Social Media Responsibility',
         desc: 'Students must not engage in any activity, either in person or through social media, that may harm the reputation, discipline, or values of the institute. Any content related to the institute should be shared responsibly and respectfully.',
       },
     ],
@@ -253,7 +291,7 @@ export default function TermsAndConditions() {
                 className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 hover:shadow-md transition-shadow"
               >
                 <h3 className="font-bold text-gray-900 mb-2">{rule.title}</h3>
-                <p className="text-sm text-gray-600 leading-relaxed">{rule.desc}</p>
+                <div className="text-sm text-gray-600 leading-relaxed">{rule.desc}</div>
               </div>
             ))}
           </div>
