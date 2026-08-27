@@ -787,12 +787,12 @@ export default function RegisterSection() {
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Fixed Telephone Number <span className="text-red-500">*</span></label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Parent's or Guardian Mobile No. <span className="text-red-500">*</span></label>
                   <input value={form.guardianFixedTel} onChange={e => set('guardianFixedTel', e.target.value)} placeholder="0XX-XXXXXXX" className={inputCls(errors.guardianFixedTel)} />
                   {errors.guardianFixedTel && <p className="text-red-500 text-xs mt-1">{errors.guardianFixedTel}</p>}
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Mobile <span className="text-red-500">*</span></label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Parent's or Guardian WhatsApp No. <span className="text-red-500">*</span></label>
                   <input value={form.guardianMobile} onChange={e => set('guardianMobile', e.target.value)} placeholder="07X-XXXXXXX" className={inputCls(errors.guardianMobile)} />
                   {errors.guardianMobile && <p className="text-red-500 text-xs mt-1">{errors.guardianMobile}</p>}
                 </div>
