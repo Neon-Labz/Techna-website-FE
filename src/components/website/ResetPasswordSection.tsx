@@ -1,8 +1,10 @@
 'use client';
+
 import { useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { Eye, EyeOff, KeyRound, GraduationCap, CheckCircle } from 'lucide-react';
+import { Eye, EyeOff, KeyRound, CheckCircle } from 'lucide-react';
 
 const API = process.env.NEXT_PUBLIC_SERVER_URL ?? 'http://localhost:4000/api';
 
@@ -65,36 +67,55 @@ export default function ResetPasswordSection() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-950 via-blue-900 to-blue-800 flex items-center justify-center px-4 py-12">
-      <div className="absolute top-20 left-20 w-64 h-64 bg-yellow-400/10 rounded-full blur-3xl pointer-events-none" />
-      <div className="absolute bottom-20 right-20 w-80 h-80 bg-blue-400/10 rounded-full blur-3xl pointer-events-none" />
+    <div
+      className="min-h-screen flex items-center justify-center px-4 py-6 sm:py-8 relative"
+      style={{
+        backgroundImage: "url('/techna-promo.jpg')",
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundRepeat: 'no-repeat',
+      }}
+    >
+      {/* Dark overlay so the white card stays readable over the photo */}
+      <div className="absolute inset-0 bg-black/55" />
 
-      <div className="w-full max-w-md relative">
-        <div className="bg-white rounded-3xl shadow-2xl p-8">
-          <div className="text-center mb-8">
-            <div className="w-16 h-16 bg-gradient-to-br from-blue-900 to-blue-700 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg">
-              <GraduationCap className="w-9 h-9 text-yellow-400" />
-            </div>
-            <h1 className="text-2xl font-bold text-gray-900">Reset Password</h1>
-            <p className="text-gray-500 text-sm mt-1">
-              {emailHint
-                ? <>Enter the 6-digit code sent to <strong>{emailHint}</strong></>
-                : 'Enter the 6-digit code from your email'}
+      <div className="w-full max-w-[480px] sm:max-w-xl relative z-10">
+        <div className="bg-white rounded-3xl shadow-2xl px-4 pb-5 pt-4 sm:px-10 sm:pb-6 sm:pt-5">
+          <div className="flex flex-col items-center">
+            <Image
+              src="/new.png"
+              alt="Techna Logo"
+              width={200}
+              height={200}
+              className="block w-[190px] h-[145px] sm:w-[230px] sm:h-[175px] object-contain -mb-2"
+            />
+            <h1 className="text-xl sm:text-2xl font-extrabold text-slate-800 leading-tight text-center">
+              Reset Password
+            </h1>
+            <p className="text-slate-500 text-xs sm:text-sm font-medium mt-1.5 text-center px-2">
+              {emailHint ? (
+                <>
+                  Enter the 6-digit code sent to{' '}
+                  <span className="font-semibold text-slate-700">{emailHint}</span>
+                </>
+              ) : (
+                'Enter the 6-digit code from your email'
+              )}
             </p>
           </div>
 
           {success ? (
-            <div className="text-center py-4">
-              <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <CheckCircle className="w-9 h-9 text-green-600" />
+            <div className="text-center py-2">
+              <div className="w-14 h-14 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                <CheckCircle className="w-8 h-8 text-green-600" />
               </div>
-              <h2 className="text-lg font-semibold text-gray-900 mb-2">Password Reset!</h2>
-              <p className="text-gray-500 text-sm mb-6">
+              <h2 className="text-lg font-semibold text-gray-900 mb-1.5">Password Reset!</h2>
+              <p className="text-gray-500 text-sm mb-4">
                 Your password has been updated. You can now sign in with your new password.
               </p>
               <button
                 onClick={() => router.push('/login')}
-                className="w-full py-3.5 bg-gradient-to-r from-blue-900 to-blue-700 hover:from-blue-800 hover:to-blue-600 text-white font-semibold rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl"
+                className="w-full flex items-center justify-center gap-2 py-3.5 bg-gradient-to-r from-[#0183CB] to-[#34BFF3] hover:from-[#0175B5] hover:to-[#20AEE5] text-white font-semibold rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl"
               >
                 Go to Sign In
               </button>
@@ -102,12 +123,12 @@ export default function ResetPasswordSection() {
           ) : (
             <>
               {error && (
-                <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl text-sm mb-5">
+                <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-2.5 rounded-xl text-sm mb-3.5 mt-3">
                   {error}
                 </div>
               )}
 
-              <form onSubmit={handleSubmit} className="space-y-5">
+              <form onSubmit={handleSubmit} className="space-y-3 mt-3.5">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1.5">
                     6-Digit Reset Code
@@ -119,7 +140,7 @@ export default function ResetPasswordSection() {
                       inputMode="numeric"
                       maxLength={6}
                       value={token}
-                      onChange={e => setToken(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                      onChange={(e) => setToken(e.target.value.replace(/\D/g, '').slice(0, 6))}
                       placeholder="123456"
                       className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-gray-50 text-gray-900 placeholder-gray-400 tracking-widest font-mono text-center text-lg"
                     />
@@ -134,8 +155,9 @@ export default function ResetPasswordSection() {
                     <input
                       type={showPassword ? 'text' : 'password'}
                       value={newPassword}
-                      onChange={e => setNewPassword(e.target.value)}
+                      onChange={(e) => setNewPassword(e.target.value)}
                       placeholder="At least 8 characters"
+                      autoComplete="new-password"
                       className="w-full pl-4 pr-11 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-gray-50 text-gray-900 placeholder-gray-400"
                     />
                     <button
@@ -143,7 +165,11 @@ export default function ResetPasswordSection() {
                       onClick={() => setShowPassword(!showPassword)}
                       className="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
                     >
-                      {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                      {showPassword ? (
+                        <EyeOff className="w-4 h-4" />
+                      ) : (
+                        <Eye className="w-4 h-4" />
+                      )}
                     </button>
                   </div>
                 </div>
@@ -155,8 +181,9 @@ export default function ResetPasswordSection() {
                   <input
                     type={showPassword ? 'text' : 'password'}
                     value={confirmPassword}
-                    onChange={e => setConfirmPassword(e.target.value)}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
                     placeholder="Repeat your new password"
+                    autoComplete="new-password"
                     className="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-gray-50 text-gray-900 placeholder-gray-400"
                   />
                 </div>
@@ -164,7 +191,7 @@ export default function ResetPasswordSection() {
                 <button
                   type="submit"
                   disabled={loading}
-                  className="w-full flex items-center justify-center gap-2 py-3.5 bg-gradient-to-r from-blue-900 to-blue-700 hover:from-blue-800 hover:to-blue-600 text-white font-semibold rounded-xl transition-all duration-200 disabled:opacity-60 shadow-lg hover:shadow-xl"
+                  className="w-full flex items-center justify-center gap-2 py-3.5 bg-gradient-to-r from-[#0183CB] to-[#34BFF3] hover:from-[#0175B5] hover:to-[#20AEE5] text-white font-semibold rounded-xl transition-all duration-200 disabled:opacity-60 shadow-lg hover:shadow-xl"
                 >
                   {loading ? (
                     <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
@@ -174,15 +201,15 @@ export default function ResetPasswordSection() {
                 </button>
               </form>
 
-              <div className="text-center mt-4">
-                <Link href="/forgot-password" className="text-blue-700 text-sm hover:underline">
+              <div className="text-center mt-3">
+                <Link href="/forgot-password" className="text-blue-700 text-sm font-medium hover:underline">
                   Didn&apos;t receive a code? Resend
                 </Link>
               </div>
             </>
           )}
 
-          <div className="text-center mt-6 pt-6 border-t border-gray-100">
+          <div className="text-center mt-3 pt-3 border-t border-gray-100">
             <p className="text-gray-500 text-sm">
               Remember your password?{' '}
               <Link href="/login" className="text-blue-700 font-semibold hover:underline">
@@ -190,10 +217,19 @@ export default function ResetPasswordSection() {
               </Link>
             </p>
           </div>
+
+          {/* {!success && (
+            <div className="mt-3 p-2 bg-blue-50 rounded-xl text-xs text-blue-700 text-center">
+              Check your inbox for the 6-digit code we sent you
+            </div>
+          )} */}
         </div>
 
-        <div className="text-center mt-6">
-          <Link href="/" className="text-blue-200 text-sm hover:text-white transition-colors">
+        <div className="text-center mt-4">
+          <Link
+            href="/"
+            className="inline-flex items-center gap-1.5 text-white text-sm font-medium bg-black/30 hover:bg-black/45 px-4 py-2 rounded-full backdrop-blur-sm transition-colors"
+          >
             ← Back to Home
           </Link>
         </div>
