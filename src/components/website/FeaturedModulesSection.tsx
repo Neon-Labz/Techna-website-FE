@@ -67,7 +67,7 @@ export default function FeaturedModulesSection() {
                 >
                   {/* Card Top */}
                   <div
-                    className="p-5 sm:p-6 relative overflow-hidden"
+                    className="p-5 sm:p-6 relative overflow-hidden h-full"
                     style={{
                       background: 'linear-gradient(135deg, #34BFF3 0%, #1a9fd4 60%, #0e7ab5 100%)',
                     }}

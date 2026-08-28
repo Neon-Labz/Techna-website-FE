@@ -56,7 +56,7 @@ export const subjectUnitsByName: Record<string, SubjectUnitDetail[]> = {
     { term: 'மூன்றாம் தவணை', grade: '13', unitNo: 'அலகு24', title: 'இணையமும் தொடர்பாடலும்' },
     { term: 'மூன்றாம் தவணை', grade: '13', unitNo: 'அலகு25', title: 'தொழினுட்ப முன்னேற்றமும் சூழற்சமநிலையும்' },
   ],
-  'information & communication technology': [
+  'information & communication technology (ict)': [
     { term: 'பாடத்திட்டம்', unitNo: 'அலகு1', title: 'தகவல் மற்றும் தொடர்பாடல் தொழினுட்ப எண்ணக்கரு (28 பாடவேளைகள்)' },
     { term: 'பாடத்திட்டம்', unitNo: 'அலகு2', title: 'கணினி அறிமுகம் (22 பாடவேளைகள்)' },
     { term: 'பாடத்திட்டம்', unitNo: 'அலகு3', title: 'தரவு பிரதிநிதித்துவம் (18 பாடவேளைகள்)' },

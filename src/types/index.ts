@@ -82,6 +82,7 @@ export interface Module {
   recordings?: LectureVideo[];
   lectureRecordings?: LectureVideo[];
   status?: string;
+  batch?: string;
 }
 
 export interface LectureVideo {
@@ -102,6 +103,7 @@ export interface LectureVideo {
   isPublished?: boolean | string;
   published?: boolean | string;
   status?: string;
+  batch?: string;
 }
 
 export interface Notice {

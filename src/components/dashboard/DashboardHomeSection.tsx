@@ -64,6 +64,7 @@ type Video = {
   isPublished?: boolean | string;
   published?: boolean | string;
   status?: string;
+  batch?: string;
 };
 
 type Module = {
@@ -376,19 +377,23 @@ export default function DashboardHomeSection() {
           ...video,
           moduleId: video.moduleId || moduleKey(m),
           moduleName: video.moduleName || m.name,
+          batch: video.batch || m.batch,
         }))
     );
   }, [modules]);
 
   const studentModules = selectedModules;
 
+  const studentBatch = normalizeText(student?.batch);
   const filteredVideos =
     activeModule === 'all'
       ? allVideos.filter((v) =>
+          normalizeText(v.batch) === studentBatch &&
           isSelectedModuleContent(v.moduleId, v.moduleName)
         )
       : allVideos.filter(
           (v) =>
+            normalizeText(v.batch) === studentBatch &&
             isSelectedModuleContent(v.moduleId, v.moduleName) &&
             (normalizeText(v.moduleId) === normalizeText(activeModule) ||
               normalizeText(v.moduleName) === normalizeText(activeModule))
